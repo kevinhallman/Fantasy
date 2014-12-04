@@ -1,0 +1,154 @@
+$def with (teamMeets,scores,fail,team1,team2,teamScores)
+<style>
+h1 {
+	border-bottom: solid orange;
+	padding: 10px;
+}
+select {
+	padding: 1px;
+	font-size: 12;
+}
+option {
+	font-size: 12;
+}
+input {
+	font-size: 20;
+	padding: 3px;
+	border-radius: 10px;
+}
+#scoreTable {
+	float:left;
+	size:1500px;
+}
+#report {
+	float:left;
+	size:1000px;
+	padding-left:20px
+}
+</style>
+
+<h1>Choose who to swim! (D3 Men Only)</h1>
+
+<script type="text/javascript">
+	var dict = new Object()
+	$for team in teamMeets:
+		dict["$team"]=[]
+		$for meet in teamMeets[team]:
+			dict["$team"].push("$meet")
+			
+	function getMeets (form,name) {
+		if (name == "team1") {
+			var team1 = form.team1.value;
+			var meet1list = form.meet1;
+			meet1list.innerHTML = "";
+			meet1list.options[0]= new Option("Create Lineup","Create Lineup");
+			for (i in dict[team1]) {
+				var option = document.createElement("option");
+				option.text = dict[team1][i];
+				option.value = dict[team1][i];
+				meet1list.appendChild(option);
+			}
+		}
+		
+		if (name == "team2") {
+			var team2 = form.team2.value;
+			var meet2list = form.meet2;
+			meet2list.innerHTML = "";
+			meet2list.options[0]= new Option("Create Lineup","Create Lineup");
+			for (i in dict[team2]) {
+				var option = document.createElement("option");
+				option.text = dict[team2][i];
+				option.value = dict[team2][i];
+				meet2list.appendChild(option);
+			}
+		}
+}
+</script>
+$ teams = teamMeets.keys()
+$ teams.sort()
+<form name=form1 action="/swimulate" method="POST">
+	Team: <select type="text" name="team1" onchange="getMeets(this.form,this.name)">
+		<option></option>
+		$for name in teams:
+			$if name==team1: <option selected="selected">$name</option>
+			$else: <option>$name</option>
+	</select>
+	</br>
+	Meet: <select type="text" name="meet1"></select>	</br>
+	</br>
+	Team: <select type="text" name="team2" onchange="getMeets(this.form,this.name)"> 
+		<option></option>
+		$for name in teams:
+			$if name==team2: <option selected="selected">$name</option>
+			$else: <option>$name</option>
+	</select>
+	</br>
+	Meet: <select type="text" name="meet2"></select>	</br>
+	<p><input type="submit" value="Swimulate"></p>
+</form>
+
+
+<style>
+h2 {
+	background: CornflowerBlue;
+	border-width: 20px
+	border-radius: 20px
+}
+table, th, td {
+    border: 0px solid black;
+    border-collapse: collapse;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+th {
+	padding-head: 5px;
+    border-style: solid;
+    border-bottom: solid black;
+}
+</style>
+
+
+<div id="scoreTable">
+$if fail:
+	$if fail !=True:$fail
+$else:
+	<h2 align="center">
+		Simulated Results
+	</h2>
+	<table>
+	$for event in scores:
+		$if event == 'scores': $continue
+		<tr>
+		<th align="left" colspan=7> $event </th>
+		</tr>
+		$for swim in scores[event]:
+			<tr>
+			$for part in swim:
+				<td>$part</td>
+			</tr>
+	</table>
+	</br>
+	<table>
+	<tr>
+	<th>Final Scores</th>
+	</tr>
+	$for swim in scores['scores']:
+		<tr>
+		$for part in swim:
+			<td>$part</td>
+		</tr>
+	</table>
+</div>
+
+$if teamScores:
+	<div id="report">
+		<h2 align="center">	Score Report </h2>
+		<table>
+		$for team in teamScores:
+			<tr> <th>$team</th> </tr>
+			$for name in teamScores[team]:
+				<tr>
+				<td>$name[0]</td> <td>$name[1]</td>
+				</tr>
+		</table>
+	</div>

@@ -1,0 +1,65 @@
+$def with (teamMeets,hello)
+<h1>Choose who to swim!</h1>
+
+<script type="text/javascript">
+	var dict = new Object()
+	$for team in teamMeets:
+		dict["$team"]=[]
+		$for meet in teamMeets[team]
+			dict["$team"][dict["$team"].length]="$meet"
+	function getMeets (form,name) {
+		if (name == "team1") {
+			var team1 = form.team1.value;
+			var meet1list = form.meet1;
+			meet1list.innerHTML = "";
+			var newOption = document.createElement("option");
+			newOption.value = "Create Lineup";
+			newOption.text = "Create Lineup";
+			meet1list.add(newOption);
+			for (i in dict[team1]) {
+				var newOption = document.createElement("option");
+				newOption.value = dict[team1][i];
+				newOption.text = dict[team1][i];
+				meet1list.add(newOption);
+			}
+		}
+		if (name == "team2") {
+			var team2 = form.team2.value;
+			var meet2list = form.meet2;
+			meet2list.innerHTML = "";
+			var newOption = document.createElement("option");
+			newOption.value = "Create Lineup";
+			newOption.text = "Create Lineup";
+			meet2list.add(newOption);
+			for (i in dict[team2]) {
+				var newOption = document.createElement("option");
+				newOption.value = dict[team2][i];
+				newOption.text = dict[team2][i];
+				meet2list.add(newOption);
+			}
+		}
+		return team1;
+}
+</script>
+$ teams = teamMeets.keys()
+$ teams.sort()
+<form name=form1 action="/hello" method="POST">
+	<select type="text" name="team1" onchange="getMeets(this.form,this.name)">
+		<option></option>
+		$for name in teams:
+			<option>$name</option>
+	</select>
+	</br>
+	<select type="text" name="meet1"></select>
+	</br>
+	</br>
+	<select type="text" name="team2" onchange="getMeets(this.form,this.name)"> 
+		<option></option>
+		$for name in teams:
+			<option>$name</option>
+	</select>
+	</br>
+	<select type="text" name="meet2"></select>
+	</br>
+	<p><input type="submit" value="Swimulate"></p>
+</form>

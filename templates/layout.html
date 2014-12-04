@@ -1,0 +1,43 @@
+$def with (content)
+
+<html>
+<head>
+	<style>
+	ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 10;
+		overflow: hidden;
+	}
+	li {
+    	float: left;
+	}
+	a:link, a:visited {
+		display: block;
+		#width: 120px;
+		font-weight: bold;
+		color: #FFFFFF;
+		background-color: #98bf21;
+		text-align: center;
+		padding: 4px;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+	a:hover, a:active {
+		background-color: #7A991A;
+	}
+	</style>
+    <title>Swims</title>
+</head>
+<body>
+<ul>
+  <li><a href="/fantasy">Fantasy</a></li>
+  <li><a href="/times">Top Times</a></li>
+  <li><a href="/conference">Conference</a></li>
+  <li><a href="/swimulate">Head to Head</a></li>
+</ul>
+
+$:content
+
+</body>
+</html>

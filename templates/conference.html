@@ -1,0 +1,84 @@
+$def with (conferences,scores,teamScores)
+<h1>
+Conference Meets (4% flat taper)
+</h1>
+
+<style>
+h2 {
+	background: CornflowerBlue;
+	border-width: 20px
+	border-radius: 20px
+}
+table, th, td {
+    border: 0px solid black;
+    border-collapse: collapse;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+th {
+	padding-head: 5px;
+    border-style: solid;
+    border-bottom: solid black;
+}
+#scoreTable {
+	float:left;
+	size:1500px;
+}
+#report {
+	float:left;
+	size:1000px;
+	padding-left:20px
+}
+</style>
+
+<form name=confForm action="/conference" method="GET">
+	Conference: <select type="text" name="conference">
+		<option>Nationals</option>
+		$for name in conferences:
+			<option>$name</option>
+	<p><input type="submit" value="Swimulate"></p>
+</form>
+
+<div id="scoreTable">
+$if scores:
+	<h2 align="center">
+	Simulated Results
+	</h2>
+	<table>
+	$for event in scores:
+		$if event == 'scores': $continue
+		<tr>
+		<th align="left" colspan=7> $event </th>
+		</tr>
+		$for swim in scores[event]:
+			<tr>
+			$for part in swim:
+				<td>$part</td>
+			</tr>
+	</table>
+	</br>
+	<table>
+	<tr>
+	<th>Final Scores</th>
+	</tr>
+	$for swim in scores['scores']:
+		<tr>
+		$for part in swim:
+			<td>$part</td>
+		</tr>
+	</table>
+</div>
+	
+$if teamScores:
+	<div id="report">
+		<h2 align="center">	Score Report </h2>
+		<table>
+		$for team in teamScores:
+			<tr> <th>$team</th> </tr>
+			$for name in teamScores[team]:
+				$if name[1]!=0:
+					<tr>
+					<td>$name[0]</td> <td>$name[1]</td>
+					</tr>
+		</table>
+	</div>
