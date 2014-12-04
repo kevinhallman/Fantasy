@@ -14,7 +14,7 @@ app = web.application(urls, globals())
 
 render = web.template.render('templates/', base="layout")
 
-meets.start(file='./bin/D3_15_11-24',gender='Women')
+meets.start(file='./bin/D3_15_11-24',gender='Men')
 database=meets.database
 
 
