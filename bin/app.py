@@ -97,5 +97,4 @@ class Times(object):
 		return render.times()
 
 if __name__ == "__main__":
-	port = int(os.environ.get('PORT', 8080))
-	app.run(port=port)
+	app.run()
