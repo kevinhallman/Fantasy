@@ -1,0 +1,31 @@
+$def with (wins,losses,teams,meet,conferences)
+<style>
+#records {
+	#float:left;
+	#size:100px;
+}
+#meets {
+	float:left;
+	size:1000px;
+}
+</style>
+<div id="records">
+<h1>
+Dual Meet Records
+</h1>
+
+<form name=confForm action="/topDuals" method="GET">
+	Conference: <select type="text" name="conference">
+		<option>All Teams</option>
+		$for name in conferences:
+			<option>$name</option>
+	<input type="submit" value="Swimulate">
+</form>
+
+$if teams:
+	<table>
+	<tr> <th>Team</th> <th>Record</th> <th>Top Dual Meet</th> </tr>
+	$for num,team in enumerate(teams):
+		<tr> <td>$(num+1): $team[0]</td> <td>$team[1]-$losses[team[0]]</td> <td>$meet[team[0]]</td> </tr>
+	</table>
+</div>

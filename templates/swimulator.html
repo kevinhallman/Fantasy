@@ -1,21 +1,5 @@
 $def with (teamMeets,scores,fail,team1,team2,teamScores)
 <style>
-h1 {
-	border-bottom: solid orange;
-	padding: 10px;
-}
-select {
-	padding: 1px;
-	font-size: 12;
-}
-option {
-	font-size: 12;
-}
-input {
-	font-size: 20;
-	padding: 3px;
-	border-radius: 10px;
-}
 #scoreTable {
 	float:left;
 	size:1500px;
@@ -34,7 +18,7 @@ input {
 	$for team in teamMeets:
 		dict["$team"]=[]
 		$for meet in teamMeets[team]:
-			dict["$team"].push("$meet")
+			dict["$team"].push("$:meet")
 			
 	function getMeets (form,name) {
 		if (name == "team1") {
@@ -88,56 +72,11 @@ $ teams.sort()
 </form>
 
 
-<style>
-h2 {
-	background: CornflowerBlue;
-	border-width: 20px
-	border-radius: 20px
-}
-table, th, td {
-    border: 0px solid black;
-    border-collapse: collapse;
-    padding-right: 10px;
-    padding-left: 10px;
-}
-th {
-	padding-head: 5px;
-    border-style: solid;
-    border-bottom: solid black;
-}
-</style>
-
-
 <div id="scoreTable">
 $if fail:
 	$if fail !=True:$fail
 $else:
-	<h2 align="center">
-		Simulated Results
-	</h2>
-	<table>
-	$for event in scores:
-		$if event == 'scores': $continue
-		<tr>
-		<th align="left" colspan=7> $event </th>
-		</tr>
-		$for swim in scores[event]:
-			<tr>
-			$for part in swim:
-				<td>$part</td>
-			</tr>
-	</table>
-	</br>
-	<table>
-	<tr>
-	<th>Final Scores</th>
-	</tr>
-	$for swim in scores['scores']:
-		<tr>
-		$for part in swim:
-			<td>$part</td>
-		</tr>
-	</table>
+	$:scores
 </div>
 
 $if teamScores:

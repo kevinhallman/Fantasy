@@ -1,6 +1,8 @@
 import web
 import meets
 import os
+import operator
+import re
 
 urls = (
   '/', 'Swim',
@@ -8,6 +10,7 @@ urls = (
   '/fantasy','Fantasy',
   '/conference','Conf',
   '/times','Times',
+  '/topDuals','Duals',
 )
 
 app = web.application(urls, globals())
@@ -16,16 +19,20 @@ render = web.template.render('templates/', base="layout")
 
 meets.start(file='./bin/D3_15_11-24',gender='Men')
 database=meets.database
-
+topDuals = {}
 
 teamMeets = {}
 for team in database.teams:
 	teamMeets[team]=[]
 	for season in database.teams[team].meets:
 		for meet in database.teams[team].meets[season]:
+			meet = re.sub('\"','\\\\\"',meet)
 			teamMeets[team].append(meet)
 
+
 conferences = database.conferences
+confList = conferences.keys()
+confList.sort()
 
 class Swim(object):
 	def GET(self):
@@ -65,8 +72,9 @@ class Swim(object):
 				scores = newMeet.scoreString(showNum=6)
 				teamScores = newMeet.scoreReport(printout=False)
 				fail = False
-			print team1,team2
-			return render.swimulator(teamMeets = teamMeets,scores = scores,fail = fail,team1=team1,team2=team2,teamScores=teamScores)
+			else:
+				teamScores = None
+			return render.swimulator(teamMeets = teamMeets,scores = showMeet(scores),fail = fail,team1=team1,team2=team2,teamScores=teamScores)
 
 class Fantasy(object):
 	def GET(self):
@@ -88,13 +96,64 @@ class Conf(object):
 		else:
 			scores = None
 			teamScores = None
-		confList = conferences.keys()
-		confList.sort()
-		return render.conference(conferences=confList,scores = scores,teamScores = teamScores)
+		return render.conference(conferences=confList,scores = showMeet(scores),teamScores = teamScores)
 		
 class Times(object):
 	def GET(self):
 		return render.times()
+
+class Duals(object):
+	def GET(self):
+		form = web.input(conference=None)
+		confName = form.conference
+		
+		if confName:
+			#cache
+			global topDuals
+			if not confName in topDuals:
+				if confName in database.conferences:
+					teams = database.conferences[confName].teams
+				else:
+					teams = 'all'
+				topDuals[confName] = database.topDual(printout=False,teams = teams) #results,meets,wins,losses
+			
+			wins = topDuals[confName][2]
+			losses = topDuals[confName][3]
+			teams = sorted(wins.items(),key=operator.itemgetter(1),reverse=True)
+			meet = topDuals[confName][1]
+		else:
+			wins = None
+			losses = None
+			teams = None
+			meet = None
+		
+		return render.duals(wins = wins,losses = losses,teams = teams,meet = meet,conferences = confList)
+		
+#HTML generators
+
+def showMeet(scores):
+	if scores == None: return None
+	html='<h2 align="center">Simulated Results</h2>'
+	
+	html += '<table>	<tr>	<th>Final Scores</th>	</tr>'
+	for swim in scores['scores']:
+		html += '<tr>'
+		for part in swim:
+			html += '<td>'+str(part)+'</td>'
+		html += '</tr>'
+	html += '</table>'
+	
+	html+='<table>'
+	for event in scores:
+		if event == 'scores': continue
+		html += '<tr><th align="left" colspan=7>'+event+'</th></tr>'
+		for swim in scores[event]:
+			html += '<tr>'
+			for part in swim:
+				html += '<td>'+str(part)+'</td>'
+			html += '</tr>'
+	html += '</table></br>'
+	return html
 
 if __name__ == "__main__":
 	app.run()

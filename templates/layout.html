@@ -3,25 +3,57 @@ $def with (content)
 <html>
 <head>
 	<style>
+	h1 {
+		border-bottom: solid CornflowerBlue;
+		padding: 10px;
+	}
+	h2 {
+		background: CornflowerBlue;
+		border-width: 20px
+		border-radius: 20px
+	}
+	body {
+		padding-left:50px;
+		padding-right:50px;
+	}
+	table, th, td {
+    	border: 0px solid black;
+    	border-collapse: collapse;
+    	padding-right: 10px;
+    	padding-left: 10px;
+	}
+	th {
+		padding: 5px;
+    	border-style: solid;
+    	border-bottom: solid black;
+	}
 	ul {
 		list-style-type: none;
 		margin: 0;
 		padding: 10;
 		overflow: hidden;
 	}
-	li {
+	select,form,input {
+		font-size: 20;
+	}
+	input {
+		border-radius: 10px;
+	}
+	#header {
     	float: left;
 	}
 	a:link, a:visited {
 		display: block;
-		#width: 120px;
+		#width: 175px;
 		font-weight: bold;
 		color: #FFFFFF;
 		background-color: #98bf21;
 		text-align: center;
-		padding: 4px;
+		padding: 8px;
 		text-decoration: none;
 		text-transform: uppercase;
+		border-left-style:solid;
+		#border-color:black;
 	}
 	a:hover, a:active {
 		background-color: #7A991A;
@@ -31,10 +63,11 @@ $def with (content)
 </head>
 <body>
 <ul>
-  <li><a href="/fantasy">Fantasy</a></li>
-  <li><a href="/times">Top Times</a></li>
-  <li><a href="/conference">Conference</a></li>
-  <li><a href="/swimulate">Head to Head</a></li>
+	<li><a href="/conference" id="header">Conference</a></li>
+	<li><a href="/swimulate" id="header">Head to Head</a></li>
+	<li><a href="/topDuals" id="header">Dual Meet Ranking</a></li>
+	<li><a href="/fantasy" id="header">Fantasy</a></li>
+	<li><a href="/times" id="header">Top Times</a></li>
 </ul>
 
 $:content
