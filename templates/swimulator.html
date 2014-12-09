@@ -1,15 +1,4 @@
-$def with (teamMeets,scores,fail,team1,team2,teamScores)
-<style>
-#scoreTable {
-	float:left;
-	size:1500px;
-}
-#report {
-	float:left;
-	size:1000px;
-	padding-left:20px
-}
-</style>
+$def with (teamMeets,scores,fail,team1,team2,teamScores,finalScores)
 
 <h1>Choose who to swim! (D3 Men Only)</h1>
 
@@ -50,7 +39,7 @@ $def with (teamMeets,scores,fail,team1,team2,teamScores)
 </script>
 $ teams = teamMeets.keys()
 $ teams.sort()
-<form name=form1 action="/swimulate" method="POST">
+<form name=form1 action="/swimulate" method="GET">
 	Team: <select type="text" name="team1" onchange="getMeets(this.form,this.name)">
 		<option></option>
 		$for name in teams:
@@ -79,15 +68,12 @@ $else:
 	$:scores
 </div>
 
+<div id="report">
 $if teamScores:
-	<div id="report">
-		<h2 align="center">	Score Report </h2>
-		<table>
-		$for team in teamScores:
-			<tr> <th>$team</th> </tr>
-			$for name in teamScores[team]:
-				<tr>
-				<td>$name[0]</td> <td>$name[1]</td>
-				</tr>
-		</table>
-	</div>
+	$:teamScores
+</div>
+
+<div id="finalScores">
+$if finalScores:
+	$:finalScores
+</div>

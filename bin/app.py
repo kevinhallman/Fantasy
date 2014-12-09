@@ -4,6 +4,8 @@ import os
 import operator
 import re
 
+eventOrder=["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle",'500 Yard Freestyle','1000 Yard Freestyle',"1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","1 mtr Diving","3 mtr Diving"]
+
 urls = (
   '/', 'Swim',
   '/swimulate','Swim',
@@ -36,12 +38,10 @@ confList.sort()
 
 class Swim(object):
 	def GET(self):
-		return render.swimulator(teamMeets,scores=None,fail=True,team1=None,team2=None,teamScores=None)
-
-	def POST(self):
-		form = web.input()
+		form = web.input(team1='',team2='')
 		if form.team1=='' or form.team2=='':
-			return render.swimulator(teamMeets,scores=None,fail=True,team1=None,team2=None,teamScores=None)
+			return render.swimulator(teamMeets,scores=None,fail=True,team1=None,team2=None,teamScores=None,finalScores=None)
+		
 		else:
 			team1 = database.teams[form.team1]
 			team2 = database.teams[form.team2]
@@ -74,7 +74,7 @@ class Swim(object):
 				fail = False
 			else:
 				teamScores = None
-			return render.swimulator(teamMeets = teamMeets,scores = showMeet(scores),fail = fail,team1=team1,team2=team2,teamScores=teamScores)
+			return render.swimulator(teamMeets = teamMeets,scores = showMeet(scores),fail = fail,team1=team1,team2=team2,teamScores=showTeamScores(teamScores),finalScores=showScores(scores))
 
 class Fantasy(object):
 	def GET(self):
@@ -96,7 +96,7 @@ class Conf(object):
 		else:
 			scores = None
 			teamScores = None
-		return render.conference(conferences=confList,scores = showMeet(scores),teamScores = teamScores)
+		return render.conference(conferences=confList,scores = showMeet(scores),teamScores = showTeamScores(teamScores),finalScores=showScores(scores))
 		
 class Times(object):
 	def GET(self):
@@ -135,17 +135,9 @@ def showMeet(scores):
 	if scores == None: return None
 	html='<h2 align="center">Simulated Results</h2>'
 	
-	html += '<table>	<tr>	<th>Final Scores</th>	</tr>'
-	for swim in scores['scores']:
-		html += '<tr>'
-		for part in swim:
-			html += '<td>'+str(part)+'</td>'
-		html += '</tr>'
-	html += '</table>'
-	
 	html+='<table>'
-	for event in scores:
-		if event == 'scores': continue
+	for event in eventOrder:
+		if not event in scores: continue
 		html += '<tr><th align="left" colspan=7>'+event+'</th></tr>'
 		for swim in scores[event]:
 			html += '<tr>'
@@ -155,5 +147,31 @@ def showMeet(scores):
 	html += '</table></br>'
 	return html
 
+def showScores(scores):
+	if scores == None: return None
+	html ='<h2 align="center">	Final Scores </h2>'
+	html += '<table>'
+	for swim in scores['scores']:
+		html += '<tr>'
+		for part in swim:
+			html += '<td>'+str(part)+'</td>'
+		html += '</tr>'
+	html += '</table>'
+	return html
+	
+def showTeamScores(teamScores):
+	if teamScores == None: return None
+	html = 	'<h2 align="center">	Score Report </h2>'
+	html += '<table>'
+	for team in teamScores:
+		html += '<tr> <th>'+team+'</th> </tr>'
+		for name in teamScores[team]:
+			if name[0] == 'Total': continue
+			html += '<tr>'
+			html += '<td>'+name[0]+'</td> <td>'+str(name[1])+'</td>'
+			html += '</tr>'
+	html += '</table>'
+	return html
+	
 if __name__ == "__main__":
 	app.run()
