@@ -120,14 +120,16 @@ class Duals(object):
 			wins = topDuals[confName][2]
 			losses = topDuals[confName][3]
 			teams = sorted(wins.items(),key=operator.itemgetter(1),reverse=True)
-			meet = topDuals[confName][1]
+			meets = topDuals[confName][1]
+			for team in meets:
+				meets[team] = str(meets[team])
 		else:
 			wins = None
 			losses = None
 			teams = None
-			meet = None
+			meets = None
 		
-		return render.duals(wins = wins,losses = losses,teams = teams,meet = meet,conferences = confList)
+		return render.duals(wins = wins,losses = losses,teams = teams,meet = meets,conferences = confList)
 		
 #HTML generators
 
