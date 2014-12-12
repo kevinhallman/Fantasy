@@ -85,7 +85,7 @@ class Swim(object):
 					else:
 						createLinup = True
 					teamsMeets[num][1]='Create Lineup'
-				else:
+				elif form[key]:
 					teamsMeets[num][1]=database.meets[form[key]]
 		
 		if exit: return render.swimulator(teamMeets,scores=None,teamScores=None,finalScores=None)	
