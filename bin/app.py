@@ -16,7 +16,7 @@ urls = (
   
 )
 
-#web.config.debug = False
+web.config.debug = False
 
 meets.start(file='./bin/D3_15_12-8',gender='Men')
 databaseMen = meets.database
