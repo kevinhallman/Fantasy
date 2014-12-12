@@ -1,0 +1,35 @@
+$def with (gender,division)
+
+<h1>
+Welcome!
+</h1>
+<p>
+The current gender is $gender. The division is $division.
+</p>
+
+<form>
+Gender:
+$if gender=='women': 
+	<input type="radio" name="gender" value="women" checked>Women
+	<input type="radio" name="gender" value="men">Men
+$else:
+	<input type="radio" name="gender" value="women">Women
+	<input type="radio" name="gender" value="men" checked>Men
+
+<br>
+Division:
+$if division=='D1':
+	<input type="radio" name="division" value="D1" checked>D1
+	<input type="radio" name="division" value="D2">D2
+	<input type="radio" name="division" value="D3">D3
+$elif division=='D2':
+	<input type="radio" name="division" value="D1">D1
+	<input type="radio" name="division" value="D2" checked>D2
+	<input type="radio" name="division" value="D3">D3
+$elif division=='D3':
+	<input type="radio" name="division" value="D1">D1
+	<input type="radio" name="division" value="D2">D2
+	<input type="radio" name="division" value="D3" checked>D3
+<br>
+<input type="submit" value="Save">
+</form>

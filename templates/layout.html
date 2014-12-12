@@ -33,18 +33,15 @@ $def with (content)
 		padding: 10;
 		overflow: hidden;
 	}
-	select,form,input {
+	select,form,input,button {
 		font-size: 20;
 	}
-	input {
+	input,button {
 		border-radius: 10px;
 	}
 	#header {
     	float: left;
-	}
-	a:link, a:visited {
 		display: block;
-		#width: 175px;
 		font-weight: bold;
 		color: #FFFFFF;
 		background-color: #98bf21;
@@ -53,25 +50,70 @@ $def with (content)
 		text-decoration: none;
 		text-transform: uppercase;
 		border-left-style:solid;
-		#border-color:black;
+		cursor: pointer;
 	}
-	a:hover, a:active {
+	a:link, a:visited {
+	}
+	#header:hover, #header:active {
 		background-color: #7A991A;
 	}
 	div { float:left; 	padding-left:20px }
 	#scoreTable { size:1500px; }
 	#report { size:1000px; }
 	#finalScores { size:1000px;}
+	.hidden { display:none}
 	</style>
     <title>Swims</title>
+
+	<script>
+	function summaryType(option) {
+		var newSummary = document.getElementById(option.value.toString());
+		newSummary.setAttribute("class","visible");
+		var summaries = ["event","swimmer","year"]
+		for (i in summaries) {
+			if (summaries[i] != option.value.toString()) {
+				var oldSummary = document.getElementById(summaries[i]);
+				oldSummary.setAttribute("class","hidden");
+			}
+		}
+	}
+	/*		
+	function goHere (value) {
+		var urls = ["conference","swimulate","duals","times","women","men"];
+		target = urls[value-1];
+		var pattern = /(http:\/\/[^\/]*)\/?(men|women)?\/?(.*)?/;
+		var result = pattern.exec(location.href);
+		if (result[2] == undefined){ 
+			result[2] = "men";
+		}
+		
+		if (value==7) {
+			location.href = result[1] + '/' + result[2];
+		}
+		
+		else if (result != null) {
+			if (target=="men" || target=="women") {
+				if (result[3] == undefined) {
+					location.href = result[1] + '/' + target;
+				}
+				else {
+					location.href = result[1] + '/' + target + '/' + result[3];
+				}
+			}
+			else {
+				location.href = result[1] + '/' + result[2] + '/' + target;
+			}
+		}
+	}*/
+	</script>
 </head>
 <body>
 <ul>
-	<li><a href="/conference" id="header">Conference</a></li>
-	<li><a href="/swimulate" id="header">Head to Head</a></li>
-	<li><a href="/topDuals" id="header">Dual Meet Ranking</a></li>
-	<li><a href="/fantasy" id="header">Fantasy</a></li>
-	<li><a href="/times" id="header">Top Times</a></li>
+	<li value=1 ><a id="header" href="/">Home</a></li>
+	<li value=2 ><a id="header" href="/conference">Conference</a> </li>
+	<li value=3 ><a id="header" href="/swimulate">Head to Head</a></li>
+	<li value=4 ><a id="header" href="/duals">Dual Meet Ranking</a></li>
+	<li value=5 ><a id="header" href="/times">Top Times</a></li>
 </ul>
 
 $:content
