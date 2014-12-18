@@ -1,7 +1,28 @@
+$def with(conferences,events,scores)
+
 <h1>
 Top Times
-</h2>
+</h1>
 
-<p>
-Under Construction
-</p>
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		<option>All</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+
+	<br>
+	Event: <select name="event">
+		<option>All</option>
+		$for event in events:
+			<option>$event</option>
+	</select>
+
+	<br>
+	<input type="submit" value="Get Top Times">
+</form>
+
+<div id="scoreTable">
+$if scores:
+	$:scores
+</div>

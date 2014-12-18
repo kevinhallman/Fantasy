@@ -1,13 +1,20 @@
 $def with (conferences,scores,teamScores,finalScores)
 <h1>
-Conference Meets (4% flat taper)
+Taper Meet
 </h1>
 
 <form name=confForm method="GET">
-	Conference: <select type="text" name="conference">
+	Conference: <select name="conference">
 		<option>Nationals</option>
 		$for name in conferences:
 			<option>$name</option>
+	</select>
+	<br>
+	Taper Method: <select name="taper">
+	<option>Top Time</option>
+	<option>Median Time</option>
+	</select>
+	<br>
 	<input type="submit" value="Swimulate">
 </form>
 

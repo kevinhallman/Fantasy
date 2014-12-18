@@ -7,11 +7,6 @@ Welcome!
 The current gender is $gender. The division is $division.
 </p>
 
-<style>
-	#divisions {display:none}
-</style>
-
-
 <form>
 Gender:
 $if gender=='women': 
@@ -20,9 +15,7 @@ $if gender=='women':
 $else:
 	<input type="radio" name="gender" value="women">Women
 	<input type="radio" name="gender" value="men" checked>Men
-
 <br>
-<div id="divisions">
 Division:
 $if division=='D1':
 	<input type="radio" name="division" value="D1" checked>D1
@@ -36,7 +29,6 @@ $elif division=='D3':
 	<input type="radio" name="division" value="D1">D1
 	<input type="radio" name="division" value="D2">D2
 	<input type="radio" name="division" value="D3" checked>D3
-</div>
 <br>
 <input type="submit" value="Save">
 </form>

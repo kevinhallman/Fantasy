@@ -1,6 +1,6 @@
 $def with (teamMeets,scores,teamScores,finalScores)
 
-<h1>Choose who to swim! (D3 Men Only)</h1>
+<h1>Head to Head Competition</h1>
 
 <script type="text/javascript">
 	var dict = new Object();
@@ -58,22 +58,22 @@ $ teams = teamMeets.keys()
 $ teams.sort()
 <form name=form1 method="GET">
 	<button type="button" onclick="addTeam(this.form);">Add New Team</button>
-	</br> </br>
-	Team: <select type="text" name="team1" onchange="getMeets(this.form,this.name)">
+	<br> <br>
+	Team: <select name="team1" onchange="getMeets(this.form,this.name)">
 		<option></option>
 		$for name in teams:
 			<option>$:name</option>
 	</select>
-	</br>
-	Meet: <select type="text" name="meet1"></select>	</br>
-	</br>
-	Team: <select type="text" name="team2" onchange="getMeets(this.form,this.name)"> 
+	<br>
+	Meet: <select name="meet1"></select>
+	<br>
+	Team: <select name="team2" onchange="getMeets(this.form,this.name)">
 		<option></option>
 		$for name in teams:
 			<option>$:name</option>
 	</select>
-	</br>
-	Meet: <select type="text" name="meet2"></select>	</br>
+	<br>
+	Meet: <select name="meet2"></select>	<br>
 	<input id="swim" type="submit" value="Swimulate">
 </form>
 

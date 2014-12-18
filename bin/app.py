@@ -3,33 +3,43 @@ import meets
 import os
 import operator
 import re
+eventOrder=["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","1 mtr Diving","3 mtr Diving"]
 
-eventOrder=["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle",'500 Yard Freestyle','1000 Yard Freestyle',"1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","1 mtr Diving","3 mtr Diving"]
-
-urls = (
-  '/', 'Home',
-  '/swimulate','Swim',
-  '/fantasy','Fantasy',
-  '/conference','Conf',
-  '/times','Times',
-  '/duals','Duals',
-  
+urls = ('/', 'Home',
+	'/swimulate', 'Swim',
+	'/fantasy', 'Fantasy',
+	'/conference', 'Conf',
+	'/times', 'Times',
+	'/duals', 'Duals',
 )
 
 web.config.debug = False
 
-meets.start(file='./bin/D3_15_12-8',gender='Men')
-databaseMen = meets.database
+meets.start(file='./bin/D3_15_12-12',gender='Men')
+databaseMenD3 = meets.database
 
-meets.start(file='./bin/D3_15_12-8',gender='Women')
-databaseWomen = meets.database
+meets.start(file='./bin/D3_15_12-12',gender='Women')
+databaseWomenD3 = meets.database
 
-topDuals = {'men':{},'women':{}}
+meets.start(file='./bin/D2_15_12-15',gender='Men')
+databaseMenD2 = meets.database
+
+meets.start(file='./bin/D2_15_12-15',gender='Women')
+databaseWomenD2 = meets.database
+
+meets.start(file='./bin/D1_15_12-12',gender='Men')
+databaseMenD1 = meets.database
+
+meets.start(file='./bin/D1_15_12-12',gender='Women')
+databaseWomenD1 = meets.database
+
+topDuals = {'men': {}, 'women': {}}
 gender = 'men'
 division = 'D3'
 
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="layout")
+
 
 def getTeamMeets(database):
 	teamMeets = {}
@@ -47,6 +57,23 @@ def getConfList(database):
 	confList.sort()
 	return confList
 
+def getDatabase():
+	if gender == 'women':
+		if division == 'D1':
+			database = databaseWomenD1
+		elif division == 'D2':
+			database = databaseWomenD2
+		else:
+			database = databaseWomenD3
+	else:
+		if division == 'D1':
+			database = databaseMenD1
+		elif division == 'D2':
+			database = databaseMenD2
+		else:
+			database = databaseMenD3
+	return database
+
 class Home():
 	def GET(self):
 		form = web.input(gender=None,division=None)
@@ -59,10 +86,7 @@ class Home():
 
 class Swim(object):
 	def GET(self):
-		if gender == 'women':
-			database = databaseWomen
-		else:
-			database = databaseMen		
+		database = getDatabase()
 		teamMeets = getTeamMeets(database)
 		confList = getConfList(database)
 		
@@ -124,43 +148,57 @@ class Fantasy(object):
 		
 class Conf(object):
 	def GET(self):
-		if gender == 'women':
-			database = databaseWomen
-		else:
-			database = databaseMen
+		database = getDatabase()
 			
 		teamMeets = getTeamMeets(database)
 		confList = getConfList(database)
 		
-		form = web.input(conference=None)
+		form = web.input(conference=None, taper=None)
 		if form.conference:
-			if form.conference == 'Nationals':
-				confMeet = database.conference2(teams=database.teams.keys())
-				scores = confMeet.scoreString(25)
-				teamScores = confMeet.scoreReport(printout=False,repressSwim=True,repressTeam=True)
+			if form.taper == 'Top Time':
+				topTimes=True
 			else:
+				topTimes=False
+			if form.conference == 'Nationals':
+				confMeet = database.conference(teams=database.teams.keys(), topTimes=topTimes)
+				scores = confMeet.scoreString(25)
+				teamScores = confMeet.scoreReport(printout=False, repressSwim=True, repressTeam=True)
+			else:
+				print form.conference
 				conf = database.conferences[form.conference]
-				confMeet = database.conference2(teams=conf.teams)
+				confMeet = database.conference(teams=conf.teams, topTimes=topTimes)
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport(printout=False)
 		else:
 			scores = None
 			teamScores = None
-		return render.conference(conferences=confList,scores = showMeet(scores),teamScores = showTeamScores(teamScores),finalScores=showScores(scores))
+		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores), finalScores=showScores(scores))
 		
 		
 class Times(object):
 	def GET(self):
-		return render.times()
+		database = getDatabase()
+		confList = getConfList(database)
+		form = web.input(conference=None,event=None)
+		scores = None
+		if form.conference and form.event:
+			if form.conference in database.conferences:
+				teams = database.conferences[form.conference].teams
+			else:
+				teams = 'all'
+			if form.event == 'All':
+				events = 'all'
+			else:
+				events = {form.event}
+			topTimes = database.topTimesReport(events=events, teams=teams)
+			scores = showMeet(topTimes.scoreString(showNum=100, showScores=False, showPlace=True))
+
+		return render.times(conferences=confList, events=eventOrder, scores=scores)
+
 
 class Duals(object):
 	def GET(self):
-		if gender == 'women':
-			database = databaseWomen
-		else:
-			database = databaseMen
-			
-		teamMeets = getTeamMeets(database)
+		database = getDatabase()
 		confList = getConfList(database)
 		
 		form = web.input(conference=None)
@@ -190,17 +228,16 @@ class Duals(object):
 		
 		return render.duals(wins = wins,losses = losses,teams = teams,meet = meets,conferences = confList)
 
-		
+
 #HTML generators
 
 def showMeet(scores):
 	if scores == None: return None
 	html='<h2 align="center">Simulated Results</h2>'
-	
 	html+='<table>'
 	for event in eventOrder:
 		if not event in scores: continue
-		html += '<tr><th align="left" colspan=7>'+event+'</th></tr>'
+		html += '<tr><th align="left" colspan=7>' + event + '</th></tr>'
 		for swim in scores[event]:
 			html += '<tr>'
 			for part in swim:
@@ -221,7 +258,7 @@ def showScores(scores):
 	html += '</table>'
 	return html
 	
-def showTeamScores(teamScores,showType='swimmer'):
+def showTeamScores(teamScores, showType='swimmer'):
 	#type = swimmer,event, or year
 	if teamScores == None: return None
 	html = '<h2 align="center">	Score Report </h2>'
@@ -229,13 +266,14 @@ def showTeamScores(teamScores,showType='swimmer'):
 	html += 'Show By: <select type="text" onchange="summaryType(this)">'
 	html += '<option>swimmer</option> <option>event</option> <option>year</option>'
 	html += '</select>'
+	teams = {team: teamScores[team]['total'] for team in teamScores}
 	for type in ['swimmer','event','year']:
 		if type==showType: html += '<table id=' + type + '>'
 		else: html += '<table class="hidden" id=' + type + '>'
-		for team in teamScores:
+		for team in sorted(teams, key=teams.__getitem__, reverse=True):
 			html += '<tr> <th>'+team+'</th> </tr>'
 			if not type in teamScores[team]: continue
-			for name in sorted(teamScores[team][type],key=teamScores[team][type].__getitem__,reverse=True):
+			for name in sorted(teamScores[team][type], key=teamScores[team][type].__getitem__, reverse=True):
 				html += '<tr>'
 				html += '<td>'+name+'</td> <td>'+str(teamScores[team][type][name])+'</td>'
 				html += '</tr>'

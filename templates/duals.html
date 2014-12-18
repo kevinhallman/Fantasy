@@ -15,10 +15,11 @@ Dual Meet Records
 </h1>
 
 <form name=confForm method="GET">
-	Conference: <select type="text" name="conference">
+	Conference: <select name="conference">
 		<option>All Teams</option>
 		$for name in conferences:
 			<option>$name</option>
+    </select>
 	<input type="submit" value="Swimulate">
 </form>
 

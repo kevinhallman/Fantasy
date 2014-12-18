@@ -39,7 +39,7 @@ $def with (content)
 	input,button {
 		border-radius: 10px;
 	}
-	#header {
+	.header {
     	float: left;
 		display: block;
 		font-weight: bold;
@@ -54,13 +54,13 @@ $def with (content)
 	}
 	a:link, a:visited {
 	}
-	#header:hover, #header:active {
+	.header:hover, .header:active {
 		background-color: #7A991A;
 	}
-	div { float:left; 	padding-left:20px }
+	div { float:left; }
 	#scoreTable { size:1500px; }
-	#report { size:1000px; }
-	#finalScores { size:1000px;}
+	#report { size:1000px; padding-left:20px; }
+	#finalScores { size:1000px; padding-left:20px; }
 	.hidden { display:none}
 	</style>
     <title>Swims</title>
@@ -109,11 +109,11 @@ $def with (content)
 </head>
 <body>
 <ul>
-	<li value=1 ><a id="header" href="/">Home</a></li>
-	<li value=2 ><a id="header" href="/conference">Conference</a> </li>
-	<li value=3 ><a id="header" href="/swimulate">Head to Head</a></li>
-	<li value=4 ><a id="header" href="/duals">Dual Meet Ranking</a></li>
-	<li value=5 ><a id="header" href="/times">Top Times</a></li>
+	<li value=1 ><a class="header" href="/">Home</a></li>
+	<li value=2 ><a class="header" href="/conference">Conference</a> </li>
+	<li value=3 ><a class="header" href="/swimulate">Head to Head</a></li>
+	<li value=4 ><a class="header" href="/duals">Dual Meet Ranking</a></li>
+	<li value=5 ><a class="header" href="/times">Top Times</a></li>
 </ul>
 
 $:content
