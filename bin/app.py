@@ -1,8 +1,8 @@
 import web
 import meets
-import os
 import operator
 import re
+
 eventOrder=["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","1 mtr Diving","3 mtr Diving"]
 
 urls = ('/', 'Home',
@@ -14,32 +14,30 @@ urls = ('/', 'Home',
 )
 
 web.config.debug = False
-
-meets.start(file='./bin/D3_15_12-12',gender='Men')
+meets.start(file='./bin/D3_15_12-12', gender='Men')
 databaseMenD3 = meets.database
 
-meets.start(file='./bin/D3_15_12-12',gender='Women')
+meets.start(file='./bin/D3_15_12-12', gender='Women')
 databaseWomenD3 = meets.database
 
-meets.start(file='./bin/D2_15_12-15',gender='Men')
+meets.start(file='./bin/D2_15_12-15', gender='Men')
 databaseMenD2 = meets.database
 
-meets.start(file='./bin/D2_15_12-15',gender='Women')
+meets.start(file='./bin/D2_15_12-15', gender='Women')
 databaseWomenD2 = meets.database
 
-meets.start(file='./bin/D1_15_12-12',gender='Men')
+meets.start(file='./bin/D1_15_12-12', gender='Men')
 databaseMenD1 = meets.database
 
-meets.start(file='./bin/D1_15_12-12',gender='Women')
+meets.start(file='./bin/D1_15_12-12', gender='Women')
 databaseWomenD1 = meets.database
 
-topDuals = {'men': {}, 'women': {}}
+topDuals = {'men': {'D1': {}, 'D2': {}, 'D3': {}}, 'women': {'D1': {}, 'D2': {}, 'D3': {}}}
 gender = 'men'
 division = 'D3'
 
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="layout")
-
 
 def getTeamMeets(database):
 	teamMeets = {}
@@ -207,17 +205,17 @@ class Duals(object):
 		if confName:
 			#cache
 			global topDuals
-			if not confName in topDuals[gender]:
+			if not confName in topDuals[gender][division]:
 				if confName in database.conferences:
 					teams = database.conferences[confName].teams
 				else:
 					teams = 'all'
-				topDuals[gender][confName] = database.topDual(printout=False,teams = teams) #results,meets,wins,losses
+				topDuals[gender][division][confName] = database.topDual(printout=False, teams=teams)
 			
-			wins = topDuals[gender][confName][2]
-			losses = topDuals[gender][confName][3]
-			teams = sorted(wins.items(),key=operator.itemgetter(1),reverse=True)
-			meets = topDuals[gender][confName][1]
+			wins = topDuals[gender][division][confName][2]
+			losses = topDuals[gender][division][confName][3]
+			teams = sorted(wins.items(), key=operator.itemgetter(1), reverse=True)
+			meets = topDuals[gender][division][confName][1]
 			for team in meets:
 				meets[team] = str(meets[team])
 		else:
@@ -226,7 +224,7 @@ class Duals(object):
 			teams = None
 			meets = None
 		
-		return render.duals(wins = wins,losses = losses,teams = teams,meet = meets,conferences = confList)
+		return render.duals(wins=wins, losses=losses, teams=teams, meet=meets, conferences=confList)
 
 
 #HTML generators
