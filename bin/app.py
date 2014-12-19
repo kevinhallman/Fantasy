@@ -13,6 +13,7 @@ urls = ('/', 'Home',
 	'/duals', 'Duals',
 )
 
+
 web.config.debug = False
 meets.start(file='./bin/D3_15_12-12', gender='Men')
 databaseMenD3 = meets.database
@@ -31,6 +32,7 @@ databaseMenD1 = meets.database
 
 meets.start(file='./bin/D1_15_12-12', gender='Women')
 databaseWomenD1 = meets.database
+
 
 topDuals = {'men': {'D1': {}, 'D2': {}, 'D3': {}}, 'women': {'D1': {}, 'D2': {}, 'D3': {}}}
 gender = 'men'
@@ -235,7 +237,7 @@ def showMeet(scores):
 	html+='<table>'
 	for event in eventOrder:
 		if not event in scores: continue
-		html += '<tr><th align="left" colspan=7>' + event + '</th></tr>'
+		html += '<tr><th align="left" colspan=6>' + event + '</th></tr>'
 		for swim in scores[event]:
 			html += '<tr>'
 			for part in swim:
