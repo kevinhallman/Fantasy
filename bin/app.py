@@ -30,17 +30,10 @@ databaseWomenD3 = meets.database
 meets.start(file='./swimData/DIII14f', gender='Women')
 database14WomenD3 = meets.database
 
-if prod: meets.start(file='./swimData/DII15m', gender='Men')
-databaseMenD2 = meets.database
-
-if prod: meets.start(file='./swimData/DII15f', gender='Women')
-databaseWomenD2 = meets.database
-
-if prod: meets.start(file='./swimData/DI15m', gender='Men')
-databaseMenD1 = meets.database
-
-if prod: meets.start(file='./swimData/DI15f', gender='Women')
-databaseWomenD1 = meets.database
+databaseMenD1 = None
+databaseWomenD1 = None
+databaseMenD2 = None
+databaseWomenD2 = None
 
 gender = 'Women'
 division = 'D3'
@@ -89,6 +82,49 @@ class Home():
 			gender = form.gender
 		if form.division and form.division != division:
 			division = form.division
+
+			#cleanup
+			global database14MenD3, database14WomenD3, databaseMenD3, databaseWomenD3, databaseMenD1, databaseWomenD1, databaseMenD2, databaseWomenD2
+			if division == 'D1':
+				database14MenD3 = None
+				database14WomenD3 = None
+				databaseMenD3 = None
+				databaseWomenD3 = None
+				databaseMenD2 = None
+				databaseWomenD2 = None
+
+				meets.start(file='./swimData/DI15m', gender='Men')
+				databaseMenD1 = meets.database
+				meets.start(file='./swimData/DI15f', gender='Women')
+				databaseWomenD1 = meets.database
+
+			if division == 'D2':
+				database14MenD3 = None
+				database14WomenD3 = None
+				databaseMenD3 = None
+				databaseWomenD3 = None
+				databaseMenD1 = None
+				databaseWomenD1 = None
+
+				meets.start(file='./swimData/DII15m', gender='Men')
+				databaseMenD2 = meets.database
+				meets.start(file='./swimData/DII15f', gender='Women')
+				databaseWomenD2 = meets.database
+			else:
+				databaseMenD1 = None
+				databaseWomenD1 = None
+				databaseMenD2 = None
+				databaseWomenD2 = None
+
+				meets.start(file='./swimData/DIII15m', gender='Men')
+				databaseMenD3 = meets.database
+				meets.start(file='./swimData/DIII14m', gender='Men')
+				database14MenD3 = meets.database
+				meets.start(file='./swimData/DIII15f', gender='Women')
+				databaseWomenD3 = meets.database
+				meets.start(file='./swimData/DIII14f', gender='Women')
+				database14WomenD3 = meets.database
+
 		return render.home(gender, division)
 
 class Swim(object):
@@ -361,6 +397,7 @@ def googleTable(teamScores, scores):
 		table.append("['" + team + "','All Teams' ," + str(score[1]) + "],")
 	for team in teamScores:
 		for swimmer in teamScores[team]['swimmer']:
+			if swimmer == 'Relays': continue
 			score = teamScores[team]['swimmer'][swimmer]
 			swimmerName = re.sub("'", "", swimmer)
 			if score == 0: continue
