@@ -24,10 +24,10 @@ databaseMenD3 = meets.database
 meets.start(file='./swimData/DIII14m', gender='Men')
 database14MenD3 = meets.database
 
-meets.start(file='./swimData/DIII15f', gender='Women')
+#meets.start(file='./swimData/DIII15f', gender='Women')
 databaseWomenD3 = meets.database
 
-meets.start(file='./swimData/DIII14f', gender='Women')
+#meets.start(file='./swimData/DIII14f', gender='Women')
 database14WomenD3 = meets.database
 
 databaseMenD1 = None
