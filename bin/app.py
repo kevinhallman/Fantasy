@@ -17,7 +17,7 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-prod = False
+prod = True
 
 if prod: web.config.debug = False
 meets.start(file='./swimData/DIII15m', gender='Men')
