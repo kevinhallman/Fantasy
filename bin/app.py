@@ -15,20 +15,20 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-prod = True
 
-if prod: web.config.debug = False
+
+web.config.debug = False
 meets.start(file='./swimData/DIII15m', gender='Men')
 databaseMenD3 = meets.database
 
-#meets.start(file='./swimData/DIII14m', gender='Men')
-database14MenD3 = meets.database
-
-#meets.start(file='./swimData/DIII15f', gender='Women')
+meets.start(file='./swimData/DIII15f', gender='Women')
 databaseWomenD3 = meets.database
 
-meets.start(file='./swimData/DIII14f', gender='Women')
+#meets.start(file='./swimData/DIII14f', gender='Women')
 database14WomenD3 = meets.database
+
+#meets.start(file='./swimData/DIII14m', gender='Men')
+database14MenD3 = meets.database
 
 databaseMenD1 = None
 databaseWomenD1 = None
@@ -186,9 +186,7 @@ class Fantasy(object):
 class Conf(object):
 	def GET(self):
 		database = getDatabase()
-
 		confList = getConfList(database)
-		
 		form = web.input(conference=None, taper=None, _unicode=False)
 		if form.conference:
 			if form.taper == 'Top Time':
