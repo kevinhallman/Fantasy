@@ -1,0 +1,61 @@
+$def with(conferences,events)
+
+<h1>Expected Conference Placing</h1>
+<p>
+This widget helps high school swimmers see how they would place in a given college conference. It only currently
+	works for D3 conferences. Average 4-year improvement is about 3% from senior year of HS to senior year of college.
+</p>
+<style>
+input[type=text] {
+	width:24px;
+	border-radius: none;
+	appearance: none;
+	border: solid 1px #dcdcdc;
+	margin: 0;
+}
+
+#container {
+	margin-right: 20px;
+	float: left;
+	border: 1px;
+	width: 15%
+}
+</style>
+
+<form method="get">
+	<select name="event1">
+	$for event in events:
+		<option> $event </option>
+	</select>
+		<input name="min1" type="text" value="0" maxlength="2"/>:
+		<input name="sec1" type="text" value="00" maxlength="2"/>.
+		<input name="hun1" type="text" value="00" maxlength="2"/>
+	<br>
+
+	<select name="event2">
+	$for event in events:
+		<option> $event </option>
+	</select>
+		<input name="min2" type="text" value="0" maxlength="2" />:
+		<input name="sec2" type="text" value="00" maxlength="2"/>.
+		<input name="hun2" type="text" value="00" maxlength="2"/>
+	<br>
+
+	<select name="event3">
+	$for event in events:
+		<option> $event </option>
+	</select>
+	<input name="min3" type="text" value="0" maxlength="2" style="width:24px;" />:
+						<input name="sec3" type="text" value="00" maxlength="2"
+							   style="width:24px;" />.
+						<input name="hun3" type="text" value="00" maxlength="2"
+							   style="width:24px;" />
+	<br>
+	With Expected Improvement <input type="checkbox" name="improvement">
+	<br>
+	<input type="submit" value="Swimulate">
+</form>
+
+<br>
+
+$:conferences

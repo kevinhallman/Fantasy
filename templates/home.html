@@ -1,4 +1,4 @@
-$def with (gender,division)
+$def with (gender,division,mem)
 
 <h1>
 Welcome!
@@ -9,12 +9,12 @@ The current gender is $gender. The division is $division.
 
 <form>
 Gender:
-$if gender=='women': 
-	<input type="radio" name="gender" value="women" checked>Women
-	<input type="radio" name="gender" value="men">Men
+$if gender=='Women':
+	<input type="radio" name="gender" value="Women" checked>Women
+	<input type="radio" name="gender" value="Men">Men
 $else:
-	<input type="radio" name="gender" value="women">Women
-	<input type="radio" name="gender" value="men" checked>Men
+	<input type="radio" name="gender" value="Women">Women
+	<input type="radio" name="gender" value="Men" checked>Men
 <br>
 Division:
 $if division=='D1':

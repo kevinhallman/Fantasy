@@ -1,4 +1,4 @@
-D3	3	City Univ. of New York	Staten Island
+D3	City Univ. of New York	Staten Island
 D3	City Univ. of New York	Lehman
 D3	City Univ. of New York	Baruch
 D3	City Univ. of New York	Hunter

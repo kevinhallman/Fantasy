@@ -226,7 +226,7 @@ with open(confFile,'r') as confs:
 
 
 genders = ['f', 'm']
-divisions = ['DI', 'DII', 'DIII']
+divisions = ['DI'] #, 'DII', 'DIII']
 distances = {}
 distances['FL'] = [100, 200]
 distances['BK'] = [100, 200]
@@ -237,7 +237,7 @@ distances['FR-R'] = [200, 400, 800]
 distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 strokes = ['FR', 'FL', 'BR', 'BK', 'IM','FR-R','MED-R']
 conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
-years = ['15','14','13','12','11']
+years = ['10', '09', '08'] #['15','14','13','12','11']
 
 directory = 'tests'
 for year in years:

@@ -1,4 +1,4 @@
-$def with (conferences,scores,teamScores,finalScores)
+$def with (conferences,scores,teamScores,finalScores,table)
 <h1>
 Taper Meet
 </h1>
@@ -18,6 +18,36 @@ Taper Meet
 	<input type="submit" value="Swimulate">
 </form>
 
+$if scores:
+	<div id="chart" style="width: 1000px; height: 400px; float:none; margin-left: auto; margin-right: auto;"> </div>
+	<script>
+	google.load("visualization", "1", {packages:["treemap"]});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+       	var data = google.visualization.arrayToDataTable([
+       	$for line in table:
+       		$:line
+       	]);
+       	tree = new google.visualization.TreeMap(document.getElementById('chart'));
+
+		var options = {
+       		minColor: '#f00',
+       		midColor: '#ddd',
+       		maxColor: '#0d0',
+       		headerHeight: 15,
+      		fontColor: 'black',
+       		showScale: false,
+       		generateTooltip: showFullTooltip
+       	};
+
+       	tree.draw(data, options);
+
+		function showFullTooltip(row, size, value) {
+    		return '<div>' + 'Score: ' + data.getValue(row, 2) + ' </div>';
+  		};
+    }
+	</script>
 <div id="scoreTable">
 $if scores:
 	$:scores
