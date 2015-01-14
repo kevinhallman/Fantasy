@@ -24,16 +24,12 @@ databaseMenD3 = meets.database
 meets.start(file='./swimData/DIII15f', gender='Women')
 databaseWomenD3 = meets.database
 
-#meets.start(file='./swimData/DIII14f', gender='Women')
-database14WomenD3 = meets.database
-
-#meets.start(file='./swimData/DIII14m', gender='Men')
-database14MenD3 = meets.database
-
 databaseMenD1 = None
 databaseWomenD1 = None
 databaseMenD2 = None
 databaseWomenD2 = None
+database14WomenD3 = None
+database14MenD3 = None
 
 gender = 'Women'
 division = 'D3'
@@ -57,21 +53,34 @@ def getConfList(database):
 	confList.sort()
 	return confList
 
-def getDatabase():
-	if gender == 'Women':
-		if division == 'D1':
-			database = databaseWomenD1
-		elif division == 'D2':
-			database = databaseWomenD2
+def getDatabase(year=15):
+	global database14WomenD3, database14MenD3
+	if year == 14:  # load 2014 databases and forget the other gender
+		if gender=='Women':
+			database14MenD3 = None
+			if not database14WomenD3:
+				database14WomenD3 = meets.start(file='./swimData/DIII14f', gender='Women')
+			database = database14WomenD3
 		else:
-			database = databaseWomenD3
+			database14WomenD3 = None
+			if not database14MenD3:
+				database14MenD3 = meets.start(file='./swimData/DIII14m', gender='Men')
+			database = database14MenD3
 	else:
-		if division == 'D1':
-			database = databaseMenD1
-		elif division == 'D2':
-			database = databaseMenD2
+		if gender == 'Women':
+			if division == 'D1':
+				database = databaseWomenD1
+			elif division == 'D2':
+				database = databaseWomenD2
+			else:
+				database = databaseWomenD3
 		else:
-			database = databaseMenD3
+			if division == 'D1':
+				database = databaseMenD1
+			elif division == 'D2':
+				database = databaseMenD2
+			else:
+				database = databaseMenD3
 	return database
 
 class Home():
@@ -264,13 +273,9 @@ class Duals(object):
 
 class Placing(object):
 	def GET(self):
-		if gender=='Women':
-			database = database14WomenD3
-		else:
-			database = database14MenD3
-
+		database = getDatabase(year=14)
 		form = web.input(_unicode=False)
-		if len(form.keys()) == 0:  #initial load
+		if len(form.keys()) == 0:  # initial load
 			confTable = ''
 		else:
 			times = [0, 0, 0]
@@ -291,7 +296,7 @@ class Placing(object):
 					events[num] = form[key]
 			newSwims = set()
 			for i in range(len(events)):
-				if times[i] == 0:  #remove nonexistant swims
+				if times[i] == 0:  # remove nonexistant swims
 					continue
 				elif improvement:
 					times[i] *= 0.975
@@ -301,6 +306,8 @@ class Placing(object):
 				confTable = showConf(confPlaces, newSwims)
 			else:
 				confTable = ''
+
+		database = None  # return RAM
 
 		return render.placing(conferences=confTable, events=eventOrder)
 
