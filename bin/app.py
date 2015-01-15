@@ -15,24 +15,12 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-
-
 web.config.debug = False
-meets.start(file='./swimData/DIII15m', gender='Men')
-databaseMenD3 = meets.database
-
-meets.start(file='./swimData/DIII15f', gender='Women')
-databaseWomenD3 = meets.database
-
-databaseMenD1 = None
-databaseWomenD1 = None
-databaseMenD2 = None
-databaseWomenD2 = None
-database14WomenD3 = None
-database14MenD3 = None
+database = meets.start(file='./swimData/DIII15f', gender='Women')
+database14 = None
 
 gender = 'Women'
-division = 'D3'
+division = 'D1'
 
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="layout")
@@ -53,92 +41,41 @@ def getConfList(database):
 	confList.sort()
 	return confList
 
-def getDatabase(year=15):
-	global database14WomenD3, database14MenD3
-	if year == 14:  # load 2014 databases and forget the other gender
-		if gender=='Women':
-			database14MenD3 = None
-			if not database14WomenD3:
-				database14WomenD3 = meets.start(file='./swimData/DIII14f', gender='Women')
-			database = database14WomenD3
-		else:
-			database14WomenD3 = None
-			if not database14MenD3:
-				database14MenD3 = meets.start(file='./swimData/DIII14m', gender='Men')
-			database = database14MenD3
-	else:
-		if gender == 'Women':
-			if division == 'D1':
-				database = databaseWomenD1
-			elif division == 'D2':
-				database = databaseWomenD2
-			else:
-				database = databaseWomenD3
-		else:
-			if division == 'D1':
-				database = databaseMenD1
-			elif division == 'D2':
-				database = databaseMenD2
-			else:
-				database = databaseMenD3
-	return database
-
 class Home():
 	def GET(self):
 		form = web.input(gender=None, division=None, _unicode=False)
 		global gender, division
+		change = False
 		if form.gender and form.gender != gender:
 			gender = form.gender
+			change = True
 		if form.division and form.division != division:
 			division = form.division
-
-			#cleanup
-			global database14MenD3, database14WomenD3, databaseMenD3, databaseWomenD3, databaseMenD1, databaseWomenD1, databaseMenD2, databaseWomenD2
+			change = True
+		if change:
+			global database
 			if division == 'D1':
-				database14MenD3 = None
-				database14WomenD3 = None
-				databaseMenD3 = None
-				databaseWomenD3 = None
-				databaseMenD2 = None
-				databaseWomenD2 = None
+				if gender == 'Men':
+					database = meets.start(file='./swimData/DI15m', gender='Men')
+				if gender == 'Women':
+					database = meets.start(file='./swimData/DI15f', gender='Women')
 
-				meets.start(file='./swimData/DI15m', gender='Men')
-				databaseMenD1 = meets.database
-				meets.start(file='./swimData/DI15f', gender='Women')
-				databaseWomenD1 = meets.database
+			elif division == 'D2':
 
-			if division == 'D2':
-				database14MenD3 = None
-				database14WomenD3 = None
-				databaseMenD3 = None
-				databaseWomenD3 = None
-				databaseMenD1 = None
-				databaseWomenD1 = None
-
-				meets.start(file='./swimData/DII15m', gender='Men')
-				databaseMenD2 = meets.database
-				meets.start(file='./swimData/DII15f', gender='Women')
-				databaseWomenD2 = meets.database
+				if gender == 'Men':
+					database = meets.start(file='./swimData/DII15m', gender='Men')
+				if gender == 'Women':
+					database = meets.start(file='./swimData/DII15f', gender='Women')
 			else:
-				databaseMenD1 = None
-				databaseWomenD1 = None
-				databaseMenD2 = None
-				databaseWomenD2 = None
-
-				meets.start(file='./swimData/DIII15m', gender='Men')
-				databaseMenD3 = meets.database
-				meets.start(file='./swimData/DIII14m', gender='Men')
-				database14MenD3 = meets.database
-				meets.start(file='./swimData/DIII15f', gender='Women')
-				databaseWomenD3 = meets.database
-				meets.start(file='./swimData/DIII14f', gender='Women')
-				database14WomenD3 = meets.database
+				if gender == 'Men':
+					database = meets.start(file='./swimData/DIII15m', gender='Men')
+				if gender == 'Women':
+					database = meets.start(file='./swimData/DIII15f', gender='Women')
 
 		return render.home(gender, division)
 
 class Swim(object):
 	def GET(self):
-		database = getDatabase()
 		teamMeets = getTeamMeets(database)
 		
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False)
@@ -194,7 +131,6 @@ class Fantasy(object):
 		
 class Conf(object):
 	def GET(self):
-		database = getDatabase()
 		confList = getConfList(database)
 		form = web.input(conference=None, taper=None, _unicode=False)
 		if form.conference:
@@ -224,7 +160,6 @@ class Conf(object):
 
 class Times(object):
 	def GET(self):
-		database = getDatabase()
 		confList = getConfList(database)
 		form = web.input(conference=None, event=None, _unicode=False)
 		scores = None
@@ -244,7 +179,6 @@ class Times(object):
 
 class Duals(object):
 	def GET(self):
-		database = getDatabase()
 		confList = getConfList(database)
 		
 		form = web.input(conference=None)
@@ -273,7 +207,13 @@ class Duals(object):
 
 class Placing(object):
 	def GET(self):
-		database = getDatabase(year=14)
+		global database14
+		if not database14 or not database14.gender == gender:
+			if gender == 'Women':
+				database14 = meets.start(file='./swimData/DIII14f', gender='Women')
+			else:
+				database14 = meets.start(file='./swimData/DIII14m', gender='Men')
+
 		form = web.input(_unicode=False)
 		if len(form.keys()) == 0:  # initial load
 			confTable = ''
@@ -302,7 +242,7 @@ class Placing(object):
 					times[i] *= 0.975
 				newSwims.add((events[i], times[i]))
 			if len(newSwims) > 0:
-				confPlaces = database.conferencePlace(division=division, gender=gender, newSwims=newSwims)
+				confPlaces = database14.conferencePlace(division=division, gender=gender, newSwims=newSwims)
 				confTable = showConf(confPlaces, newSwims)
 			else:
 				confTable = ''
