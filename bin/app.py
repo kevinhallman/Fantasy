@@ -19,8 +19,8 @@ urls = ('/', 'Home',
 database = meets.start(file='./swimData/DI15f', gender='Women')
 database14 = None
 
-gender = 'Women'
-division = 'D1'
+gender = 'Men'
+division = 'D3'
 
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="layout")
