@@ -63,7 +63,6 @@ class Home():
 					database = meets.start(file='./swimData/DI15f', gender='Women')
 
 			elif division == 'D2':
-
 				if gender == 'Men':
 					database = meets.start(file='./swimData/DII15m', gender='Men')
 				if gender == 'Women':
