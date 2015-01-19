@@ -90,7 +90,7 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 		strokeOut='Butterfly'
 		Stroke='4'
 	elif Stroke=='IM':
-		strokeOut='IM'
+		strokeOut='Individual Medley'
 		Stroke='5'
 	elif Stroke=='FR-R':
 		strokeOut='Freestyle Relay'
@@ -164,13 +164,13 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 		'ctl00$ctl82$btnSearch': 'Search'
 	}
 	r = requests.post(URL, data=payload)
-	r=r.text
-	place=r.find('ctl82_dgSearchResults')
-	if RelInd=='rbRelay':
-		place=r.find('ctl82_trSearchResults')
-	end=r.find('</table>',place)
-	count=0
-	event=str(Distance)+' '+strokeOut
+	r = r.text
+	place = r.find('ctl82_dgSearchResults')
+	if RelInd == 'rbRelay':
+		place = r.find('ctl82_trSearchResults')
+	end = r.find('</table>', place)
+	count = 0
+	event = str(Distance) + ' Yard ' + strokeOut
 	num = 0
 	if RelInd=='rbIndividual':
 		while place>0:
@@ -194,7 +194,7 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 				File.write(meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(time))+'\n')
 	elif RelInd=='rbRelay':
 		while place>0:
-			place=r.find('</td>',place+1,end)
+			place=r.find('</td>', place+1, end)
 			count=(count+1) % 8
 			if count==2:
 				time=r[r.find('>',place+5)+1:r.find('<',place+9)]
@@ -226,7 +226,7 @@ with open(confFile,'r') as confs:
 
 
 genders = ['f', 'm']
-divisions = ['DI'] #, 'DII', 'DIII']
+divisions = ['DI', 'DII', 'DIII']
 distances = {}
 distances['FL'] = [100, 200]
 distances['BK'] = [100, 200]
@@ -237,9 +237,9 @@ distances['FR-R'] = [200, 400, 800]
 distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 strokes = ['FR', 'FL', 'BR', 'BK', 'IM','FR-R','MED-R']
 conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
-years = ['10', '09', '08'] #['15','14','13','12','11']
+years = ['14']  # ['15','14','13','12','11']
 
-directory = 'tests'
+directory = 'swimData'
 for year in years:
 	for division in divisions:
 		if division == 'DI':

@@ -15,7 +15,7 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-web.config.debug = False
+#web.config.debug = False
 database = meets.start(file='./swimData/DI15f', gender='Women')
 database14 = None
 
@@ -44,14 +44,16 @@ def getConfList(database):
 class Home():
 	def GET(self):
 		form = web.input(gender=None, division=None, _unicode=False)
-		global gender, division
+		global gender, division, database14
 		change = False
 		if form.gender and form.gender != gender:
 			gender = form.gender
 			change = True
+			database14 = None
 		if form.division and form.division != division:
 			division = form.division
 			change = True
+			database14 = None
 		if change:
 			global database
 			if division == 'D1':
@@ -208,11 +210,18 @@ class Duals(object):
 class Placing(object):
 	def GET(self):
 		global database14
-		if not database14 or not database14.gender == gender:
+		if not database14:
 			if gender == 'Women':
-				database14 = meets.start(file='./swimData/DIII14f', gender='Women')
+				g = 'f'
 			else:
-				database14 = meets.start(file='./swimData/DIII14m', gender='Men')
+				g = 'm'
+			if division == 'D1':
+				d = 'DI'
+			elif division == 'D2':
+				d = 'DII'
+			else:
+				d = 'DIII'
+			database14 = meets.start(file='./swimData/' + d + '14' + g, gender=gender)
 
 		form = web.input(_unicode=False)
 		if len(form.keys()) == 0:  # initial load
@@ -246,8 +255,6 @@ class Placing(object):
 				confTable = showConf(confPlaces, newSwims)
 			else:
 				confTable = ''
-
-		database = None  # return RAM
 
 		return render.placing(conferences=confTable, events=eventOrder)
 
