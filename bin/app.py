@@ -221,7 +221,7 @@ class Placing(object):
 				d = 'DII'
 			else:
 				d = 'DIII'
-			database14 = meets.start(file='./swimData/' + d + '14' + g, gender=gender)
+			database14 = meets.start(file='./swimData/' + d + '14' + g, gender=gender, meetTruncate=True, division=division)
 
 		form = web.input(_unicode=False)
 		if len(form.keys()) == 0:  # initial load
@@ -235,14 +235,17 @@ class Placing(object):
 					improvement = True
 				else:
 					num = int(key[-1]) - 1
-				if 'min' in key:
-					times[num] += 60*int(form[key])
-				elif 'sec' in key:
-					times[num] += int(form[key])
-				elif 'hun' in key:
-					times[num] += .01*int(form[key])
-				elif 'event' in key:
-					events[num] = form[key]
+				try:
+					if 'min' in key:
+						times[num] += 60*int(form[key])
+					elif 'sec' in key:
+						times[num] += int(form[key])
+					elif 'hun' in key:
+						times[num] += .01*int(form[key])
+					elif 'event' in key:
+						events[num] = form[key]
+				except ValueError:
+					pass
 			newSwims = set()
 			for i in range(len(events)):
 				if times[i] == 0:  # remove nonexistant swims
