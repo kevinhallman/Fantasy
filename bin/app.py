@@ -15,7 +15,7 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-#web.config.debug = False
+web.config.debug = False
 database = meets.start(file='./swimData/DIII15m', gender='Men')
 database14 = None
 
