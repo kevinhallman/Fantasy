@@ -15,7 +15,7 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 )
 
-web.config.debug = False
+#web.config.debug = False
 database = meets.start(file='./swimData/DI15f', gender='Women')
 database14 = None
 
@@ -294,14 +294,14 @@ def showTeamScores(teamScores, showType='swimmer'):
 	if teamScores == None: return None
 	html = '<h2 align="center">	Score Report </h2>'
 	html += '<form>'
-	html += 'Show By: <select type="text" onchange="summaryType(this)">'
+	html += 'Show By: <select type="text" onchange="sumType(this.form);" id="summaryType">'
 	html += '<option>swimmer</option> <option>event</option> <option>year</option>'
 	html += '</select>'
 	html += '</form>'
 	teams = {team: teamScores[team]['total'] for team in teamScores}
-	for type in ['swimmer','event','year']:
-		if type==showType: html += '<table id=' + type + '>'
-		else: html += '<table class="hidden" id=' + type + '>'
+	for type in ['swimmer', 'event', 'year']:
+		if type==showType: html += '<table id="' + type + '">'
+		else: html += '<table class="hidden" id="' + type + '">'
 		for team in sorted(teams, key=teams.__getitem__, reverse=True):
 			html += '<tr> <th>'+team+'</th> </tr>'
 			if not type in teamScores[team]: continue

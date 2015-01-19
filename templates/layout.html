@@ -80,9 +80,33 @@ $def with (content)
 		text-indent: 2px;
 	}
 	</style>
-    	<script src="http://d3js.org/d3.v3.min.js"></script>
+    	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script type="text/javascript">
+			function sumType (form) {
+				var select = document.getElementById("summaryType");
+				var type = select.options[select.selectedIndex].text;
+				var event = document.getElementById("event");
+				var year = document.getElementById("year");
+				var swimmer = document.getElementById("swimmer");
+				if (type == "swimmer") {
+					swimmer.setAttribute("class","visible");
+					event.setAttribute("class","hidden");
+					year.setAttribute("class","hidden");
+				}
+				if (type == "event") {
+					event.setAttribute("class","visible");
+					swimmer.setAttribute("class","hidden");
+					year.setAttribute("class","hidden");
+				}
+				if (type == "year") {
+					year.setAttribute("class","visible");
+					event.setAttribute("class","hidden");
+					swimmer.setAttribute("class","hidden");
+				}
+			}
+		</script>
 		<title>Swims</title>
 
 	</head>
