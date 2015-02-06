@@ -1,34 +1,8 @@
-$def with (gender,division)
+$def with ()
 
 <h1>
 Welcome!
 </h1>
-<p>
-The current gender is $gender. The division is $division.
-</p>
 
-<form>
-Gender:
-$if gender=='Women':
-	<input type="radio" name="gender" value="Women" checked>Women
-	<input type="radio" name="gender" value="Men">Men
-$else:
-	<input type="radio" name="gender" value="Women">Women
-	<input type="radio" name="gender" value="Men" checked>Men
-<br>
-Division:
-$if division=='D1':
-	<input type="radio" name="division" value="D1" checked>D1
-	<input type="radio" name="division" value="D2">D2
-	<input type="radio" name="division" value="D3">D3
-$elif division=='D2':
-	<input type="radio" name="division" value="D1">D1
-	<input type="radio" name="division" value="D2" checked>D2
-	<input type="radio" name="division" value="D3">D3
-$elif division=='D3':
-	<input type="radio" name="division" value="D1">D1
-	<input type="radio" name="division" value="D2">D2
-	<input type="radio" name="division" value="D3" checked>D3
-<br>
-<input type="submit" value="Save">
-</form>
+Welcome to the swimulator! Here you can simulate all types of collegiate swimming competitions using data going back
+to 2014, more coming soon.

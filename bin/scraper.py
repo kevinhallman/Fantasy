@@ -188,7 +188,7 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 				meet=r[r.find('>',place+5)+1:r.find('<',place+9)]
 			if count==9:
 				date=r[r.find('>',place+5)+1:r.find('<',place+9)]
-				if time=='Time':
+				if time=='Time' or '&nbsp' in team:
 					continue
 				num += 1
 				File.write(meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(time))+'\n')
@@ -197,18 +197,18 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 			place=r.find('</td>', place+1, end)
 			count=(count+1) % 8
 			if count==2:
-				time=r[r.find('>',place+5)+1:r.find('<',place+9)]
+				time=r[r.find('>', place+5) + 1: r.find('<', place+9)]
 			if count==4:
-				swimmer=r[r.find('<br>',place+9):r.find('</',place+9)]
+				swimmer=r[r.find('<br>', place+9): r.find('</', place+9)]
 			if count==4:
-				team=r[r.find('>',place+5)+1:r.find('<',place+9)]
+				team=r[r.find('>', place+5)+1: r.find('<', place+9)]
 			if count==5:
-				meet=r[r.find('>',place+5)+1:r.find('<',place+9)]
+				meet=r[r.find('>', place+5)+1:r.find('<', place+9)]
 			if count==6:
-				date=r[r.find('>',place+5)+1:r.find('<',place+9)]
-				if time=='Time':
+				date=r[r.find('>', place+5)+1:r.find('<', place+9)]
+				if time == 'Time' or '&nbsp' in team:
 					continue
-				swimmer=swimmer.replace('<br>','')
+				swimmer = swimmer.replace('<br>', '')
 				num += 1
 				File.write(meet+'\t'+date+'\t'+swimmer+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(time))+'\n')
 	return num
@@ -226,7 +226,7 @@ with open(confFile,'r') as confs:
 
 
 genders = ['f', 'm']
-divisions = ['DI', 'DII', 'DIII']
+divisions = ['DIII']
 distances = {}
 distances['FL'] = [100, 200]
 distances['BK'] = [100, 200]
@@ -237,7 +237,7 @@ distances['FR-R'] = [200, 400, 800]
 distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 strokes = ['FR', 'FL', 'BR', 'BK', 'IM','FR-R','MED-R']
 conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
-years = ['14']  # ['15','14','13','12','11']
+years = ['15']  # ['15','14','13','12','11']
 
 directory = 'swimData'
 for year in years:

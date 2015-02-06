@@ -1,1 +1,1 @@
-web: python bin/app.py $PORT
+web: python bin/appsql.py $PORT

@@ -82,7 +82,7 @@ $def with (content)
 	</style>
     	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
 		<script type="text/javascript">
 			function sumType (form) {
 				var select = document.getElementById("summaryType");
@@ -107,10 +107,28 @@ $def with (content)
 				}
 			}
 		</script>
+		<script type="text/javascript">
+			\$(document).ready(function() {
+    			\$('input[type=radio]').change(function() {
+    				if (this.name == 'gender') {
+            			\$.post('home', {gender: this.value}, reload);
+            		}
+            		else if (this.name == 'division') {
+            			\$.post('home', {division: this.value}, reload);
+            		}
+            		else if (this.name == 'season') {
+            			\$.post('home', {season: this.value}, reload);
+            		}
+    			});
+			});
+
+			function reload() {
+				var url = \$(location).attr('href');
+            	\$('body').load(url);
+			}
+		</script>
 		<title>Swims</title>
 
-	</head>
-	<body>
 		<ul>
 			<li value=1 ><a class="header" href="/">Home</a></li>
 			<li value=2 ><a class="header" href="/conference">Conference</a> </li>
@@ -119,7 +137,42 @@ $def with (content)
 			<li value=5 ><a class="header" href="/times">Top Times</a></li>
 			<li value=6 ><a class="header" href="/placing">Placing</a></li>
 		</ul>
+		<form>
+			<br/>
+			Gender:
+			$if context.gender=='Women':
+				<input type="radio" name="gender" value="Women" checked>Women
+				<input type="radio" name="gender" value="Men">Men
+			$else:
+				<input type="radio" name="gender" value="Women">Women
+				<input type="radio" name="gender" value="Men" checked>Men
+			<br>
+			Division:
+			$if context.division=='D1':
+				<input type="radio" name="division" value="D1" checked>D1
+				<input type="radio" name="division" value="D2">D2
+				<input type="radio" name="division" value="D3">D3
+			$elif context.division=='D2':
+				<input type="radio" name="division" value="D1">D1
+				<input type="radio" name="division" value="D2" checked>D2
+				<input type="radio" name="division" value="D3">D3
+			$elif context.division=='D3':
+				<input type="radio" name="division" value="D1">D1
+				<input type="radio" name="division" value="D2">D2
+				<input type="radio" name="division" value="D3" checked>D3
+			<br>
+			Season:
+			$if context.season==2014:
+				<input type="radio" name="season" value="2015">2015
+				<input type="radio" name="season" value="2014" checked>2014
+			$elif context.season==2015:
+				<input type="radio" name="season" value="2015" checked>2015
+				<input type="radio" name="season" value="2014">2014
+		</form>
+	</head>
 
+	<body>
 		$:content
+
 	</body>
 </html>
