@@ -70,7 +70,7 @@ render = web.template.render('templates/', base="layout", globals={'context': se
 
 app.add_processor(connection_processor)
 
-database = sqlmeets.SwimDatabase(database=db)
+database = sqlmeets.SwimDatabase()
 meetList = clean(database.teamMeets)
 conferences = getConfs('data/conferences.txt')
 
