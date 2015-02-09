@@ -6,7 +6,7 @@ import json
 import os, urlparse
 from peewee import *
 
-eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","1 mtr Diving","3 mtr Diving"]
+eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
 
 urls = ('/', 'Home',
@@ -18,6 +18,18 @@ urls = ('/', 'Home',
 	'/duals', 'Duals',
 	'/placing', 'Placing',
 )
+
+prod = True
+if prod:
+	urlparse.uses_netloc.append("postgres")
+	url = urlparse.urlparse(os.environ["DATABASE_URL"])
+	db = PostgresqlDatabase(database=url.path[1:],
+    	user=url.username,
+    	password=url.password,
+    	host=url.hostname,
+    	port=url.port)
+else:
+	db = PostgresqlDatabase('swimdb', user='hallmank')
 
 def connection_processor(handler):
 	db.connect()
@@ -56,17 +68,9 @@ session = web.session.Session(app, web.session.DiskStore('sessions'), initialize
 	'D3','season': 2015})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
-database = sqlmeets.SwimDatabase()
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
-db = PostgresqlDatabase(database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port)
-#db = PostgresqlDatabase('swimdb', user='hallmank')
 app.add_processor(connection_processor)
 
+database = sqlmeets.SwimDatabase(database=db)
 meetList = clean(database.teamMeets)
 conferences = getConfs('data/conferences.txt')
 
