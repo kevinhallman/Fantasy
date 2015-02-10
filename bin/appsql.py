@@ -21,7 +21,7 @@ urls = ('/', 'Home',
 	'/improvement', 'Improvement'
 )
 
-prod = False
+prod = True
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
