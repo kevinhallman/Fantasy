@@ -4,6 +4,7 @@ import operator
 import re
 import json
 import os, urlparse
+import numpy
 from peewee import *
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
@@ -17,9 +18,10 @@ urls = ('/', 'Home',
 	'/times', 'Times',
 	'/duals', 'Duals',
 	'/placing', 'Placing',
+	'/improvement', 'Improvement'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -70,7 +72,7 @@ render = web.template.render('templates/', base="layout", globals={'context': se
 
 app.add_processor(connection_processor)
 
-database = sqlmeets.SwimDatabase()
+database = sqlmeets.SwimDatabase(database=db)
 meetList = clean(database.teamMeets)
 conferences = getConfs('data/conferences.txt')
 
@@ -80,6 +82,7 @@ for division in conferences:
 	for conference in conferences[division]:
 		for team in conferences[division][conference]:
 			allTeams[division].add(team)
+
 
 class Home():
 	def GET(self):
@@ -287,6 +290,31 @@ class Placing(object):
 
 		return render.placing(conferences=confTable, events=eventOrder)
 
+class Improvement():
+	def GET(self):
+		division = session.division
+		gender = session.gender
+		season = session.season - 1
+		confList = conferences[division]
+		form = web.input(conference=None)
+		if form.conference in confList:
+			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=confList[
+				form.conference])
+			table = googleCandle(teamImp)
+		elif form.conference == 'Nationals':
+			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=allTeams[
+				division])
+			table = googleCandle(teamImp)
+		else:
+			table = None
+		return render.improvement(conferences=sorted(confList.keys()), table=table)
+
+class confTeamMeet():
+	def POST(self):
+		return
+
+
+
 #HTML generators
 
 def showMeet(scores):
@@ -357,18 +385,6 @@ def showConf(scores, newSwims):
 
 	return html
 
-'''
-def jsonEncode(teamScores):
-	teams = {'name': 'flare', 'children': []}
-	for team in teamScores:
-		newTeam = {'name': team, 'children': []}
-		for swimmer in teamScores[team]['swimmer']:
-			newTeam['children'].append({'name': swimmer, 'size': teamScores[team]['swimmer'][swimmer]})
-		teams['children'].append(newTeam)
-
-	return json.dumps(teams)
-'''
-
 def googleTable(teamScores, scores):
 	table = ["['Name','Parent','Score'],"]
 	table.append("['All Teams', null, 0],")
@@ -385,7 +401,20 @@ def googleTable(teamScores, scores):
 			if score == 0: continue
 			teamName = re.sub("'", "", team)
 			table.append("['" + swimmerName + "','" + teamName + "'," + str(score) + "],")
-	del table[-1]
+	return table
+
+def googleCandle(confImp):
+	table = []
+	teamord = []
+	for team in confImp:
+		if confImp[team]==[]: continue
+		teamord.append((team, numpy.median(confImp[team])))
+
+	for team, med in sorted(teamord, key=lambda score: score[1], reverse=True):
+		nums = confImp[team]
+		teamName = re.sub("'", "", team)
+		table.append("['" + teamName + "'," + str(min(nums))+","+str(numpy.percentile(nums, 25))+","+str(numpy.percentile(
+			nums, 75))+","+str(max(nums)) + '],')
 	return table
 
 if __name__ == "__main__":

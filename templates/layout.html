@@ -109,6 +109,7 @@ $def with (content)
 		</script>
 		<script type="text/javascript">
 			\$(document).ready(function() {
+				var url = \$(location).attr('href');
     			\$('input[type=radio]').change(function() {
     				if (this.name == 'gender') {
             			\$.post('home', {gender: this.value}, reload);
@@ -124,11 +125,13 @@ $def with (content)
 
 			function reload() {
 				var url = \$(location).attr('href');
-            	\$('body').load(url);
+            	\$('body').load(url.split("?")[0]);
 			}
 		</script>
 		<title>Swims</title>
+	</head>
 
+	<body>
 		<ul>
 			<li value=1 ><a class="header" href="/">Home</a></li>
 			<li value=2 ><a class="header" href="/conference">Conference</a> </li>
@@ -136,8 +139,9 @@ $def with (content)
 			<li value=4 ><a class="header" href="/duals">Dual Meet Ranking</a></li>
 			<li value=5 ><a class="header" href="/times">Top Times</a></li>
 			<li value=6 ><a class="header" href="/placing">Placing</a></li>
+			<!--<li value=7 ><a class="header" href="/improvement">Improvement</a></li> -->
 		</ul>
-		<form>
+		<form id="gendiv">
 			<br/>
 			Gender:
 			$if context.gender=='Women':
@@ -169,9 +173,7 @@ $def with (content)
 				<input type="radio" name="season" value="2015" checked>2015
 				<input type="radio" name="season" value="2014">2014
 		</form>
-	</head>
 
-	<body>
 		$:content
 
 	</body>

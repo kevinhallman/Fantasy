@@ -1,0 +1,38 @@
+$def with (conferences,table)
+
+$if table:
+	<script>
+		google.load("visualization", "1", {packages:["corechart"]});
+		google.setOnLoadCallback(drawChart);
+  		function drawChart() {
+			var data = google.visualization.arrayToDataTable([
+				$for line in table:
+					$:line
+			// Treat first row as data as well.
+			], true);
+
+			var options = {
+				legend:'none'
+			};
+
+			var chart = new google.visualization.CandlestickChart(document.getElementById('chart'));
+
+			chart.draw(data, options);
+		}
+	</script>
+
+<h1>
+Team Improvement
+</h1>
+Here you can simulate conference or national swim meet.
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		<option>Nationals</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+
+	<input type="submit" value="Swimulate">
+</form>
+
+<div id="chart" style="width: 1400px; height: 600px; float:none; margin-left: auto; margin-right: auto;"> </div>
