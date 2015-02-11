@@ -18,10 +18,11 @@ urls = ('/', 'Home',
 	'/times', 'Times',
 	'/duals', 'Duals',
 	'/placing', 'Placing',
-	'/improvement', 'Improvement'
+	'/improvement', 'Improvement',
+	'/confTeamMeet', 'confTeamMeet'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -83,6 +84,19 @@ for division in conferences:
 		for team in conferences[division][conference]:
 			allTeams[division].add(team)
 
+allMeets = {}
+for division in conferences:
+	allMeets[division] = {}
+	for conference in conferences[division]:
+		allMeets[division][conference] = {}
+		for team in conferences[division][conference]:
+			if not team in meetList: continue
+			allMeets[division][conference][team] = {}
+			for season in meetList[team]:
+				allMeets[division][conference][team][season] = []
+				for meet in meetList[team][season]:
+					allMeets[division][conference][team][season].append(meet)
+#print json.dumps(allMeets)
 
 class Home():
 	def GET(self):
@@ -301,7 +315,7 @@ class Improvement():
 			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=confList[
 				form.conference])
 			table = googleCandle(teamImp)
-		elif form.conference == 'Nationals':
+		elif form.conference == 'All':
 			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=allTeams[
 				division])
 			table = googleCandle(teamImp)
@@ -311,7 +325,10 @@ class Improvement():
 
 class confTeamMeet():
 	def POST(self):
-		return
+		web.header("Content-Type", "application/json")
+		return json.dumps(allMeets)
+
+
 
 
 
@@ -409,12 +426,11 @@ def googleCandle(confImp):
 	for team in confImp:
 		if confImp[team]==[]: continue
 		teamord.append((team, numpy.median(confImp[team])))
-
 	for team, med in sorted(teamord, key=lambda score: score[1], reverse=True):
 		nums = confImp[team]
 		teamName = re.sub("'", "", team)
 		table.append("['" + teamName + "'," + str(min(nums))+","+str(numpy.percentile(nums, 25))+","+str(numpy.percentile(
-			nums, 75))+","+str(max(nums)) + '],')
+			nums, 75))+","+str(max(nums)) + "," + str(round(med, 2)) + '],')
 	return table
 
 if __name__ == "__main__":

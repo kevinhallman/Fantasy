@@ -10,6 +10,7 @@ $if table:
 					$:line
 			// Treat first row as data as well.
 			], true);
+			data.setColumnProperty(5, 'role', 'tooltip');
 
 			var options = {
 				legend:'none'
@@ -24,10 +25,11 @@ $if table:
 <h1>
 Team Improvement
 </h1>
-Here you can simulate conference or national swim meet.
+You can see how teams in a conference improved their swimmers (top taper time to top taper time) from 2013-2014.
+Hover for median percent improvement (positive means you got faster).
 <form name=confForm method="GET">
 	Conference: <select name="conference">
-		<option>Nationals</option>
+		<option>All</option>
 		$for name in conferences:
 			<option>$name</option>
 	</select>
