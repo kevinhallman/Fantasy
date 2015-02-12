@@ -22,7 +22,7 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = Trueg
+prod = True
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
