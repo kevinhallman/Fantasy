@@ -19,10 +19,10 @@ urls = ('/', 'Home',
 	'/duals', 'Duals',
 	'/placing', 'Placing',
 	'/improvement', 'Improvement',
-	'/confTeamMeet', 'confTeamMeet'
+	'/teamMeets', 'teamMeets'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -60,9 +60,9 @@ def clean(meetList):
 	for team in meetList:
 		newList[team] = {}
 		for season in meetList[team]:
-			newList[team][season] = set()
+			newList[team][season] = []
 			for meet in meetList[team][season]:
-				newList[team][season].add(re.sub('\"', '\\\\\"', meet))
+				newList[team][season].append(re.sub('\"', '\\\\\"', meet))
 	return newList
 
 web.config.debug = False
@@ -79,24 +79,12 @@ conferences = getConfs('data/conferences.txt')
 
 allTeams = {}
 for division in conferences:
-	allTeams[division] = set()
+	allTeams[division] = []
 	for conference in conferences[division]:
 		for team in conferences[division][conference]:
-			allTeams[division].add(team)
-
-allMeets = {}
-for division in conferences:
-	allMeets[division] = {}
-	for conference in conferences[division]:
-		allMeets[division][conference] = {}
-		for team in conferences[division][conference]:
-			if not team in meetList: continue
-			allMeets[division][conference][team] = {}
-			for season in meetList[team]:
-				allMeets[division][conference][team][season] = []
-				for meet in meetList[team][season]:
-					allMeets[division][conference][team][season].append(meet)
-#print json.dumps(allMeets)
+			allTeams[division].append(team)
+for division in allTeams:
+	allTeams[division].sort()
 
 class Home():
 	def GET(self):
@@ -109,21 +97,13 @@ class Home():
 		session.season = int(form.season)
 
 		web.header("Content-Type", "application/json")
-		return json.dumps({
-			'gender' : session.gender,
-            'division' : session.division,
-			'season' : session.season
-        	})
+		return
 
 class Swim(object):
 	def GET(self):
 		division = session.division
 		gender = session.gender
 		season = session.season
-		teamMeets = {}
-		for team in allTeams[division]:
-			if team in meetList and season in meetList[team]:
-				teamMeets[team] = meetList[team][season]
 
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False)
 		keys = form.keys()
@@ -152,7 +132,7 @@ class Swim(object):
 			del(formMeets[tm])
 
 		if len(formMeets) + len(optimizeTeams) < 1:
-			return render.swimulator(teamMeets, scores=None, teamScores=None, finalScores=None)
+			return render.swimulator(divTeams=allTeams, scores=None, teamScores=None, finalScores=None)
 		
 		else:
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
@@ -167,7 +147,7 @@ class Swim(object):
 			scores = newMeet.scoreString(showNum=showNum)
 			teamScores = newMeet.scoreReport(printout=False)
 				
-			return render.swimulator(teamMeets=teamMeets, scores=showMeet(scores), teamScores=showTeamScores(
+			return render.swimulator(divTeams=allTeams, scores=showMeet(scores), teamScores=showTeamScores(
 				teamScores), finalScores=showScores(scores))
 
 class Fantasy(object):
@@ -323,13 +303,18 @@ class Improvement():
 			table = None
 		return render.improvement(conferences=sorted(confList.keys()), table=table)
 
-class confTeamMeet():
+class teamMeets():
 	def POST(self):
+		form = web.input(team=None, season=None)
 		web.header("Content-Type", "application/json")
-		return json.dumps(allMeets)
 
-
-
+		if form.team in meetList:
+			seasonMeets = meetList[form.team]
+			if form.season and int(form.season) in seasonMeets:
+				return json.dumps(seasonMeets[int(form.season)])
+			return json.dumps(seasonMeets)
+		else:
+			return
 
 
 #HTML generators

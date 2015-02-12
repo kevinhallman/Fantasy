@@ -1,79 +1,165 @@
-$def with (teamMeets,scores,teamScores,finalScores)
+$def with (divTeams,scores,teamScores,finalScores)
 
 <h1>Head to Head Competition</h1>
 
 <script type="text/javascript">
-	var dict = new Object();
-	$for team in teamMeets:
-		dict["$:team"]=[]
-		$for meet in teamMeets[team]:
-			dict["$:team"].push("$:meet")
-	var numTeams=2;		
-	function getMeets (form,name) {
-		var team = form[name].value;
-		var meetList = form['meet' + name.slice(-1)];
-		meetList.innerHTML = "";
-		meetList.options[0]= new Option("Create Lineup","Create Lineup");
-		for (i in dict[team]) {
-			var option = document.createElement("option");
-			option.text = dict[team][i];
-			option.value = dict[team][i];
-			meetList.appendChild(option);
-		}
-	}
-	function addTeam (form) {
+	var divTeams = new Object();
+	$for division in divTeams:
+		divTeams["$division"] = [];
+		$for team in divTeams[division]:
+			divTeams["$division"].push("$:team");
+
+	currentDiv = "$(context.division)";
+	currentSeason = "$(context.season)";
+	numTeams = 2;
+
+	function add() {
 		numTeams += 1;
-		var submit = document.getElementById("swim");
-		var teams = document.createElement("select");
-		var meets = document.createElement("select");
+		var swim = $$("#swim")
 
-		form.insertBefore(document.createElement("br"),submit);
-		form.insertBefore(document.createTextNode("Team: "),submit);
-		form.insertBefore(teams,submit);
-		form.insertBefore(document.createElement("br"),submit);
-		form.insertBefore(document.createTextNode("Meet: "),submit);
-		form.insertBefore(meets,submit);
-		form.insertBefore(document.createElement("br"),submit);
-		
-		teams.setAttribute("name","team" + numTeams.toString());
-		meets.setAttribute("name","meet" + numTeams.toString());
-		teams.setAttribute("onchange","getMeets(this.form,this.name)");
-		meets.setAttribute("name","meet" + numTeams.toString());
+		// add the divisions
+		var html = 'Team: <select name=division' + String(numTeams) + ' onchange="getTeams(this)">';
+		for (division in divTeams) {
+			if (currentDiv == division) {
+				html += '<option selected>' + division + '</option>';
+			}
+			else {
+				html += '<option>' + division + '</option>';
+			}
+		}
+		html += '</select>';
 
-		var keys=[];
-		keys.push("")
-		for (var team in dict) {
-			keys.push(team);
+		// add the teams
+		html += '<select name=team' + String(numTeams) + ' onchange="getSeasons(this)">';
+		html += '<option></option>';
+		for (var i in divTeams[currentDiv]) {
+			html += '<option>' + divTeams[currentDiv][i] + '</option>';
 		}
-		keys.sort();
-		for (var i in keys) {
-			var option = document.createElement("option");
-			option.text = keys[i];
-			option.value = keys[i];
-			teams.appendChild(option);
-		}
+		html += '</select>';
+
+		swim.before(html);
+
+		html = '<br>Meet: ';
+		html += '<select name=season' + String(numTeams) + ' class="seasons" onchange="meets(this)">' +
+		'<option></option> </select>';
+		html += '<select name=meet' + String(numTeams) + ' class="meets">' + '<option></option> </select> <br>';
+		swim.before(html);
+		getSeasons($$("select[name=season" + numTeams + "]"));
 	}
+
+	function getTeams(select) {
+		div = select.value;
+		num = select.name.slice(-1);
+
+		$$("select[name=team" + num + "]").html('');
+		$$("select[name=team" + num + "]").append($$('<option>'));
+		for (var i in divTeams[div]) {
+			$$("select[name=team" + num + "]")
+				.append($$('<option>')
+				.text(divTeams[div][i]));
+		}
+
+		// clear out season and meets
+		$$("select[name=season" + num + "]").html('');
+		$$("select[name=meet" + num + "]").html('');
+	}
+
+	function getSeasons(select) {
+		team = select.value;
+		num = select.name.slice(-1);
+		$$.post('teamMeets', {'team': team}, function(seasonMeets) {
+			$$("select[name=season" + num + "]").html('');
+
+			$$.each(seasonMeets, function (season, meets) {
+				if (currentSeason == season) {
+					$$("select[name=season" + num + "]")
+						.append($$('<option>')
+						.attr('selected', 'selected')
+						.text(season));
+
+					// do the meets for the default
+					$$("select[name=meet" + num + "]").html('');
+					$$("select[name=meet" + num + "]")
+						.append($$('<option>')
+						.text('Create Lineup'));
+					$$.each(meets, function(index, meet) {
+						$$("select[name=meet" + num + "]")
+							.append($$('<option>')
+							.text(meet));
+					});
+				}
+				else {
+					$$("select[name=season" + num + "]")
+					.append($$('<option>')
+					.text(season));
+				}
+			});
+		});
+	};
+
+	function meets(select) {
+		// when the season is changed
+		season = select.value
+		num = select.name.slice(-1)
+		team = $$("select[name=team" + num + "] option:selected").text()
+
+		$$.post('teamMeets', {'team': team, 'season': season}, function(meets) {
+			$$("select[name=meet" + num + "]").html('');
+			$$("select[name=meet" + num + "]")
+				.append($$('<option>')
+				.text('Create Lineup'));
+
+			$$.each(meets, function(index, meet) {
+				$$("select[name=meet" + num + "]")
+					.append($$('<option>')
+					.text(meet));
+			});
+		});
+	}
+
 </script>
-$ teams = teamMeets.keys()
-$ teams.sort()
-<form name=form1 method="GET">
-	<button type="button" onclick="addTeam(this.form);">Add New Team</button>
+
+$ teams = divTeams[context.division]
+<form id="teamForm" method="GET">
+	<button type="button" onclick="add(this.form);">Add New Team</button>
 	<br> <br>
-	Team: <select name="team1" onchange="getMeets(this.form,this.name)">
+	Team:<select name="division1" onchange="getTeams(this)">
+		$for division in ['D1', 'D2', 'D3']:
+			$if division==context.division:
+				<option selected> $division </option>
+			$else:
+				<option> $division </option>
+	</select>
+
+	<select name="team1" onchange="getSeasons(this)">
 		<option></option>
 		$for name in teams:
 			<option>$:name</option>
 	</select>
 	<br>
-	Meet: <select name="meet1"></select>
+
+	Meet: <select name="season1" onchange="meets(this)">	</select>
+	<select name="meet1">	</select>
 	<br>
-	Team: <select name="team2" onchange="getMeets(this.form,this.name)">
+
+	Team: <select name="division2" onchange="getTeams(this)">
+		$for division in ['D1', 'D2', 'D3']:
+			$if division==context.division:
+				<option selected> $division </option>
+			$else:
+				<option> $division </option>
+	</select>
+	<select name="team2" onchange="getSeasons(this)">
 		<option></option>
 		$for name in teams:
 			<option>$:name</option>
 	</select>
 	<br>
-	Meet: <select name="meet2"></select>	<br>
+
+	Meet: <select name="season2" onchange="meets(this)">	</select>
+	<select name="meet2">	</select>
+	<br>
+
 	<input id="swim" type="submit" value="Swimulate">
 </form>
 
