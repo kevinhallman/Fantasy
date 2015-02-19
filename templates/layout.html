@@ -146,14 +146,12 @@ $def with (content)
 			<li value=1 ><a class="header" href="/">Home</a></li>
 			<li value=2 ><a class="header" href="/conference">Conference</a> </li>
 			<li value=3 ><a class="header" href="/swimulate">Head to Head</a></li>
-			<li value=4 ><a class="header" href="/duals">Dual Meet Ranking</a></li>
 			<li value=5 ><a class="header" href="/times">Top Times</a></li>
 			<li value=6 ><a class="header" href="/placing">Placing</a></li>
 			<li value=7 ><a class="header" href="/improvement">Improvement</a></li>
 		</ul>
 		<form id="gendiv">
 			<br/>
-			Gender:
 			$if context.gender=='Women':
 				<input type="radio" name="gender" value="Women" checked>Women
 				<input type="radio" name="gender" value="Men">Men
@@ -161,7 +159,6 @@ $def with (content)
 				<input type="radio" name="gender" value="Women">Women
 				<input type="radio" name="gender" value="Men" checked>Men
 			<br>
-			Division:
 			$if context.division=='D1':
 				<input type="radio" name="division" value="D1" checked>D1
 				<input type="radio" name="division" value="D2">D2
@@ -175,7 +172,6 @@ $def with (content)
 				<input type="radio" name="division" value="D2">D2
 				<input type="radio" name="division" value="D3" checked>D3
 			<br>
-			Season:
 			$if context.season==2014:
 				<input type="radio" name="season" value="2015">2015
 				<input type="radio" name="season" value="2014" checked>2014

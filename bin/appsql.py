@@ -168,12 +168,12 @@ class Conf(object):
 				topTimes = False
 			if form.conference == 'Nationals':
 				confMeet = database.conference(teams=allTeams[division], topTimes=topTimes, gender=gender,
-											   season=season)
+											   season=season, divisions=division)
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(printout=False, repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
-											   season=season)
+											   season=season, divisions=division)
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport(printout=False)
 		else:
@@ -415,7 +415,7 @@ def googleCandle(confImp):
 		nums = confImp[team]
 		teamName = re.sub("'", "", team)
 		table.append("['" + teamName + "'," + str(min(nums))+","+str(numpy.percentile(nums, 25))+","+str(numpy.percentile(
-			nums, 75))+","+str(max(nums)) + "," + str(round(med, 2)) + '],')
+			nums, 75))+","+str(max(nums)) + ",'" + str(round(med, 2)) + ' n=' + str(len(nums)) + "'],")
 	return table
 
 if __name__ == "__main__":
