@@ -22,7 +22,7 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -101,9 +101,7 @@ class Home():
 
 class Swim(object):
 	def GET(self):
-		division = session.division
 		gender = session.gender
-		season = session.season
 
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False)
 		keys = form.keys()
@@ -112,11 +110,13 @@ class Swim(object):
 		for key in keys:
 			num = int(key[-1])
 			if not num in formMeets:
-				formMeets[num]=[None, None]
+				formMeets[num] = [None, None, None, None]
 			if "team" in key:
 				formMeets[num][0] = form[key]
 			elif "meet" in key:
 				formMeets[num][1] = form[key]
+			elif "season" in key:
+				formMeets[num][3] = form[key]
 
 		#use topDual if no meet?
 		remove = set()
@@ -146,7 +146,8 @@ class Swim(object):
 				showNum = 6	
 			scores = newMeet.scoreString(showNum=showNum)
 			teamScores = newMeet.scoreReport(printout=False)
-				
+			newMeet.reset(True, True)
+
 			return render.swimulator(divTeams=allTeams, scores=showMeet(scores), teamScores=showTeamScores(
 				teamScores), finalScores=showScores(scores))
 
@@ -288,16 +289,17 @@ class Improvement():
 	def GET(self):
 		division = session.division
 		gender = session.gender
-		season = session.season - 1
+		#season = session.season - 1
+		season = 2014
 		confList = conferences[division]
 		form = web.input(conference=None)
 		if form.conference in confList:
-			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=confList[
-				form.conference])
+			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1,
+												   season3=season-2, teams=confList[form.conference])
 			table = googleCandle(teamImp)
 		elif form.conference == 'All':
-			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1, teams=allTeams[
-				division])
+			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1,
+												   season3=season-3, teams=allTeams[division])
 			table = googleCandle(teamImp)
 		else:
 			table = None
