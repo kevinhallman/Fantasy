@@ -13,7 +13,8 @@ $if table:
 			data.setColumnProperty(5, 'role', 'tooltip');
 
 			var options = {
-				legend:'none'
+				legend:'none',
+				'chartArea': {'width': '90%', 'height': '80%'}
 			};
 
 			var chart = new google.visualization.CandlestickChart(document.getElementById('chart'));
@@ -25,16 +26,19 @@ $if table:
 <h1>
 Team Improvement
 </h1>
-You can see how teams in a conference improved their swimmers (top taper time to top taper time) from 2013-2014.
-Hover for median percent improvement (positive means you got faster).
+See how teams in a conference improved their upperclassmen swimmers, top taper time to top taper time. Hover for median percent improvement (positive means you got faster).
 <form name=confForm method="GET">
 	Conference: <select name="conference">
 		<option>All</option>
 		$for name in conferences:
 			<option>$name</option>
 	</select>
-
-	<input type="submit" value="Swimulate">
+	<br>
+	Year: <select name="season">
+	$for year in ['All', 2013, 2014, 2015]:
+		<option>$year</option>
+	</select>
+	<input type="submit" value="Calculate">
 </form>
 
-<div id="chart" style="width: 1400px; height: 600px; float:none; margin-left: auto; margin-right: auto;"> </div>
+<div id="chart" style="width: 1300px; height: 500px; float:none; margin-left: auto; margin-right: auto;"> </div>

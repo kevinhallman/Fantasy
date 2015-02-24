@@ -22,7 +22,7 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = False
+prod = True
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -290,19 +290,42 @@ class Improvement():
 		division = session.division
 		gender = session.gender
 		#season = session.season - 1
-		season = 2014
+		season = 2015
 		confList = conferences[division]
-		form = web.input(conference=None)
+		form = web.input(conference=None, season=None)
+
+		if form.season in {'2015', '2014', '2013'}:
+			season1 = int(form.season)
+			season2 = int(form.season) - 1
+			season3 = None
+			season4 = None
+		elif form.season == 'All':
+			season1 = season
+			season2 = season - 1
+			season3 = season - 2
+			season4 = season - 3
+		else:
+			return render.improvement(conferences=sorted(confList.keys()), table=None)
+
 		if form.conference in confList:
-			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1,
-												   season3=season-2, teams=confList[form.conference])
+			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
+												   season3=season3, season4=season4, teams=confList[form.conference])
 			table = googleCandle(teamImp)
+			'''
+			for team in indImp:
+				print team
+				for swimmer in indImp[team]:
+					for event in indImp[team][swimmer]:
+						print swimmer, event, indImp[team][swimmer][event]
+			'''
 		elif form.conference == 'All':
-			teamImp, indImp = database.improvement(gender=gender, season1=season, season2=season-1,
-												   season3=season-3, teams=allTeams[division])
+			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
+												   season3=season3, season4=season4, teams=allTeams[division])
 			table = googleCandle(teamImp)
+			print indImp
 		else:
 			table = None
+
 		return render.improvement(conferences=sorted(confList.keys()), table=table)
 
 class teamMeets():
