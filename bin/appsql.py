@@ -22,7 +22,7 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -322,7 +322,7 @@ class Improvement():
 			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
 												   season3=season3, season4=season4, teams=allTeams[division])
 			table = googleCandle(teamImp)
-			print indImp
+			#print indImp
 		else:
 			table = None
 
