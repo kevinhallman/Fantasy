@@ -1,0 +1,61 @@
+$def with (conferences, table, bar)
+
+$if table:
+	<script type="text/javascript">
+    $if bar:
+    	google.load('visualization', '1.1', {packages: ['bar']});
+    $else:
+    	google.load('visualization', '1.1', {packages: ['line']});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+		var data = google.visualization.arrayToDataTable([
+			$for line in table:
+				$:line
+		]);
+
+		var options = {
+			chart: {
+				title: 'Projected team score',
+        	},
+        	$if bar:
+        		legend: { position: 'none' },
+			width: 1200,
+			height: 700,
+			displayExactValues: true
+		};
+
+		$if bar:
+			var chart = new google.charts.Bar(document.getElementById('chart'));
+		$else:
+			var chart = new google.charts.Line(document.getElementById('chart'));
+
+		chart.draw(data, options);
+	}
+  </script>
+
+<h1>
+Team Rankings
+</h1>
+See how strong a team is compared to other teams in its division. Projected scores are based off the expected placing
+of a team's top times.
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		<option>All</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+	<br>
+	Year: <select name="season">
+	$for year in ['All', 2012, 2013, 2014, 2015]:
+		<option>$year</option>
+	</select>
+	<br>
+	Scoring method: <select name="dual">
+		<option>Invite</option>
+		<option>Dual</option>
+	</select>
+	<input type="submit" value="Show">
+</form>
+
+<div id="chart" style="width: 1300px; height: 500px; float:center; margin-left: auto; margin-right: auto;"> </div>
