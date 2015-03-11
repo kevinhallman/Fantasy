@@ -152,13 +152,15 @@ Toledo	2014	Toledo vs MSU
 Toledo	2014	Toledo
 Toledo	2014	Denison University vs. Wabash(
 Toledo	2014	Toledo vs. OSU
-Toledo	2015	Toledo  Marshall vs BGSU
-Toledo	2015	Duquesne v. Toledo
 Toledo	2015	2015 WICA vs Toledo
+Toledo	2015	Duquesne v. Toledo
+Toledo	2015	Toledo  Marshall vs BGSU
+Toledo	2015	2014 Miami University Invitati
+Toledo	2015	Last Chance Qualifier-Women
 Toledo	2015	Toledo vs Ball State
 Toledo	2015	Toledo vs Ohio State
 Toledo	2015	Toledo vs Ohio
-Toledo	2015	2014 Miami University Invitati
+Toledo	2015	2015 MAC Women's Swim and Dive
 Toledo	2015	Eastern Michigan-Toledo
 Toledo	2015	Ohio State Winter Invite 2015
 Wabash	2012	DePauw vs Wabash Dual 2011
@@ -279,17 +281,22 @@ Indiana	2014	Iowa vs Illinois-Indiana-Misso
 Indiana	2014	AU IU UM vs ND 2013
 Indiana	2014	2013 AT&T Winter National Cham
 Indiana	2014	IU - PU Men
+Indiana	2015	Last Chance NCAA Qualifier 201
 Indiana	2015	Auburn - Indiana 2014
 Indiana	2015	IUPUI - WKU - IU Men
 Indiana	2015	OSU - INDIANA-LOUISVILLE
 Indiana	2015	2014 Winter National Time Trials
-Indiana	2015	2014 TN vs KY vs Indiana
+Indiana	2015	2015 Southern Premier
 Indiana	2015	2014 AT&T Winter National Cham
+Indiana	2015	2015 B1G Men's Swimming & Divi
 Indiana	2015	Michigan Quad Meet
 Indiana	2015	2015 IL Flying Fish Time Trial
 Indiana	2015	IU - Louisville - Evansville
+Indiana	2015	Boiler-Make-It Qualification C
+Indiana	2015	2015 IL  Illinois Senior SCY C
 Indiana	2015	IU vs. ND vs. Wisconsin Dual
 Indiana	2015	Indiana Intercollegiates 2014
+Indiana	2015	2014 TN vs KY vs Indiana
 Indiana	2015	2015 B1G Women's Swim & Dive C
 Indiana	2015	Indiana vs. Purdue Dual 2015
 Indiana	2015	2014 Hoosierland Open Invitati
@@ -351,14 +358,17 @@ Ball State	2015	2014 EMU Swim and Dive Invitat
 Ball State	2015	Ball State vs. Akron
 Ball State	2015	Ball State  vs BGSU
 Ball State	2015	Ball State vs Evansville
+Ball State	2015	2015 MAC Mens Championship TTs
 Ball State	2015	Butler Invitational 2015
 Ball State	2015	2015 MICA vs Ball State
 Ball State	2015	Toledo vs Ball State
+Ball State	2015	2015 MAC Mens Championships
 Ball State	2015	Ball State vs Milwaukee vs IUP
 Ball State	2015	IUPUI - BSU - XU
 Ball State	2015	Indiana Intercollegiates 2014
 Ball State	2015	EIU vs Ball State
 Ball State	2015	BSU vs. Miami
+Ball State	2015	2015 MAC Women's Swim and Dive
 Ball State	2015	11th Annual Doug Coers Invitat
 Brown	2012	BU vs Columbia & Brown Women
 Brown	2012	2012 Women's Ivy Champs
@@ -407,12 +417,14 @@ Brown	2014	Brown vs Columbia Women
 Brown	2014	Brown vs Yale Men
 Brown	2015	Brown
 Brown	2015	Brown @ Yale
+Brown	2015	Princeton University NCAA Qual
 Brown	2015	2015 NE W Ivy Champs TT
 Brown	2015	Brown University vs Northeaste
 Brown	2015	Brown vs Cornell
 Brown	2015	2015 NE W Ivy Champs
 Brown	2015	Mens Meet Brown v Harvard v Pe
 Brown	2015	Brown @ Columbia Men
+Brown	2015	2015 Men's Ivy League Champion
 Brown	2015	Womens Meet Brown v Harvard v
 Brown	2015	Brown at Columbia Women
 Brown	2015	Brown University Invitational
@@ -702,17 +714,20 @@ Michigan St	2015	ARMY & MSU AT BUFFALO
 Michigan St	2015	2014 Winter National Time Trials
 Michigan St	2015	2014 Northwestern TYR Invitati
 Michigan St	2015	Michigan State University vs P
-Michigan St	2015	2015 MI OLY Michigan Open
+Michigan St	2015	2015 B1G Men's Swimming & Divi
+Michigan St	2015	2014 AT&T Winter National Cham
 Michigan St	2015	Michigan State vs Toledo
-Michigan St	2015	2015 B1G Women's Swim & Dive C
+Michigan St	2015	2015 MI OLY Michigan Open
+Michigan St	2015	2015 B1G Men's Swimming Time T
 Michigan St	2015	Oakland vs. msu 2015
 Michigan St	2015	Mich St vs Ohio State
 Michigan St	2015	Mich State vs Michigan-women
 Michigan St	2015	MSU, Marshall  vs BGSU
 Michigan St	2015	Michigan State vs Iowa
 Michigan St	2015	Mich State vs Michigan-men
+Michigan St	2015	2015 B1G Women's Swim & Dive C
 Michigan St	2015	Israel Winter Championship Short Course
-Michigan St	2015	2014 AT&T Winter National Cham
+Michigan St	2015	Michigan Last Chance
 GW	2012	AU CU GW Meet
 GW	2012	Rhode Island Invitational
 GW	2012	2011 George Washington Univers
@@ -1430,6 +1445,7 @@ Northeastern	2015	Brown University vs Northeaste
 Northeastern	2015	UCONN Invite 2015
 Northeastern	2015	GMU/CofC/Towson/Northeastern
 Northeastern	2015	Northeastern Women vs UNH Wome
+Northeastern	2015	2015 Colonial Athletics Assoc
 Grinnell	2012	Midwest Conference Championshi
 Grinnell	2012	Grinnell College Invite
 Grinnell	2012	Luther vs Grinnell 11
@@ -1468,13 +1484,14 @@ Grinnell	2014	IIT v. Grinnell
 Grinnell	2015	Luther V Grinnell dual
 Grinnell	2015	Grinnell V. UNL Club Dual
 Grinnell	2015	Grinnell Invitational 2015
-Grinnell	2015	Coe V. Grinnell Dual
+Grinnell	2015	2015 Midwest Conference Time T
 Grinnell	2015	Connecticut vs Grinnell 15
 Grinnell	2015	Loras College vs. Grinnell Col
 Grinnell	2015	Monmouth College Invite 2014
+Grinnell	2015	Grinnell Last Chance
 Grinnell	2015	Pioneer Classic 2014
 Grinnell	2015	2015 Midwest Conference Champi
-Grinnell	2015	2015 Midwest Conference Time T
+Grinnell	2015	Coe V. Grinnell Dual
 Grinnell	2015	Macalester vs Grinnell
 Allegheny	2012	Allegheny v Case Western
 Allegheny	2012	Allegheny College Vs. Grove Ci
@@ -1770,6 +1787,7 @@ Marist	2014	2014 MAAC Championships
 Marist	2014	Marist vs Fordham
 Marist	2014	Canisius vs Marist 2013
 Marist	2015	Marist vs Binghamton
+Marist	2015	2015 ECAC Open Swimming Time T
 Marist	2015	Marist
 Marist	2015	Marist vs Fairfield
 Marist	2015	Marist vs Rider
@@ -1778,6 +1796,7 @@ Marist	2015	Fordham vs. Marist
 Marist	2015	Marist vs Canisius
 Marist	2015	2015 MAAC Championships
 Marist	2015	SHU vs Marist
+Marist	2015	2015 ECAC Open Swimming & Divi
 Marist	2015	Marist vs So. Connecticut
 Denver	2012	Air Force Vs Denver University
 Denver	2012	FAU 2011 December Invite
@@ -1830,20 +1849,25 @@ Denver	2014	2014 Summit Swimming TTs
 Denver	2014	DU vs. Wyoming
 Denver	2014	2013 Hawkeye Invitational
 Denver	2015	Denver University vs. Wyoming
+Denver	2015	2015 ST American Short Course Cha
 Denver	2015	2014 Hawkeye Invitational
 Denver	2015	UTAH vs Denver
 Denver	2015	2014 AT&T Winter National Cham
 Denver	2015	CSM vs. DU
 Denver	2015	Missouri St-Denver-Kansas
-Denver	2015	DU vs. Wyoming (men)
+Denver	2015	2015 WOMENS PAC-12 SWIMMING IN
 Denver	2015	DU vs CSU vs UNO
+Denver	2015	DU vs. Wyoming (men)
 Denver	2015	Denver Relays 2014
-Denver	2015	UNLV vs DENVER
 Denver	2015	2014 CO Jeffco Pineapple Open
+Denver	2015	2015 Summit League Championshi
+Denver	2015	2015 Summit League Time Trials
 Denver	2015	GCU, DU @ AFA
 Denver	2015	Denver at BYU
 Denver	2015	DU vs Boise State (w)
 Denver	2015	DU vs. AFA Sprint Eliminator
+Denver	2015	UNLV vs DENVER
+TCNJ	2015	2015 Metropolitan Collegiate C
 Maryland	2012	UMD vs NC State
 Maryland	2012	2011 UMD vs UMBC
 Maryland	2012	2011 PV UMD Red & Black Invitational
@@ -1899,16 +1923,19 @@ Rice	2014	Rice VS North Texas Dual
 Rice	2014	CSCAA Collegiate Classic
 Rice	2014	2013 UT Invite
 Rice	2014	UALR versus RICE
-Rice	2015	SMU vs Rice Women's Dual
+Rice	2015	2015 GU Speedo Sectionals Champio
+Rice	2015	2015 GU AGS Sectionals Champs
+Rice	2015	North Texas vs Rice
 Rice	2015	Houston/Rice/Tulane/LSU
 Rice	2015	Texas A&M vs. Rice Women's Dua
 Rice	2015	2015 C-USA Time Trials
+Rice	2015	2015 Big 12 Last Chance Meet
 Rice	2015	Nev-Rice-SDSU 1-9-14
 Rice	2015	UH v Rice
 Rice	2015	2014 UH Phill Hansel Inv
 Rice	2015	2014 UIW Christmas Invitationa
 Rice	2015	2015 C-USA Women's Champs & C-
-Rice	2015	North Texas vs Rice
+Rice	2015	SMU vs Rice Women's Dual
 Rider	2012	Rider vs Marist
 Rider	2012	2012 ECAC Swimming & Diving Op
 Rider	2012	Rutgers/Fordham/Rider
@@ -1942,6 +1969,7 @@ Rider	2015	2014 LaSalle-Rider
 Rider	2015	Marist vs Rider
 Rider	2015	2014 Rider vs UMBC
 Rider	2015	Rider vs Seton
+Rider	2015	2015 ECAC Open Swimming & Divi
 Rider	2015	Brown University Invitational
 Linfield	2012	Northwest Invitational Meet
 Linfield	2012	2011 NWC Sprint Pentathlon
@@ -2138,6 +2166,7 @@ Boston College	2014	Bryant University Vs Boston Co
 Boston College	2014	BC at Providence
 Boston College	2014	Terrier Invitational 2013
 Boston College	2014	Northeastern Women vs. Boston
+Boston College	2015	2015 ACC Men's Time Trials
 Boston College	2015	Tufts University vs. Boston Co
 Boston College	2015	Thomas Murphy Invitational
 Boston College	2015	2015 ACC Women's Time Trials
@@ -2150,9 +2179,10 @@ Boston College	2015	Terrier Invitational
 Boston College	2015	BC-VT @ Maine
 Boston College	2015	Fairfield vs BC
 Boston College	2015	Bridgewater State Univ. v. Bos
+Boston College	2015	UCONN vs Boston College
 Boston College	2015	2015 ACC Women's Championship
 Boston College	2015	Bryant
-Boston College	2015	UCONN vs Boston College
+Boston College	2015	2015 ACC Men's Championship
 Grand Valley	2012	AU vs GVSU
 Grand Valley	2012	2012 MI EGRA Red District Meet
 Grand Valley	2012	2011 Calvin Winter Invitationa
@@ -2360,6 +2390,7 @@ Denison	2015	2015 NCAC Swimming Time Trials
 Denison	2015	Denison University vs. Kenyon
 Denison	2015	Kenyon College Fast Chance Inv
 Denison	2015	Denison University vs. Ohio St
+Denison	2015	Denison vs. Pittsburgh
 Denison	2015	Denison University vs. Ohio Un
 Denison	2015	CMU vs Denison
 Denison	2015	Ohio State-Princeton-Denson
@@ -2367,7 +2398,7 @@ Denison	2015	Denison University vs. Univers
 Denison	2015	Denison University vs. DePauw
 Denison	2015	Ohio Wesleyan vs Denison Unive
 Denison	2015	2014 Miami University Invitati
-Denison	2015	Denison vs. Pittsburgh
+Denison	2015	2015 WI 13&Over SC State Champ
 Greensboro Coll.	2014	Gally_Greensboro_Hollins
 Greensboro Coll.	2014	Guilford, Hampden-Sydney, Brid
 Greensboro Coll.	2014	2013 R-MC Yellow Jacket Invita
@@ -2435,6 +2466,8 @@ UC Davis	2015	2015 MPSF Swim & Dive Champs
 UC Davis	2015	UC Davis vs. Pacific
 UC Davis	2015	UC Davis vs.San Jose State
 UC Davis	2015	UC Davis vs. BYU
+UC Davis	2015	2015 CC Juanita Allington Memorial Sr Meet
+UC Davis	2015	2015 SN Vacaville Classic
 LSU	2012	2011 Pan American Games
 LSU	2012	UF vs. LSU
 LSU	2012	LSU vs. Auburn (men)
@@ -2840,11 +2873,12 @@ John Carroll	2014	JCU vs Oberlin Dual Meet
 John Carroll	2015	JCU vs Hiram
 John Carroll	2015	Allegheny College vs. John Car
 John Carroll	2015	John Carroll University vs Def
+John Carroll	2015	BW vs JCU
 John Carroll	2015	Mount Union v. John Carroll
 John Carroll	2015	JCU/ONU dual
 John Carroll	2015	2015 OAC Time Trials
 John Carroll	2015	CWRU vs. JCU
-John Carroll	2015	BW vs JCU
+John Carroll	2015	LE Senior Championship Meet 20
 John Carroll	2015	Oberlin vs. John Carroll
 John Carroll	2015	John Carroll vs. Ohio Wesleyan
 John Carroll	2015	JCU vs Wilmington
@@ -3068,15 +3102,18 @@ Ohio	2014	WVU/ISU vs Ohio
 Ohio	2014	BSU vs. OU
 Ohio	2014	University of Akron vs. Ohio U
 Ohio	2014	BGSU vs Ohio
+Ohio	2015	2015 MAC Women's Swim Time Tri
 Ohio	2015	WVU vs Ohio
-Ohio	2015	Ohio University v Miami Univer
+Ohio	2015	2014 H2Okie Fall Invitational
+Ohio	2015	Last Chance Qualifier-Women
 Ohio	2015	Denison University vs. Ohio Un
 Ohio	2015	EMU-vs-OU
 Ohio	2015	Marshall vs. Ohio
 Ohio	2015	Oakland vs. Ohio vs. Youngstow
-Ohio	2015	2014 H2Okie Fall Invitational
+Ohio	2015	Ohio University v Miami Univer
 Ohio	2015	Ohio University v The Ohio Sta
 Ohio	2015	Toledo vs Ohio
+Ohio	2015	2015 MAC Women's Swim and Dive
 Iowa State	2012	Mizzou Big 12 Last Chance Meet
 Iowa State	2012	Nebraska vs. Iowa State 2012
 Iowa State	2012	2012 Big 12 Swimming and Divin
@@ -3114,12 +3151,15 @@ Iowa State	2015	Illinois vs. Iowa State 2015
 Iowa State	2015	West Virginia at Iowa State
 Iowa State	2015	TCU v. Iowa State
 Iowa State	2015	Northern Iowa at Iowa State
+Iowa State	2015	2015 Big 12 Last Chance Meet
+Iowa State	2015	2015 Big 12 Swimming Time Tria
 Iowa State	2015	UN-Omaha, North Dakota, Iowa S
 Iowa State	2015	South Dakota at Iowa State
 Iowa State	2015	South Dakota State at Iowa Sta
-Iowa State	2015	Kansas Classic
-Iowa State	2015	Iowa vs Iowa State (12-12-14)
+Iowa State	2015	2015 Big 12 Swimming & Diving
 Iowa State	2015	Nebraska at Iowa State
+Iowa State	2015	Iowa vs Iowa State (12-12-14)
+Iowa State	2015	Kansas Classic
 Pfeiffer	2012	PU vs Catawba
 Pfeiffer	2012	2012 NC Nomad Dual Meet
 Pfeiffer	2012	Wingate Fall Frenzy
@@ -3277,19 +3317,23 @@ Georgia Tech	2014	2013 Georgia Tech vs Louisvill
 Georgia Tech	2014	Georgia Tech vs. SCAD
 Georgia Tech	2014	GaTech at Emory Univ.
 Georgia Tech	2014	Florida State vs. NC State, GA
+Georgia Tech	2015	Bulldog Invitational 2015
 Georgia Tech	2015	Penn State v. Georgia Tech
+Georgia Tech	2015	2015 ACC Women's Time Trials
 Georgia Tech	2015	2015 ACC Women's Championship
 Georgia Tech	2015	2014 Winter National Time Trials
-Georgia Tech	2015	FGCU vs FAU vs GT
+Georgia Tech	2015	2015 ACC Men's Time Trials
 Georgia Tech	2015	2014 AT&T Winter National Cham
 Georgia Tech	2015	2014 Georgia Tech vs UGA and S
 Georgia Tech	2015	Georgia Tech
-Georgia Tech	2015	2014 Georgia Tech Fall Invitat
+Georgia Tech	2015	2015 Yellow Jacket Championshi
 Georgia Tech	2015	2014 Georgia Tech vs Notre Dam
-Georgia Tech	2015	2015 ACC Women's Time Trials
+Georgia Tech	2015	FGCU vs FAU vs GT
 Georgia Tech	2015	2014 Georgia Tech v Pitt and G
 Georgia Tech	2015	2014 Georgia Tech vs Florida S
+Georgia Tech	2015	2014 Georgia Tech Fall Invitat
 Georgia Tech	2015	VT vs GT, UNCW & Miami
+Georgia Tech	2015	2015 ACC Men's Championship
 Jewell	2013	Last Chance Meet
 Jewell	2013	2012 Show Me Showdown
 Jewell	2013	Lindenwood, SLU, Missouri S&T,
@@ -3318,6 +3362,7 @@ Jewell	2015	2015 GLVC Championships
 Jewell	2015	SLU, Bellermine, WJ Saturday
 Jewell	2015	SLU, Bellermine, WJ Friday
 Jewell	2015	2014 Show Me Showdown
+Jewell	2015	SCS Central Section Region VII
 Jewell	2015	Jewell Vs. Lewis2
 Jewell	2015	2015 Drury Invitational
 Jewell	2015	Citrus Classic
@@ -3444,7 +3489,7 @@ Missouri St. (M)	2014	Shamrock Invitational
 Missouri St. (M)	2014	Missouri State v. Missouri
 Missouri St. (M)	2014	MSU vs. Drury
 Missouri St. (M)	2014	Missouri State v. Southern Ill
-Missouri St. (M)	2015	Polish Winter Championships
+Missouri St. (M)	2015	2015 MAC Mens Championships
 Missouri St. (M)	2015	SIU v MSU
 Missouri St. (M)	2015	UE vs MO State
 Missouri St. (M)	2015	2015 MSU vs DU
@@ -3457,6 +3502,7 @@ Missouri St. (M)	2015	MU vs Missouri State Dual
 Missouri St. (M)	2015	Louisville Cardinal Invitation
 Missouri St. (M)	2015	Missouri State vs. Drury
 Missouri St. (M)	2015	MSU vs. Truman State
+Missouri St. (M)	2015	Polish Winter Championships
 RIT	2012	RIT-Oswego
 RIT	2012	R.I.T. vs. Utica College
 RIT	2012	U of R  vs RIT 2012
@@ -3726,11 +3772,13 @@ Illinois-Chicago	2014	2014 IL  Speedo Illinois Senior Championships
 Illinois-Chicago	2014	EIU vs IUPUI vs UIC
 Illinois-Chicago	2014	WIU, Oliv.Naz, UIC
 Illinois-Chicago	2014	Horizon League Championships 2
+Illinois-Chicago	2015	Milwaukee vs UIC
 Illinois-Chicago	2015	Northwestern/UIC/Oakland Doubl
 Illinois-Chicago	2015	2014 Northwestern TYR Invitati
-Illinois-Chicago	2015	Milwaukee vs UIC
 Illinois-Chicago	2015	UIC vs Youngstown 2015
 Illinois-Chicago	2015	UIC vs Olivet Nazarene
+Illinois-Chicago	2015	2015 IL  Illinois Senior SCY C
+Illinois-Chicago	2015	Horizon League Championship 20
 Richmond	2012	Rutgers vs. University of Rich
 Richmond	2012	2012 PV Speedo Champions Series
 Richmond	2012	GMU vs. Richmond & Toronto
@@ -3760,16 +3808,17 @@ Richmond	2014	Atlantic 10 Swimming & Diving
 Richmond	2014	Duquesne v. Oakland v. Richmon
 Richmond	2014	ODU and UNCW at Richmond
 Richmond	2014	Atlantic 10 Swimming Time Tri
+Richmond	2015	Bulldog Invitational 2015
 Richmond	2015	UNCW v Rich v ODU
-Richmond	2015	2014 Richmond Duals: Meet Two/
 Richmond	2015	2014 Richmond Duals: Meet One/
 Richmond	2015	2014 Patriot Invitational
 Richmond	2015	Fordham vs. La Salle vs. Richm
 Richmond	2015	Virginia Tech vs Kentucky and
 Richmond	2015	Vilanova vs Richmond
 Richmond	2015	Richmond vs William & Mary
-Richmond	2015	Richmond vs JMU
 Richmond	2015	2015 A-10 Men's & Women's Cham
+Richmond	2015	2014 Richmond Duals: Meet Two/
+Richmond	2015	Richmond vs JMU
 Ohio St	2012	2011 Canada Cup
 Ohio St	2012	2012 EnergyAustralia Swimming
 Ohio St	2012	Ohio St. vs Mich vs Penn St.
@@ -3850,17 +3899,20 @@ Ohio St	2015	Michigan vs Ohio State
 Ohio St	2015	OSU - INDIANA-LOUISVILLE
 Ohio St	2015	Denison University vs. Ohio St
 Ohio St	2015	Ohio State Winter Invite 2015
-Ohio St	2015	2014 AT&T Winter National Cham
+Ohio St	2015	Last Chance Qualifier-Women
 Ohio St	2015	OSU vs UC (coed) OSU vs PU (wo
+Ohio St	2015	2015 B1G Men's Swimming & Divi
 Ohio St	2015	Mich St vs Ohio State
 Ohio St	2015	Ohio State-Princeton-Denson
 Ohio St	2015	OSU vs CSU
 Ohio St	2015	2014 WICA vs OSU
 Ohio St	2015	Toledo vs Ohio State
+Ohio St	2015	Dennis Stark Relays 2014
 Ohio St	2015	OSU - WEST VIRGINIA
 Ohio St	2015	Ohio University v The Ohio Sta
 Ohio St	2015	Ohio State Invitational
-Ohio St	2015	Dennis Stark Relays 2014
+Ohio St	2015	2014 AT&T Winter National Cham
+Ohio St	2015	Last Chance NCAA Qualifier 201
 Ohio St	2015	2015 B1G Women's Swim & Dive C
 Louisville	2012	Louisville vs Xavier
 Louisville	2012	IU - Louisville
@@ -3918,23 +3970,28 @@ Louisville	2014	2013 Georgia Tech vs Louisvill
 Louisville	2014	2014 NC ESSZ SPEEDO Championsh
 Louisville	2014	Louisville vs Kentucky
 Louisville	2014	LEN: European Short Course Championships
-Louisville	2015	Louisville vs Cincinnati
-Louisville	2015	Louisville vs Florida State
-Louisville	2015	Louisville vs North Carolina
-Louisville	2015	Louisville vs Xavier
-Louisville	2015	OSU - INDIANA-LOUISVILLE
 Louisville	2015	2015 ACC Women's Championship
-Louisville	2015	2014 Winter National Time Trials
+Louisville	2015	Louisville Invitational 1st Ch
+Louisville	2015	2015 NC Speedo Champions Serie
+Louisville	2015	IU - Louisville - Evansville
+Louisville	2015	Louisville vs North Carolina
+Louisville	2015	Louisville vs Florida State
+Louisville	2015	2014 TN vs AUB & Louisville
 Louisville	2015	2015 ACC Women's Time Trials
 Louisville	2015	SMU Women's Classic 2014
-Louisville	2015	12th FINA World Chams (25m)
-Louisville	2015	Michigan Quad Meet
-Louisville	2015	IU - Louisville - Evansville
-Louisville	2015	2014 33rd Annual Animal & JR
-Louisville	2015	Louisville Cardinal Invitation
-Louisville	2015	2014 TN vs AUB & Louisville
 Louisville	2015	UK vs UL
+Louisville	2015	Louisville vs Cincinnati
+Louisville	2015	Louisville vs Xavier
+Louisville	2015	OSU - INDIANA-LOUISVILLE
+Louisville	2015	2014 Winter National Time Trials
+Louisville	2015	Louisville Cardinal Invitation
+Louisville	2015	2015 Yellow Jacket Championshi
+Louisville	2015	2014 33rd Annual Animal & JR
+Louisville	2015	Bulldog Invitational 2015
 Louisville	2015	2014 AT&T Winter National Cham
+Louisville	2015	Michigan Quad Meet
+Louisville	2015	12th FINA World Chams (25m)
+Louisville	2015	2015 ACC Men's Championship
 Ramapo	2012	New Paltz vs. Ramapo
 Ramapo	2012	ESU v Ramapo
 Ramapo	2012	Ramapo 2011
@@ -4155,10 +4212,13 @@ So. Methodist	2014	Texas A&M vs. SMU Women
 So. Methodist	2014	SMU v. TCU
 So. Methodist	2014	LEN: European Short Course Championships
 So. Methodist	2014	2013 ST AAAA Fastest Man In Te
+So. Methodist	2015	2015 GU Speedo Sectionals Champio
 So. Methodist	2015	2015 American Ath. Conf. - Swi
-So. Methodist	2015	SMU vs Rice Women's Dual
+So. Methodist	2015	2015 GU AGS Sectionals Champs
+So. Methodist	2015	2015 ST American Short Course Cha
 So. Methodist	2015	Texas A&M vs. MoSt (m), Tennes
 So. Methodist	2015	SMU Women's Classic 2014
+So. Methodist	2015	SMU vs Rice Women's Dual
 So. Methodist	2015	UT vs Arizona vs SMU
 So. Methodist	2015	2015 American Ath. Conf. - Tim
 So. Methodist	2015	SMU vs TCU Men's Dual
@@ -4203,14 +4263,15 @@ Vanderbilt	2014	2014 SE Championship Qualifica
 Vanderbilt	2014	2014 SEC Swimming Time Trials
 Vanderbilt	2014	Tulane vs. Vanderilt 11/2/2013
 Vanderbilt	2015	VU-SDSU-UALR-CU
+Vanderbilt	2015	2015 Last Chance Meet
 Vanderbilt	2015	VU vs WKU vs Tulane
 Vanderbilt	2015	West Florida v North Florida v
-Vanderbilt	2015	USC vs Vanderbrilt vs Queens v
+Vanderbilt	2015	University of Kentucky vs Vand
 Vanderbilt	2015	UGA vs Vanderbilt (W)
 Vanderbilt	2015	2014 Georgia Tech Fall Invitat
 Vanderbilt	2015	Auburn vs Vanderbilt vs Notre
 Vanderbilt	2015	VU-SDSU-UALR
-Vanderbilt	2015	University of Kentucky vs Vand
+Vanderbilt	2015	USC vs Vanderbrilt vs Queens v
 Vanderbilt	2015	Marshall vs. Vanderbilt & Xavi
 Vanderbilt	2015	2015 SEC Swimming Time Trials
 Vanderbilt	2015	University of Arkansas vs Vand
@@ -4297,6 +4358,7 @@ Washington St.	2014	2013 Hawkeye Invitational
 Washington St.	2015	2014 Hawkeye Invitational
 Washington St.	2015	2014 CA OB USC vs Washington-
 Washington St.	2015	Arizona at Washington State
+Washington St.	2015	2015 WOMENS PAC-12 SWIMMING CH
 Washington St.	2015	Seattle-WSU Dual
 Washington St.	2015	Arizona State at Washington St
 Washington St.	2015	Utah at WSU (Dual)
@@ -4340,9 +4402,12 @@ Akron	2015	Akron  vs BGSU
 Akron	2015	Winter National Championships
 Akron	2015	EMU-vs- UA
 Akron	2015	Akron vs. Saint Francis
+Akron	2015	2015 MAC Women's Swim Time Tri
 Akron	2015	Akron Dual vs Buffalo
+Akron	2015	LE Senior Championship Meet 20
 Akron	2015	UA vs. Xavier & Mount Union
 Akron	2015	Ball State vs. Akron
+Akron	2015	2015 MAC Women's Swim and Dive
 Akron	2015	Akron v Youngstown State
 Akron	2015	2014 Zippy Invitational
 BSC	2013	Rhodes vs. BSC
@@ -4366,6 +4431,7 @@ BSC	2014	NCAA Division III Championship
 BSC	2015	2015 Emory Invitational Time T
 BSC	2015	5th Annual Viking Classic
 BSC	2015	BSC vs. Emory
+BSC	2015	2015 SC Southeastern Champions
 BSC	2015	Delta State Christmas Invite 2
 BSC	2015	SAA Conference Championship TT
 BSC	2015	BSC vs. Sewanee vs. West Flori
@@ -4578,6 +4644,7 @@ CSUB (M)	2014	Fresno Pacific vs CSUB
 CSUB (M)	2014	UNLV v DU v AFA v CSUB
 CSUB (M)	2015	CSUBvsUCSC
 CSUB (M)	2015	GCU v. Cal State Bakersfield
+CSUB (M)	2015	2015 WAC Swimming & Diving Cha
 CSUB (M)	2015	LMU vs. CSU Bakersfield vs. UC
 CSUB (M)	2015	CSUB v.s. Pacific
 CSUB (M)	2015	Idaho vs. SU and CSU
@@ -4635,18 +4702,22 @@ Florida St	2014	FSU vs. University of Miami
 Florida St	2014	LEN: European Short Course Championships
 Florida St	2014	Alabama versus Florida State
 Florida St	2014	Florida State vs. NC State, GA
+Florida St	2015	2014 Georgia Tech Fall Invitat
 Florida St	2015	Louisville vs Florida State
 Florida St	2015	FSU vs. Florida Southern
 Florida St	2015	UGA Fall Invitational 2014
 Florida St	2015	FGCU vs. FSU
 Florida St	2015	2015 ACC Women's Championship
-Florida St	2015	2014 FG Speedo Winter Championships
+Florida St	2015	2015 Last Chance Meet
+Florida St	2015	2015 Yellow Jacket Championshi
 Florida St	2015	Florida State University vs Un
-Florida St	2015	2014 Georgia Tech Fall Invitat
+Florida St	2015	2014 FG Speedo Winter Championships
 Florida St	2015	2014 All Florida Invitational
 Florida St	2015	12th FINA World Chams (25m)
 Florida St	2015	2015 FL ATAC Mac Crutchfield Inivtiati
 Florida St	2015	2014 Georgia Tech vs Florida S
+Florida St	2015	2015 Area 2 Championships
+Florida St	2015	2015 ACC Men's Championship
 American	2012	AU CU GW Meet
 American	2012	Army vs. American, George Maso
 American	2012	2012 Patriot League Championsh
@@ -4761,17 +4832,21 @@ Notre Dame	2015	2014 Hawkeye Invitational
 Notre Dame	2015	Michigan State vs Notre Dame-m
 Notre Dame	2015	Cleveland State University vs
 Notre Dame	2015	2015 ACC Women's Championship
-Notre Dame	2015	Notre Dame vs Illinois
-Notre Dame	2015	12th FINA World Chams (25m)
+Notre Dame	2015	2015 ACC Men's Time Trials
+Notre Dame	2015	IU vs. ND vs. Wisconsin Dual
 Notre Dame	2015	2015 ACC Women's Time Trials
+Notre Dame	2015	Boiler-Make-It Qualification C
 Notre Dame	2015	Texas Swimming & Diving Hall o
 Notre Dame	2015	ND v Purdue
 Notre Dame	2015	Auburn vs Vanderbilt vs Notre
 Notre Dame	2015	2014 Georgia Tech vs Notre Dam
+Notre Dame	2015	12th FINA World Chams (25m)
 Notre Dame	2015	Shamrock Invitational
-Notre Dame	2015	IU vs. ND vs. Wisconsin Dual
+Notre Dame	2015	Notre Dame vs Illinois
 Notre Dame	2015	MIchigan vs Northwestern - Not
+Notre Dame	2015	2015 ACC Men's Championship
 Notre Dame	2015	Dennis Stark Relays 2014
+Notre Dame	2015	Last Chance NCAA Qualifier 201
 Notre Dame	2015	ND v VT v Pitt
 Albion	2012	Albion - Saint Mary's
 Albion	2012	Olivet vs Albion
@@ -4850,10 +4925,13 @@ Bowling Green	2015	2014 EMU Swim and Dive Invitat
 Bowling Green	2015	Akron  vs BGSU
 Bowling Green	2015	Ball State  vs BGSU
 Bowling Green	2015	MSU, Marshall  vs BGSU
+Bowling Green	2015	2015 OH Tim Myers Ohio Senior S
+Bowling Green	2015	2015 MAC Women's Swim Time Tri
 Bowling Green	2015	2014 Georgia Tech Fall Invitat
 Bowling Green	2015	Oakland vs. EMU vs. BG
 Bowling Green	2015	Bowling Green at Buffalo
 Bowling Green	2015	BGSU v Youngstown State
+Bowling Green	2015	2015 MAC Women's Swim and Dive
 UCLA	2012	UA vs. UCLA 2011
 UCLA	2012	UCLA vs. Arizona State
 UCLA	2012	2012 PN PAC-12 LC Time Trials
@@ -4903,10 +4981,12 @@ UCLA	2015	UCLA@ Stanford Women
 UCLA	2015	2014 CA OBS A3 Performance Inv
 UCLA	2015	2014 CA OBS UCLA v ASU
 UCLA	2015	2014 Winter National Time Trials
+UCLA	2015	2015 WOMENS PAC-12 SWIMMING CH
 UCLA	2015	2014 AT&T Winter National Cham
 UCLA	2015	OSU vs UCLA
 UCLA	2015	2014 CA OBS UCLA v WSU
 UCLA	2015	2015 CA OBS UCLA v KU v USD
+UCLA	2015	2015 WOMENS PAC-12 Time Trials
 UCLA	2015	UCLA vs UCSB + BYU vs UCSB
 UCLA	2015	2015 CA OB USC vs UCLA -Women
 UCLA	2015	Cal Women's Swim and Dive vs.
@@ -4968,6 +5048,7 @@ Pacific	2015	2015 MPSF Swim & Dive Champs
 Pacific	2015	UCSB vs UOP & LMU
 Pacific	2015	Pacific vs. Reno, SFU, FPU
 Pacific	2015	UC Davis vs. Pacific
+Pacific	2015	2015 CC Juanita Allington Memorial Sr Meet
 Pacific	2015	Pacific vs Cal Berkeley
 Pacific	2015	UOP-SDSU 1-24-15
 Wis.- Milwaukee	2012	Horizon League CHampionships 2
@@ -5018,7 +5099,9 @@ Wis.- Milwaukee	2015	Milwaukee Vs. Oakland
 Wis.- Milwaukee	2015	Milwaukee Vs UOC
 Wis.- Milwaukee	2015	2015 Midwest Invitational
 Wis.- Milwaukee	2015	Ball State vs Milwaukee vs IUP
+Wis.- Milwaukee	2015	Horizon League Championship 20
 Wis.- Milwaukee	2015	UW - Milwaukee vs. UW - Madiso
+Wis.- Milwaukee	2015	Horizon League Time Trials
 Wis.- Milwaukee	2015	Green Bay vs. Milwaukee
 Wis.- Milwaukee	2015	Northwestern vs UW Milwaukee
 Texas A&M	2012	State 2012 NZ Open Championships
@@ -5090,15 +5173,20 @@ Texas A&M	2014	Texas A&M vs Vanderbilt
 Texas A&M	2014	2014 ST American Short Course Cha
 Texas A&M	2014	2014 SEC Swimming Time Trials
 Texas A&M	2014	Texas A&M vs. North Texas Wome
-Texas A&M	2015	North Texas vs Houston vs Texa
+Texas A&M	2015	Texas A&M vs. SMU Men
 Texas A&M	2015	2014 ST UT Women vs. Texas A&M
 Texas A&M	2015	UT Men vs. Texas A&M
-Texas A&M	2015	Texas A&M vs. LSU
+Texas A&M	2015	2015 GU AGS Sectionals Champs
+Texas A&M	2015	2015 ST American Short Course Cha
+Texas A&M	2015	2015 GU Speedo Sectionals Champio
 Texas A&M	2015	Texas A&M vs. MoSt (m), Tennes
 Texas A&M	2015	Texas A&M vs. Rice Women's Dua
+Texas A&M	2015	North Texas vs Houston vs Texa
 Texas A&M	2015	FIU, Texas A&M @ IRSC
 Texas A&M	2015	Arkansas vs Texas A&M Dual Mee
-Texas A&M	2015	Texas A&M vs. SMU Men
+Texas A&M	2015	2015 Big 12 Last Chance Meet
+Texas A&M	2015	2015 Last Chance Meet
+Texas A&M	2015	Texas A&M vs. LSU
 Texas A&M	2015	2014 GU TWST Senior Champs
 Texas A&M	2015	Art Adamson Invitational
 Texas A&M	2015	Texas A&M vs. Alabama
@@ -5139,6 +5227,8 @@ North Texas	2014	Texas A&M vs. North Texas Wome
 North Texas	2014	SMU vs North Texas
 North Texas	2014	North Texas vs Tulane
 North Texas	2015	North Texas vs Houston vs Texa
+North Texas	2015	2015 GU Speedo Sectionals Champio
+North Texas	2015	2015 GU AGS Sectionals Champs
 North Texas	2015	2014 UIW Christmas Invitationa
 North Texas	2015	Torero Shootout
 North Texas	2015	2015 C-USA Time Trials
@@ -5223,6 +5313,9 @@ Wyoming (M)	2014	2014 WAC Championship Meet
 Wyoming (M)	2014	DU vs. Wyoming
 Wyoming (M)	2014	AFA vs. WYO
 Wyoming (M)	2015	Denver University vs. Wyoming
+Wyoming (M)	2015	2015 ST American Short Course Cha
+Wyoming (M)	2015	2015 WAC Swimming Time Trials
+Wyoming (M)	2015	2015 WAC Swimming & Diving Cha
 Wyoming (M)	2015	Wyoming at USAFA
 Wyoming (M)	2015	UNLV vs WY and  NAU
 Wyoming (M)	2015	DU vs. Wyoming (men)
@@ -5270,8 +5363,9 @@ Baruch	2014	2013-14 LEHMAN v BARUCH MEETDe
 Baruch	2014	ECAC WINTER CHAMPIONSHIP 2013
 Baruch	2014	Baruch vs Brooklyn
 Baruch	2014	WPUNJ Vs Baruch Meet
+Baruch	2015	2015 ECAC Open Swimming Time T
 Baruch	2015	Baruch vs Queens vs Adelphi
-Baruch	2015	Brooklyn College vs. Baruch Co
+Baruch	2015	Baruch vs College of Staten Is
 Baruch	2015	2015 Metropolitan Collegiate C
 Baruch	2015	ECAC WINTER CHAMPIONSHIP 2014
 Baruch	2015	QC vs Baruch vs Adelphi
@@ -5279,9 +5373,10 @@ Baruch	2015	Baruch vs. York
 Baruch	2015	Baruch vs Hunter
 Baruch	2015	Baruch vs Lehman
 Baruch	2015	Baruch vs York
+Baruch	2015	Brooklyn College vs. Baruch Co
 Baruch	2015	Baruch Vs. Manhattan
 Baruch	2015	2015 CUNYAC CHAMPIONSHIP MEET
-Baruch	2015	Baruch vs College of Staten Is
+Baruch	2015	2015 ECAC Open Swimming & Divi
 Baruch	2015	2015 Metropolitan Time Trials
 Baruch	2015	Baruch vs William Paterson
 L&C	2012	L&C-UPS Dual 1.14.12
@@ -5410,6 +5505,7 @@ Fla Atlantic (M)	2015	FAU vs FIU
 Fla Atlantic (M)	2015	FAU vs IRSC
 Fla Atlantic (M)	2015	Fau vs Texas A&M
 Fla Atlantic (M)	2015	2015 C-USA Women's Champs & C-
+Fla Atlantic (M)	2015	2015 Area 2 Championships
 Fla Atlantic (M)	2015	FAU vs Princeton
 Austin College	2012	2011 Trinity University Wester
 Austin College	2012	McMurry vs Austin College
@@ -5469,6 +5565,7 @@ R-MC	2015	StMarys at R-MC
 R-MC	2015	R-M C Yellow Jacket Invitation
 R-MC	2015	ODAC 2015 Swimming Championshi
 R-MC	2015	ODAC 2015 Swimming Time Trials
+R-MC	2015	2015 PV SC Senior Championships
 R-MC	2015	UMW at R-MC
 R-MC	2015	HSC SBC RMC Ferrum
 R-MC	2015	RMCvsCUA
@@ -5844,6 +5941,7 @@ Buffalo St.	2015	Buffalo State @ Brockport
 Buffalo St.	2015	SUNYAC Championships 2015
 Buffalo St.	2015	Geneseo Invitational
 Buffalo St.	2015	Monroe CC Winter Invitational
+Buffalo St.	2015	2015 NI - RAYS Shamrock Meet
 Buffalo St.	2015	Buff State vs Oswego
 Buffalo St.	2015	Buff State vs Cortland
 Buffalo St.	2015	Buff State vs Wells
@@ -5912,10 +6010,15 @@ Univ of Utah	2015	Utah vs Cal
 Univ of Utah	2015	UTAH vs OSU
 Univ of Utah	2015	Utah at WSU (Dual)
 Univ of Utah	2015	UTAH vs Denver
+Univ of Utah	2015	2015 WOMENS PAC-12 SWIMMING IN
+Univ of Utah	2015	2015 MEN'S PAC12 SWIMMING Time
 Univ of Utah	2015	UTAH vs CMU
 Univ of Utah	2015	UNLV vs U of A vs Utah
 Univ of Utah	2015	Texas Swimming & Diving Hall o
+Univ of Utah	2015	2015 WOMENS PAC-12 Time Trials
+Univ of Utah	2015	2015 WOMENS PAC-12 SWIMMING CH
 Univ of Utah	2015	UTAH vs USC vs Mesa
+Univ of Utah	2015	2015 MEN'S PAC12 SWIMMING/DIVI
 Univ of Utah	2015	CMU Intermountain Shootout
 Univ of Utah	2015	ASU vs. Utah
 Univ of Utah	2015	UTAH vs BYU
@@ -6207,14 +6310,19 @@ Yale	2014	UNH vs YALE
 Yale	2014	Princeton Swimming 'Big Al' Op
 Yale	2014	2014  Womens Ivy League Champi
 Yale	2015	Women's Harvard-Yale-Princeton
+Yale	2015	SCSU vs Yale
 Yale	2015	Brown @ Yale
-Yale	2015	UCONN Fall Quad Meet
+Yale	2015	2015 CT Senior Open Championship
+Yale	2015	2015 Men's Ivy League Time T
 Yale	2015	Columbia @ Yale
 Yale	2015	Men's Harvard-Yale-Princeton
-Yale	2015	SCSU vs Yale
+Yale	2015	Princeton University NCAA Qual
 Yale	2015	Yale-Columbia
+Yale	2015	2015 Yellow Jacket Championshi
 Yale	2015	2015 NE W Ivy Champs
+Yale	2015	UCONN Fall Quad Meet
 Yale	2015	Bucknell Invitational
+Yale	2015	2015 Men's Ivy League Champion
 Yale	2015	Cornell - Yale
 Yale	2015	Dartmouth vs. Penn vs. Yale
 Yale	2015	Brown University Invitational
@@ -6291,6 +6399,7 @@ St. Francis Pa.	2015	St. Francis v Youngstown State
 St. Francis Pa.	2015	Akron vs. Saint Francis
 St. Francis Pa.	2015	NE Catholic Invite
 St. Francis Pa.	2015	2014 Winter National Time Trials
+St. Francis Pa.	2015	NEC CONFERENCE SWIMMING & DIVI
 St. Francis Pa.	2015	Wagner vs Saint Francis Univer
 St. Francis Pa.	2015	Siena vs Saint Francis 2015
 St. Louis	2012	MU Swimming and Diving Tiger I
@@ -6381,11 +6490,12 @@ Fresno State	2015	Bulldog Invitational 2014
 Fresno State	2015	Fresno State vs UC Davis
 Fresno State	2015	Fresno State @ San Jose State
 Fresno State	2015	Bech Cup 2015
+Fresno State	2015	Fresno State vs East Bay
 Fresno State	2015	CSUBvsUNLVvsFresnoSt
 Fresno State	2015	2014 CA OBS A3 Performance Inv
 Fresno State	2015	FRES v NEV
 Fresno State	2015	Fresno State vs FPU, Santa Cru
-Fresno State	2015	Fresno State vs East Bay
+Fresno State	2015	2015 CC Juanita Allington Memorial Sr Meet
 Fresno State	2015	2015 MW Swimming & Diving Cham
 Fresno State	2015	2015 MW Swimming Time Trials
 Stevens	2012	Stevens vs. TCNJ
@@ -6599,6 +6709,7 @@ Tennessee	2014	TN vs SC 2013
 Tennessee	2014	2013 AT&T Winter National Cham
 Tennessee	2014	UGA vs Tennessee
 Tennessee	2014	TN vs VT and MO
+Tennessee	2015	Bulldog Invitational 2015
 Tennessee	2015	Texas A&M vs. MoSt (m), Tennes
 Tennessee	2015	2014 TN vs KY vs Indiana
 Tennessee	2015	2014 AT&T Winter National Cham
@@ -6701,16 +6812,18 @@ Frostburg St.	2014	Bethany v. Frostburg
 Frostburg St.	2014	Frostburg-Davis&Elkins
 Frostburg St.	2014	MU v FU v UMW
 Frostburg St.	2014	YCP V Frostburg
+Frostburg St.	2015	2015 ECAC Open Swimming Time T
 Frostburg St.	2015	2014 Salisbury vs. Frostburg
-Frostburg St.	2015	Elizabethtown-Frostburg
 Frostburg St.	2015	Franklin & Marshall College In
 Frostburg St.	2015	CAC Championship
 Frostburg St.	2015	Frostburg, Goucher, Hood, Stev
+Frostburg St.	2015	Frostburg Vs Gallaudet_14-15
 Frostburg St.	2015	WJU vs FSU-MD vs ABU
 Frostburg St.	2015	UMW vs. Marymount & Frostburg
 Frostburg St.	2015	Frostburg-SMCM-WVtech
 Frostburg St.	2015	CAC Championship Time Trials
-Frostburg St.	2015	Frostburg Vs Gallaudet_14-15
+Frostburg St.	2015	Elizabethtown-Frostburg
+Frostburg St.	2015	2015 ECAC Open Swimming & Divi
 Frostburg St.	2015	D&E vs. Frostburg
 St. Kate's	2012	St. Thomas vs. St. Catherine
 St. Kate's	2012	2011 St. Thomas relays
@@ -7059,8 +7172,10 @@ Minnesota	2015	Minnesota Challenge
 Minnesota	2015	Minnesota vs. Northwestern vs.
 Minnesota	2015	Minnesota vs North Dakota 2014
 Minnesota	2015	Minnesota vs Iowa
+Minnesota	2015	2015 B1G Men's Swimming & Divi
 Minnesota	2015	Arizona State vs. Minnesota
 Minnesota	2015	2015 B1G Women's Swim & Dive C
+Minnesota	2015	2015 Yellow Jacket Championshi
 Minnesota	2015	Wisconsin Dual 2014
 Minnesota	2015	12th FINA World Chams (25m)
 Minnesota	2015	2015 MN FOXJ Winter Classic
@@ -7108,13 +7223,14 @@ Illinois	2014	2014 Nebraska vs. Illinois Dua
 Illinois	2014	Iowa vs Illinois-Indiana-Misso
 Illinois	2014	2014 B1G Women's Swim & Dive C
 Illinois	2014	Northwestern, Illinois and E.
+Illinois	2015	Illinois vs. Iowa State 2015
 Illinois	2015	Illinois-Tabor-Kansas
 Illinois	2015	Mizzou Invitational
 Illinois	2015	Illinois Southern Illinois vs
 Illinois	2015	Notre Dame vs Illinois
 Illinois	2015	Illinois vs Nebraska 2015
 Illinois	2015	2015 B1G Women's Swim & Dive C
-Illinois	2015	Illinois vs. Iowa State 2015
+Illinois	2015	Boiler-Make-It Qualification C
 Illinois	2015	Illinois vs. Iowa
 Illinois	2015	Illinois vs Michigan State 201
 Illinois	2015	Northwestern vs Illinois
@@ -7308,15 +7424,18 @@ Texas	2014	UT Men & Women vs. Auburn
 Texas	2014	UT Men & Women vs. Georgia
 Texas	2014	2014 Big 12 Swimming & Diving
 Texas	2014	LEN: European Short Course Championships
-Texas	2015	2014 ST UT Women vs. Texas A&M
+Texas	2015	2015 ST American Short Course Cha
 Texas	2015	UT Men vs. Texas A&M
+Texas	2015	Texas Swimming & Diving Hall o
 Texas	2015	UT vs Arizona vs SMU
 Texas	2015	UGA vs Texas
 Texas	2015	Texas vs Auburn
 Texas	2015	Women's Swim & Dive - Texas @
 Texas	2015	Michigan Quad Meet
-Texas	2015	Texas Swimming & Diving Hall o
+Texas	2015	2015 Big 12 Swimming Time Tria
+Texas	2015	2014 ST UT Women vs. Texas A&M
 Texas	2015	UT Men & Women vs. TCU
+Texas	2015	2015 Big 12 Swimming & Diving
 Texas	2015	Israel Winter Championship Short Course
 Texas	2015	Texas @ Stanford Women
 Trinity C.	2012	Trinity-Colby-Bowdoin-Wesleyan
@@ -7406,6 +7525,7 @@ Carthage	2015	Carthage Classic 2014
 Carthage	2015	Grace Goblirsch Invitational,
 Carthage	2015	Carthage vs Wheaton
 Carthage	2015	Wisconsin Private College Cham
+Carthage	2015	2015 WI 13&Over SC State Champ
 Drew	2012	Ranger Invitation
 Drew	2012	King's College vs. Drew Univer
 Drew	2012	Drew&Juniata @ Susquehanna
@@ -7433,6 +7553,7 @@ Drew	2015	Drew vs. Montclair State Unive
 Drew	2015	Drew University vs. Kings Coll
 Drew	2015	Drew University vs. Catholic U
 Drew	2015	2015 Landmark Conference Champ
+Drew	2015	2015 ECAC Open Swimming & Divi
 Drew	2015	Marywood v Drew
 Drew	2015	Elizabethtown vs. Drew
 Regis	2012	New England Catholic Invitatio
@@ -7464,15 +7585,17 @@ Regis	2014	Regis vs Simmons
 Regis	2014	2013 NE GS Senior Championship
 Regis	2014	GNAC Championships 2013
 Regis	2014	Regis vs Gordon College
-Regis	2015	Regis Collge vs Bridgewater St
+Regis	2015	2015 ECAC Open Swimming Time T
 Regis	2015	2014 GNAC Championships
 Regis	2015	Regis at Saint Joseph's Colleg
 Regis	2015	ECSU vs. BSU vs. Regis
 Regis	2015	NEISDA Championships 2015 TTs
-Regis	2015	Regis vs Elms
+Regis	2015	Regis Collge vs Bridgewater St
 Regis	2015	NEISDA Championships 2015
 Regis	2015	Regis vs Husson
 Regis	2015	Regis College vs Gordon Colleg
+Regis	2015	Regis vs Elms
+Regis	2015	2015 ECAC Open Swimming & Divi
 Regis	2015	Simmons vs. CSC vs. Regis
 Regis	2015	Regis College vs University of
 Ursuline	2014	TU vs Ursuline vs Defiance
@@ -7838,14 +7961,18 @@ Penn St	2014	2014 B1G Women's Swim & Dive C
 Penn St	2015	Penn State v. Navy
 Penn St	2015	Virginia Tech Swimming and Div
 Penn St	2015	BU INVITE
-Penn St	2015	2014 MA NLAC  Winter Splash
+Penn St	2015	Princeton University NCAA Qual
 Penn St	2015	Penn State v. Villanova
 Penn St	2015	2015 B1G Women's Swim & Dive C
 Penn St	2015	Penn State v. Virginia v. Mich
+Penn St	2015	2015 B1G Men's Swimming & Divi
 Penn St	2015	2015 Virginia Tech Invitationa
+Penn St	2015	2015 B1G Men's Swimming Time T
 Penn St	2015	Penn State v. Georgia Tech
+Penn St	2015	2014 MA NLAC  Winter Splash
 Penn St	2015	WVU vs PSU
 Penn St	2015	Rutgers/Penn State/Yale
+Penn St	2015	Last Chance NCAA Qualifier 201
 Penn St	2015	UGA Fall Invitational 2014
 WestConn	2012	2011 Little East Conference Ch
 WestConn	2012	PSU vs WCSU
@@ -8038,6 +8165,7 @@ South Dakota	2014	Green Bay vs USD
 South Dakota	2014	2013 USD vs. Iowa State Univer
 South Dakota	2015	Minnesota Challenge
 South Dakota	2015	2014 UND USD UNC AFA 2
+South Dakota	2015	2015 Summit League Championshi
 South Dakota	2015	Rochester Invite 2014
 South Dakota	2015	2014 South Dakota vs. Minnesot
 South Dakota	2015	Border Battle 2014
@@ -8047,6 +8175,7 @@ South Dakota	2015	2014 South Dakota vs. Nebraska
 South Dakota	2015	University of South Dakota vs.
 South Dakota	2015	Meet vs. Univ. of South Dakota
 South Dakota	2015	South Dakota at Iowa State
+South Dakota	2015	2015 Summit League Time Trials
 South Dakota	2015	2015 CO Loveland Heart of Wint
 South Dakota	2015	USD vs. SDSU
 South Dakota	2015	2014 MN SCSU Rochester Invite
@@ -8090,6 +8219,7 @@ Wagner	2015	2014 RU Wagner Dual Meet
 Wagner	2015	Bucknell@Columbia M & Bucknell
 Wagner	2015	Frank Elm Invitational 2014
 Wagner	2015	Iona-Wagner-Sacred Heart-St Fr
+Wagner	2015	NEC CONFERENCE SWIMMING & DIVI
 Wagner	2015	Wagner vs Saint Francis Univer
 Wagner	2015	Bryant Vs Wagner
 Wagner	2015	Rhode Island vs. Wagner
@@ -8367,6 +8497,7 @@ Miami (FL)	2014	FSU vs. University of Miami
 Miami (FL)	2015	UM 16 event order mixed relays
 Miami (FL)	2015	UM TU RU January 2015
 Miami (FL)	2015	2015 ACC Women's Championship
+Miami (FL)	2015	2015 Last Chance Meet
 Miami (FL)	2015	2015 ACC Women's Time Trials
 Miami (FL)	2015	SMU Women's Classic 2014
 Miami (FL)	2015	2014 Georgia Tech Fall Invitat
@@ -8408,8 +8539,10 @@ SIUC (M)	2014	Missouri State v. Southern Ill
 SIUC (M)	2014	UE vs SIUC
 SIUC (M)	2015	Evansville vs SIUC 2015
 SIUC (M)	2015	SIU v MSU
+SIUC (M)	2015	2015 MAC Mens Championship TTs
 SIUC (M)	2015	Quad Meet
 SIUC (M)	2015	Butler Invitational 2015
+SIUC (M)	2015	2015 MAC Mens Championships
 SIUC (M)	2015	Louisville Cardinal Invitation
 SIUC (M)	2015	UE vs SIU
 SIUC (M)	2015	SIU-UALR-WUSTL 2015
@@ -8469,17 +8602,19 @@ Towson	2014	GU v. Towson & William & Mary
 Towson	2014	2014 OK SCS Central Section Region VII
 Towson	2014	2013 AT&T Winter National Cham
 Towson	2014	TOWSON UNIVERSITY vs Hood Howa
-Towson	2015	William and Mary and Georgetow
+Towson	2015	BU INVITE
 Towson	2015	GW at TU 2014
-Towson	2015	2014 Winter National Time Trials
+Towson	2015	2015 MD LSC Senior Championshi
 Towson	2015	Towson vs ODU
 Towson	2015	2014 AT&T Winter National Cham
 Towson	2015	2015 Virginia Tech Invitationa
+Towson	2015	2014 Winter National Time Trials
 Towson	2015	Bucknell Invitational
 Towson	2015	McDaniel 2015
 Towson	2015	Hoplins 2015
 Towson	2015	GMU/CofC/Towson/Northeastern
-Towson	2015	BU INVITE
+Towson	2015	2015 Colonial Athletics Assoc
+Towson	2015	William and Mary and Georgetow
 Towson	2015	2015 Towson University
 SUNY Brockport	2012	Brockport-Oswego
 SUNY Brockport	2012	Brockport vs MCC
@@ -8697,6 +8832,7 @@ New Mexico St	2014	UofAvsOSUvsNMSUvsNAU
 New Mexico St	2014	ND NMSU at AFA
 New Mexico St	2014	NM vs. NMSU
 New Mexico St	2015	NAU vs. New Mexico State
+New Mexico St	2015	2015 WAC Swimming & Diving Cha
 New Mexico St	2015	UNC vs. NMSU
 New Mexico St	2015	#A14-322 UNLV FALL INVITATIONA
 New Mexico St	2015	New Mexico State vs Wyoming
@@ -8946,7 +9082,7 @@ Michigan	2014	2014 B1G Women's Swim & Dive C
 Michigan	2014	The Classic @ SMU
 Michigan	2014	AU IU UM vs ND 2013
 Michigan	2014	2013 AT&T Winter National Cham
-Michigan	2015	Iowa vs Michigan vs Nebraska (
+Michigan	2015	2015 B1G Men's Swimming & Divi
 Michigan	2015	Michigan vs Ohio State
 Michigan	2015	2015 Michigan First Chance Mee
 Michigan	2015	2014 Winter National Time Trials
@@ -8955,8 +9091,11 @@ Michigan	2015	2014 MI MLA Winter Championshi
 Michigan	2015	Michigan Quad Meet
 Michigan	2015	2015 B1G Women's Swim & Dive C
 Michigan	2015	Mich State vs Michigan-men
+Michigan	2015	Michigan Last Chance
 Michigan	2015	12th FINA World Chams (25m)
 Michigan	2015	MIchigan vs Northwestern - Not
+Michigan	2015	Iowa vs Michigan vs Nebraska (
+Michigan	2015	Last Chance Qualifier-Women
 Michigan	2015	Mich State vs Michigan-women
 Michigan	2015	2014 AT&T Winter National Cham
 Northern Colo	2012	2012 CA OBS MPSF Swimming & Di
@@ -8993,6 +9132,7 @@ Northern Colo	2014	NC vs. UNO
 Northern Colo	2014	AFA vs Seattle, N. Dakota, N.
 Northern Colo	2015	Mizzou Invitational
 Northern Colo	2015	GCU v. North Dakota v. Norther
+Northern Colo	2015	2015 WAC Swimming & Diving Cha
 Northern Colo	2015	2014 UND USD UNC AFA 2
 Northern Colo	2015	UNC vs. UNM
 Northern Colo	2015	UNC vs. NMSU
@@ -9306,13 +9446,17 @@ Northwestern	2014	Northwestern vs Wisconsin
 Northwestern	2014	2013 AT&T Winter National Cham
 Northwestern	2014	Northwestern, Illinois and E.
 Northwestern	2015	Iowa vs Northwestern (1-24-15)
+Northwestern	2015	2015 B1G Men's Swimming & Divi
 Northwestern	2015	Minnesota vs. Northwestern vs.
+Northwestern	2015	Northwestern/UIC/Oakland Doubl
 Northwestern	2015	2014 Winter National Time Trials
 Northwestern	2015	2014 Northwestern TYR Invitati
 Northwestern	2015	2014 AT&T Winter National Cham
 Northwestern	2015	Quad Meet
 Northwestern	2015	2015 B1G Women's Swim & Dive C
-Northwestern	2015	Northwestern/UIC/Oakland Doubl
+Northwestern	2015	2015 B1G Men's Swimming Time T
+Northwestern	2015	2015 Yellow Jacket Championshi
+Northwestern	2015	Boiler-Make-It Qualification C
 Northwestern	2015	Northwestern vs. Wisconsin
 Northwestern	2015	MIchigan vs Northwestern - Not
 Northwestern	2015	Northwestern vs Illinois
@@ -9635,16 +9779,18 @@ Buffalo	2014	UB Men vs Penn State
 Buffalo	2015	2014 WNY Invitational
 Buffalo	2015	McMaster at Buffalo
 Buffalo	2015	Magnus Cup Invitational
+Buffalo	2015	2015 MAC Mens Championships
 Buffalo	2015	Canisius at Buffalo
-Buffalo	2015	Ohio State Winter Invite 2015
 Buffalo	2015	ARMY & MSU AT BUFFALO
+Buffalo	2015	St. Bonaventure at Buffalo
 Buffalo	2015	EMU-vs-UB
 Buffalo	2015	Akron Dual vs Buffalo
 Buffalo	2015	Bowling Green at Buffalo
 Buffalo	2015	2015 Coed vs Buffalo
 Buffalo	2015	Niagara University at Universi
-Buffalo	2015	St. Bonaventure at Buffalo
+Buffalo	2015	2015 MAC Women's Swim and Dive
 Buffalo	2015	Cornell - Buffalo
+Buffalo	2015	Ohio State Winter Invite 2015
 Loyola (MD)	2012	Howard vs. Loyola
 Loyola (MD)	2012	Towson, Loyola vs UMBC
 Loyola (MD)	2012	2012 IN Purdue Invite Time Trials
@@ -9675,9 +9821,11 @@ Loyola (MD)	2014	H2ounds Invitational
 Loyola (MD)	2014	Loyola vs Colgate
 Loyola (MD)	2014	Loyola vs NJIT Mt St Marys
 Loyola (MD)	2014	AU CU GW  Loyola Meet
+Loyola (MD)	2015	2015 ECAC Open Swimming Time T
 Loyola (MD)	2015	BU INVITE
 Loyola (MD)	2015	Loyola vs Lafayette, Seton Hal
 Loyola (MD)	2015	Thomas Murphy Invitational
+Loyola (MD)	2015	La Salle University vs. Loyola
 Loyola (MD)	2015	Loyola University vs Howard Un
 Loyola (MD)	2015	Butler Invitational 2015
 Loyola (MD)	2015	H2ounds Invitational
@@ -9685,7 +9833,7 @@ Loyola (MD)	2015	AU CU GW LO
 Loyola (MD)	2015	UE vs STL
 Loyola (MD)	2015	Loyola vs Lehigh
 Loyola (MD)	2015	2015 Patriot League Time Trial
-Loyola (MD)	2015	La Salle University vs. Loyola
+Loyola (MD)	2015	2015 ECAC Open Swimming & Divi
 Loyola (MD)	2015	Loyola vs Mt St Mary's
 Loyola (MD)	2015	2015 Patriot League Championsh
 Loyola (MD)	2015	Colgate University vs Loyola U
@@ -9886,7 +10034,8 @@ Boise St	2014	Colorado Mesa, Boise and BYU
 Boise St	2014	2013 Hawkeye Invitational
 Boise St	2015	Utah at Boise State
 Boise St	2015	Wyoming v Boise State
-Boise St	2015	University of Idaho vs. Boise
+Boise St	2015	USD Relay Meet
+Boise St	2015	2015 WOMENS PAC-12 SWIMMING IN
 Boise St	2015	DU vs Boise State (w)
 Boise St	2015	2015 MW Swimming & Diving Cham
 Boise St	2015	OSU vs Boise State 2014
@@ -9894,7 +10043,7 @@ Boise St	2015	2015 MW Swimming Time Trials
 Boise St	2015	Art Adamson Invitational
 Boise St	2015	2014 Jean Freeman Invitational
 Boise St	2015	Nevada v Boise State
-Boise St	2015	USD Relay Meet
+Boise St	2015	University of Idaho vs. Boise
 Bloomsburg	2012	Bloomsburg Vs Edinboro Vs Kutz
 Bloomsburg	2012	Bloomsburg vs. Clarion
 Bloomsburg	2012	Dickinson vs. Bloomsburg
@@ -10005,6 +10154,7 @@ Valparaiso	2015	Butler Double Dual Meet 2014
 Valparaiso	2015	Dual Meet- Rose Hullman vs. Va
 Valparaiso	2015	Valparaiso vs EIU
 Valparaiso	2015	Rose-Hulman vs. Valparaiso
+Valparaiso	2015	Horizon League Championship 20
 Valparaiso	2015	Indiana Intercollegiates 2014
 Valparaiso	2015	2014 Calvin Winter Invitationa
 Valparaiso	2015	Cleveland State vs Valparaiso
@@ -10309,6 +10459,7 @@ Simmons	2014	Simmons vs. Westfield State
 Simmons	2014	Simmons- Elms vs Gordon
 Simmons	2015	Simmons vs. SJC-ME
 Simmons	2015	2014 GNAC Championships
+Simmons	2015	WELL-Simmons
 Simmons	2015	Simmons vs WNEU
 Simmons	2015	Simmons vs. CSC vs. Regis
 Simmons	2015	NEISDA Championships 2015 TTs
@@ -10318,7 +10469,7 @@ Simmons	2015	WSU Vs Simmons
 Simmons	2015	UNE vs Simmons
 Simmons	2015	Simmons vs Elms vs Gordon
 Simmons	2015	UMass Dartmouth vs Simmons Col
-Simmons	2015	WELL-Simmons
+Simmons	2015	2015 ECAC Open Swimming & Divi
 Simmons	2015	Simmons vs. Babson
 Simmons	2015	Mount Holyoke vs Simmons
 SUNY Geneseo	2012	2012 NI -  EZ North Region 1 Speedo Championships
@@ -10406,7 +10557,10 @@ Western Ill	2015	Butler Double Dual Meet 2014
 Western Ill	2015	TSU vs WIU vs LU-B
 Western Ill	2015	IUPUI - WIU - SLU
 Western Ill	2015	11th House of Champions
+Western Ill	2015	2015 Summit League Championshi
+Western Ill	2015	2015 Summit League Time Trials
 Western Ill	2015	SLU vs WIU
+Western Ill	2015	2015 IL  Illinois Senior SCY C
 Clarkson	2012	2012 UNYSCSA Championships
 Clarkson	2012	Kumpf Invite 2012
 Clarkson	2012	North Country Invitational
@@ -10685,14 +10839,18 @@ UNC	2014	Virginia Tech Swimming Challen
 UNC	2014	DUKE vs UNC
 UNC	2014	UT Men & Women vs. UNC
 UNC	2014	2014 ACC Men's Championship
+UNC	2015	Bulldog Invitational 2015
 UNC	2015	NC State vs UNC
 UNC	2015	2014 CA Sectional Time Trials
 UNC	2015	2014 UNCv.UGA
 UNC	2015	UNC 2015
 UNC	2015	2015 ACC Women's Championship
+UNC	2015	2015 ACC Men's Championship
 UNC	2015	2014 NIke Cup Invitational
-UNC	2015	2015 Carolina College Cup
+UNC	2015	2015 NC Speedo Champions Serie
 UNC	2015	UNC v. VATECH
+UNC	2015	2015 Carolina College Cup
+UNC	2015	2015 Yellow Jacket Championshi
 UNC	2015	2014 NC UNC/NCAC Mile Meet
 UNC	2015	UNC vs. TENN
 UNC	2015	UNC vs Duke Dual Meet
@@ -10773,23 +10931,29 @@ Southern Cali	2014	2014 NCAA Men's Division I
 Southern Cali	2014	2014 WOMENS PAC-12 SWIMMING CH
 Southern Cali	2014	Arizona Vs. USC
 Southern Cali	2014	2013 UT Invite
-Southern Cali	2015	2014 CA OB USC- ARIZONA STATE.
-Southern Cali	2015	2014 CA OB USC vs Washington-
-Southern Cali	2015	2015 CA OB USC vs UCLA -Women
-Southern Cali	2015	Cal Women's Swim & Dive vs. US
-Southern Cali	2015	USC @ Stanford Women
-Southern Cali	2015	SMU Women's Classic 2014
-Southern Cali	2015	2014 CA OB USC- ARIZONA UNV.-
-Southern Cali	2015	USC vs UCSB 2014
-Southern Cali	2015	Texas Swimming & Diving Hall o
-Southern Cali	2015	Cal Poly vs. USC
-Southern Cali	2015	OSU v USC 2014
 Southern Cali	2015	2014 CA OBS A3 Performance Inv
-Southern Cali	2015	12th FINA World Chams (25m)
+Southern Cali	2015	USC @ Stanford Women
+Southern Cali	2015	2015 WOMENS PAC-12 SWIMMING CH
+Southern Cali	2015	USC vs UCSB 2014
+Southern Cali	2015	2015 CA OB USC vs UCLA -Women
+Southern Cali	2015	USC vs. Wisconsin
+Southern Cali	2015	SMU Women's Classic 2014
+Southern Cali	2015	2015 WOMENS PAC-12 SWIMMING IN
+Southern Cali	2015	Cal Women's Swim & Dive vs. US
+Southern Cali	2015	Cal Men's Swim & Dive vs. USC
 Southern Cali	2015	UTAH vs USC vs Mesa
 Southern Cali	2015	USC@ Stanford Men
-Southern Cali	2015	USC vs. Wisconsin
-Southern Cali	2015	Cal Men's Swim & Dive vs. USC
+Southern Cali	2015	2014 CA OB USC vs Washington-
+Southern Cali	2015	Texas Swimming & Diving Hall o
+Southern Cali	2015	2015 MEN'S PAC12 INVITE
+Southern Cali	2015	2015 MEN'S PAC12 SWIMMING/DIVI
+Southern Cali	2015	2015 MEN'S PAC12 SWIMMING Time
+Southern Cali	2015	2014 CA OB USC- ARIZONA STATE.
+Southern Cali	2015	2014 CA OB USC- ARIZONA UNV.-
+Southern Cali	2015	2015 WOMENS PAC-12 Time Trials
+Southern Cali	2015	Cal Poly vs. USC
+Southern Cali	2015	OSU v USC 2014
+Southern Cali	2015	12th FINA World Chams (25m)
 UNE	2012	U of New England at Husson Uni
 UNE	2012	UNE verses Gordon College
 UNE	2012	UNE @ SJCM
@@ -10828,6 +10992,7 @@ UNE	2015	UNE vs Husson
 UNE	2015	UNE vs UMass Dartmouth
 UNE	2015	UNE vs Simmons
 UNE	2015	NEISDA Championships 2015
+UNE	2015	2015 ECAC Open Swimming & Divi
 UNE	2015	Commonwealth Coast Conference
 UNE	2015	Regis College vs University of
 Seattle U (M)	2013	AFA Vs Seattle, North Dakota a
@@ -10851,9 +11016,11 @@ Seattle U (M)	2014	AFA vs Seattle, N. Dakota, N.
 Seattle U (M)	2014	CSUB vs SU vs GCU
 Seattle U (M)	2015	SFU vs. Seattle University
 Seattle U (M)	2015	Whitworth University at Seattl
-Seattle U (M)	2015	2014 Husky SCY Invitational
+Seattle U (M)	2015	2015 WAC Swimming & Diving Cha
 Seattle U (M)	2015	Pacific Lutheran at Seattle Un
+Seattle U (M)	2015	2014 Husky SCY Invitational
 Seattle U (M)	2015	Idaho vs. SU and CSU
+Seattle U (M)	2015	2015 WAC Swimming Time Trials
 Seattle U (M)	2015	Seattle-Northern Colorado @ US
 Seattle U (M)	2015	Seattle-UNC @ USAFA
 Seattle U (M)	2015	Seattle U vs. Grand Canyon/Ari
@@ -10900,6 +11067,7 @@ Pepperdine	2014	2013 PCSC Pentathlon & Diving
 Pepperdine	2014	2013 Cal Poly Shootout Day 2
 Pepperdine	2014	2014 GU AGS Speedo Sectionals
 Pepperdine	2014	2014 PCSC Time Trials
+Pepperdine	2015	2015 CA OB Pacific Collegiate
 Pepperdine	2015	2014 Malibu Invitational - Dis
 Pepperdine	2015	2014 AT&T Winter National Cham
 Pepperdine	2015	2014 Malibu Invitational - Mid
@@ -11086,6 +11254,7 @@ Kalamazoo	2015	Olivet College vs. Kalamazoo C
 Neb Wesleyan	2015	MORNINGSIDE V NWU
 Neb Wesleyan	2015	TABOR COLLEGE  V NWU
 Neb Wesleyan	2015	Simpson College vs Nebraska We
+Neb Wesleyan	2015	SCS Central Section Region VII
 Neb Wesleyan	2015	2015 Liberal Arts Championship
 Neb Wesleyan	2015	TABOR COLLEGE  V NEBRASKA WESL
 Neb Wesleyan	2015	Pioneer Classic 2014
@@ -11142,9 +11311,10 @@ Bridgewater St.	2015	Regis Collge vs Bridgewater St
 Bridgewater St.	2015	UMass Dartmouth vs Bridgewater
 Bridgewater St.	2015	Bentley  v Bridgewater State
 Bridgewater St.	2015	3rd Annual Michael Arsenault R
-Bridgewater St.	2015	BSU vs. Roger Williams 2015
+Bridgewater St.	2015	2015 NE ENVY Grand Prix Series
 Bridgewater St.	2015	Gompei's Invitational
 Bridgewater St.	2015	Bridgewater State U
+Bridgewater St.	2015	BSU vs. Roger Williams 2015
 Bridgewater St.	2015	NEISDA Championships 2015 TTs
 Bridgewater St.	2015	2014 Louise goodrum Invitation
 Bridgewater St.	2015	BSU vs. Clark
@@ -11152,8 +11322,9 @@ Bridgewater St.	2015	ECSU vs. BSU vs. Regis
 Bridgewater St.	2015	NEISDA Championships 2015
 Bridgewater St.	2015	Bridgewater State Univ. v. Bos
 Bridgewater St.	2015	BSU vs. Elms
-Bridgewater St.	2015	Brandeis vs Bridgewater
 Bridgewater St.	2015	Babson vs Bridgewater
+Bridgewater St.	2015	Brandeis vs Bridgewater
+Bridgewater St.	2015	2015 NE ENVY Grand Prix #3 TT
 Misericordia	2012	Fifteenth Annual Grove City Wi
 Misericordia	2012	2012 MAC Championships
 Misericordia	2012	Misericordia vs. Kings
@@ -11301,6 +11472,7 @@ Auburn	2015	Auburn - Indiana 2014
 Auburn	2015	2014 SE War Eagle Invitational
 Auburn	2015	Florida vs Auburn
 Auburn	2015	UGA Fall Invitational 2014
+Auburn	2015	2015 Last Chance Meet
 Auburn	2015	Texas vs Auburn
 Auburn	2015	UA vs AU vs LSU
 Auburn	2015	Auburn vs Vanderbilt vs Notre
@@ -11448,6 +11620,7 @@ Loy. Marymount	2014	LMU_PEP_UAF_140108
 Loy. Marymount	2014	Sixth Annual Beach Cup
 Loy. Marymount	2014	2013 AT&T Winter National Cham
 Loy. Marymount	2014	UOP vs. UCSB and LMU
+Loy. Marymount	2015	2015 CA OB Pacific Collegiate
 Loy. Marymount	2015	2014 Malibu Invitational - Dis
 Loy. Marymount	2015	LMU vs. CSU Bakersfield vs. UC
 Loy. Marymount	2015	2014 Winter National Time Trials
@@ -11505,6 +11678,7 @@ Baldwin Wallace	2015	BW vs Mount Union
 Baldwin Wallace	2015	BW vs Defiance vs Ursuline
 Baldwin Wallace	2015	BW vs Case Western
 Baldwin Wallace	2015	Bethany Quad Meet
+Baldwin Wallace	2015	LE Senior Championship Meet 20
 Baldwin Wallace	2015	BW vs JCU
 Baldwin Wallace	2015	Fredonia Invite 2014
 Baldwin Wallace	2015	Ohio Wesleyan vs. Baldwin Wall
@@ -11556,6 +11730,7 @@ Florida Gulf	2014	FGCU vs. UNF
 Florida Gulf	2015	University of South Caroina vs
 Florida Gulf	2015	FGCU vs. FSU
 Florida Gulf	2015	FGCU vs. CU, LU, CCSU
+Florida Gulf	2015	2015 Last Chance Meet
 Florida Gulf	2015	FGCU vs FAU vs GT
 Florida Gulf	2015	2014 UIW vs. FGCU
 Florida Gulf	2015	FIU vs FGCU
@@ -11834,18 +12009,20 @@ Penn	2014	Total Performance December Inv
 Penn	2014	2014 Men's Ivy League Champion
 Penn	2014	Penn v. West Chester
 Penn	2014	2014  Womens Ivy League Champi
+Penn	2015	Womens Meet Brown v Harvard v
 Penn	2015	Mens Meet Brown v Harvard v Pe
 Penn	2015	2015 NE W Ivy Champs TT
 Penn	2015	Penn v. Delaware (M&W)
 Penn	2015	Princeton Penn Cornell Double
 Penn	2015	La Salle University vs. UPenn
+Penn	2015	Dartmouth vs. Penn vs. Yale
 Penn	2015	TPSC Invitational @ Kenyon 14-
 Penn	2015	Penn v. Columbia (W)
 Penn	2015	2015 NE W Ivy Champs
 Penn	2015	Columbia University vs. Penn
 Penn	2015	WCU vs PENN 2015
-Penn	2015	Dartmouth vs. Penn vs. Yale
-Penn	2015	Womens Meet Brown v Harvard v
+Penn	2015	2015 Men's Ivy League Champion
+Penn	2015	2015 ECAC Open Swimming & Divi
 CMU	2012	2012 Senior Recognition
 CMU	2012	Carnegie Mellon versus Clarion
 CMU	2012	Carnegie Mellon Quad Meet
@@ -12213,9 +12390,10 @@ Drexel	2015	La Salle University vs. Drexel
 Drexel	2015	2014 Winter National Time Trials
 Drexel	2015	2014 AT&T Winter National Cham
 Drexel	2015	George Washington vs Drexel
+Drexel	2015	2014 Pittsburgh Invitational
 Drexel	2015	NYU Winter Invitational
 Drexel	2015	Drexel vs Binghamton
-Drexel	2015	2014 Pittsburgh Invitational
+Drexel	2015	2015 Colonial Athletics Assoc
 Northern Iowa	2012	Northern Iowa vs Illinois Stat
 Northern Iowa	2012	UNI vs SDSU
 Northern Iowa	2012	2011 USD vs. UNI
@@ -12287,6 +12465,7 @@ South Carolina	2014	Univ. of South Carolina vs Duk
 South Carolina	2014	TN vs SC 2013
 South Carolina	2014	2014 SEC Swimming Time Trials
 South Carolina	2014	ECU v. South Carolina
+South Carolina	2015	Bulldog Invitational 2015
 South Carolina	2015	University of South Caroina vs
 South Carolina	2015	University of SC vs University
 South Carolina	2015	UK vs USC
@@ -12541,6 +12720,8 @@ Kentucky	2014	2013 AT&T Winter National Cham
 Kentucky	2014	Louisville vs Kentucky
 Kentucky	2015	Denison vs. Pittsburgh
 Kentucky	2015	Quad Meet
+Kentucky	2015	2015 SEC Swimming & Diving Cha
+Kentucky	2015	2015 Southern Premier
 Kentucky	2015	UK vs USC
 Kentucky	2015	2014 TN vs KY vs Indiana
 Kentucky	2015	Denison University vs. Ohio Un
@@ -12551,7 +12732,7 @@ Kentucky	2015	University of Kentucky vs Vand
 Kentucky	2015	2015 SEC Swimming Time Trials
 Kentucky	2015	Ohio State Invitational
 Kentucky	2015	UK vs UL
-Kentucky	2015	2015 SEC Swimming & Diving Cha
+Kentucky	2015	Last Chance NCAA Qualifier 201
 Kentucky	2015	UK vs UFL
 Macalester	2012	Macalester vs Riverfalls
 Macalester	2012	Grinnell College Invite
@@ -12659,9 +12840,14 @@ Arizona	2015	2014 CA OBS UCLA v Arizona
 Arizona	2015	Arizona Vs. Wisconsin
 Arizona	2015	Arizona at Washington State
 Arizona	2015	UT vs Arizona vs SMU
+Arizona	2015	2015 WOMENS PAC-12 SWIMMING CH
 Arizona	2015	2014 CA OB USC- ARIZONA UNV.-
 Arizona	2015	UNLV vs U of A vs Utah
 Arizona	2015	Texas Swimming & Diving Hall o
+Arizona	2015	2015 WOMENS PAC-12 Time Trials
+Arizona	2015	2015 MEN'S PAC12 INVITE
+Arizona	2015	2015 MEN'S PAC12 SWIMMING/DIVI
+Arizona	2015	2015 MEN'S PAC12 SWIMMING Time
 Arizona	2015	UA vs MIZZ vs NAU vs NMS vs OS
 Arizona	2015	Arizona Vs ASU
 Arizona	2015	Arizona Vs Stanford
@@ -12743,9 +12929,11 @@ Wisconsin	2014	Wisconsin @ Stanford
 Wisconsin	2014	Northwestern vs Wisconsin
 Wisconsin	2014	2013 UT Invite
 Wisconsin	2014	Green Bay vs. Wisconsin
+Wisconsin	2015	2015 B1G Men's Swimming & Divi
 Wisconsin	2015	Arizona Vs. Wisconsin
 Wisconsin	2015	Wisconsin @ Cal - Mens and Wom
 Wisconsin	2015	Wisconsin @ Stanford
+Wisconsin	2015	Michigan Last Chance
 Wisconsin	2015	IU vs. ND vs. Wisconsin Dual
 Wisconsin	2015	2015 B1G Women's Swim & Dive C
 Wisconsin	2015	Arizona State vs. Wisconsin
@@ -12795,9 +12983,11 @@ Alabama	2014	2014 GA SCAT Winter Kickoff
 Alabama	2014	ALABAMA v EMORY 2014
 Alabama	2014	Alabama versus Florida State
 Alabama	2014	Auburn Swimming and Diving Fal
+Alabama	2015	Bulldog Invitational 2015
 Alabama	2015	Bama vs Cinc
 Alabama	2015	UGA vs Alabama
 Alabama	2015	UA vs AU vs LSU
+Alabama	2015	2015 NC Speedo Champions Serie
 Alabama	2015	2014 H2Okie Fall Invitational
 Alabama	2015	Texas A&M vs. Alabama
 Alabama	2015	2015 SEC Swimming Time Trials
@@ -12838,6 +13028,7 @@ Cal Poly	2014	Cal vs. Cal Poly Queen of the
 Cal Poly	2014	2013 AT&T Winter National Cham
 Cal Poly	2015	Cal Poly vs. UC Santa Barbara
 Cal Poly	2015	Cal Poly vs. UC Santa Cruz
+Cal Poly	2015	Cal Poly vs. Wyoming
 Cal Poly	2015	CPSLO vs UCSB
 Cal Poly	2015	2014 CA SLO Gobbler Classic
 Cal Poly	2015	2015 MPSF Swim & Dive Time Trials
@@ -12845,7 +13036,7 @@ Cal Poly	2015	Cal Poly vs. Pepperdine
 Cal Poly	2015	Cal Poly vs. USC
 Cal Poly	2015	2014 CA OBS A3 Performance Inv
 Cal Poly	2015	2015 MPSF Swim & Dive Champs
-Cal Poly	2015	Cal Poly vs. Wyoming
+Cal Poly	2015	2015 CA COASTAL COMMITTEE CHAM
 Cal Poly	2015	CAL POLY vs CAL Queen and King
 Lewis	2012	William Jewell v Lewis
 Lewis	2012	Lincoln College v Lewis
@@ -12934,17 +13125,19 @@ Wis.- Green Bay	2014	Green Bay VS IUPUI
 Wis.- Green Bay	2014	Green Bay vs. Wisconsin
 Wis.- Green Bay	2015	2015 WI SSTY YMCA A+
 Wis.- Green Bay	2015	Green Bay VS Oakland
-Wis.- Green Bay	2015	Green Bay vs Cleveland State
+Wis.- Green Bay	2015	Green Bay vs. Milwaukee
 Wis.- Green Bay	2015	IUPUI - UWGB
 Wis.- Green Bay	2015	All WI Showcase
 Wis.- Green Bay	2015	Butler Invitational 2015
 Wis.- Green Bay	2015	11th House of Champions
 Wis.- Green Bay	2015	Phoenix 1-2-3
 Wis.- Green Bay	2015	2014 WI LAKE Fall Western Grea
+Wis.- Green Bay	2015	Green Bay vs Cleveland State
+Wis.- Green Bay	2015	2015 WI 13&Over SC State Champ
 Wis.- Green Bay	2015	UW - Milwaukee vs. UW - Madiso
-Wis.- Green Bay	2015	Green Bay vs. Milwaukee
-Wis.- Green Bay	2015	Green Bay vs. Wright State
 Wis.- Green Bay	2015	Green Bay vs YSU
+Wis.- Green Bay	2015	Green Bay vs. Wright State
+Wis.- Green Bay	2015	Horizon League Championship 20
 NJIT	2012	NJIT vs. Manhattan
 NJIT	2012	NJIT
 NJIT	2012	SFC vs NJIT
@@ -13106,6 +13299,7 @@ Montclair St.	2014	MSU vs Misercordia
 Montclair St.	2015	2015 Montclair St. vs. Vassar
 Montclair St.	2015	Franklin & Marshall College In
 Montclair St.	2015	2015 Metropolitan Collegiate C
+Montclair St.	2015	2015 MD LSC Senior Championshi
 Montclair St.	2015	St Peters vs Manhattan vs Mont
 Montclair St.	2015	MSU vs SHU
 Montclair St.	2015	MSU vs Rowan
@@ -13183,10 +13377,12 @@ WKU	2014	2014 C-USA Women's Time Trials
 WKU	2014	The 2013 WKU Hilltopper Open
 WKU	2014	2013 AT&T Winter National Cham
 WKU	2014	2014 NC ESSZ SPEEDO Championsh
+WKU	2015	Bulldog Invitational 2015
 WKU	2015	Western Kentucky vs. Purdue Me
 WKU	2015	IUPUI - WKU - IU Men
-WKU	2015	VU vs WKU vs Tulane
 WKU	2015	FIU Relays
+WKU	2015	VU vs WKU vs Tulane
+WKU	2015	2015 Southern Premier
 WKU	2015	2014 AT&T Winter National Cham
 WKU	2015	WKU vs. Delta State
 WKU	2015	2015 C-USA Time Trials
@@ -13194,6 +13390,7 @@ WKU	2015	WKU vs Cincinnati
 WKU	2015	Marshall vs. Western Kentucky
 WKU	2015	WKU vs University of the Cumbe
 WKU	2015	Louisville Cardinal Invitation
+WKU	2015	2015 CC Juanita Allington Memorial Sr Meet
 WKU	2015	2015 C-USA Women's Champs & C-
 IUPUI	2012	2011 IN Indiana Intercollegiates
 IUPUI	2012	2012 IN SRST Time Trials
@@ -13234,15 +13431,18 @@ IUPUI	2014	IUPUI - WRIGHT STATE
 IUPUI	2015	IUPUI - WKU - IU Men
 IUPUI	2015	EIU - IUPUI - Butler
 IUPUI	2015	2014 Winter National Time Trials
+IUPUI	2015	2015 Southern Premier
 IUPUI	2015	2014 AT&T Winter National Cham
+IUPUI	2015	12th FINA World Chams (25m)
 IUPUI	2015	Butler Invitational 2015
 IUPUI	2015	IUPUI - WIU - SLU
 IUPUI	2015	IUPUI - UWGB
+IUPUI	2015	Indiana Intercollegiates 2014
 IUPUI	2015	Ball State vs Milwaukee vs IUP
 IUPUI	2015	IUPUI - BSU - XU
 IUPUI	2015	11th House of Champions
-IUPUI	2015	12th FINA World Chams (25m)
-IUPUI	2015	Indiana Intercollegiates 2014
+IUPUI	2015	2015 Summit League Championshi
+IUPUI	2015	2015 Summit League Time Trials
 IUPUI	2015	2014 IUPUI Pentathlon
 Saint Vincent	2012	2012 James E Longnecker Invita
 Saint Vincent	2012	Chatham v SVC
@@ -13483,10 +13683,11 @@ Dartmouth	2014	Columbia University vs. Dartmo
 Dartmouth	2014	2014 Men's Ivy League Champion
 Dartmouth	2014	Princeton Swimming 'Big Al' Op
 Dartmouth	2014	2014  Womens Ivy League Champi
-Dartmouth	2015	Dartmouth vs. Penn vs. Yale
-Dartmouth	2015	2015 NE W Ivy Champs
-Dartmouth	2015	Harvard vs. Cornell vs. Dartmo
 Dartmouth	2015	Dartmouth vs. Columbia WOMEN
+Dartmouth	2015	2015 NE W Ivy Champs
+Dartmouth	2015	2015 Men's Ivy League Champion
+Dartmouth	2015	Dartmouth vs. Penn vs. Yale
+Dartmouth	2015	Harvard vs. Cornell vs. Dartmo
 Dartmouth	2015	Brown University Invitational
 CSUB (W)	2013	LMU vs. CSUB vs. CB
 CSUB (W)	2013	UC Davis vs.CSU Bakersfield
@@ -13512,8 +13713,10 @@ CSUB (W)	2014	Fresno Pacific vs CSUB
 CSUB (W)	2014	CSUB vs SU vs GCU
 CSUB (W)	2015	CSUB v.s. Pacific
 CSUB (W)	2015	CSUBvsUNLVvsFresnoSt
+CSUB (W)	2015	2015 WAC Swimming & Diving Cha
 CSUB (W)	2015	LMU vs. CSU Bakersfield vs. UC
 CSUB (W)	2015	Idaho vs. SU and CSU
+CSUB (W)	2015	2015 WAC Swimming Time Trials
 CSUB (W)	2015	CSUBvsSanJoseState
 CSUB (W)	2015	2014 CA OBS A3 Performance Inv
 CSUB (W)	2015	GCU v. Cal State Bakersfield
@@ -13554,6 +13757,7 @@ La Salle	2014	Bucknell Invitational
 La Salle	2014	Penn v. LaSalle
 La Salle	2014	Mason vs. La Salle
 La Salle	2014	2013 AT&T Winter National Cham
+La Salle	2015	Princeton University NCAA Qual
 La Salle	2015	2015 A-10 Time Trials
 La Salle	2015	La Salle University vs. Drexel
 La Salle	2015	Fordham vs. La Salle vs. Richm
@@ -13562,10 +13766,10 @@ La Salle	2015	A-10 Tri-Meet 2014
 La Salle	2015	Villanova University v. LaSall
 La Salle	2015	2014 LaSalle-Rider
 La Salle	2015	Bucknell Invitational
-La Salle	2015	La Salle vs. George Mason
+La Salle	2015	La Salle University vs. Loyola
 La Salle	2015	2014 AT&T Winter National Cham
 La Salle	2015	2015 A-10 Men's & Women's Cham
-La Salle	2015	La Salle University vs. Loyola
+La Salle	2015	La Salle vs. George Mason
 Evansville (M)	2013	2012  House of Champions Invit
 Evansville (M)	2013	@WKUswim_dive vs Evansville
 Evansville (M)	2013	Ball State vs Evansville
@@ -13592,6 +13796,7 @@ Evansville (M)	2015	IU - Louisville - Evansville
 Evansville (M)	2015	UE vs STL
 Evansville (M)	2015	Indiana Intercollegiates 2014
 Evansville (M)	2015	UE vs SIU
+Evansville (M)	2015	2015 MAC Mens Championships
 Bryant U (W)	2012	Bryant vs. University of Maine
 Bryant U (W)	2012	Wagner vs Bryant
 Bryant U (W)	2012	2011 NE HARV Collegiate Challe
@@ -13647,6 +13852,7 @@ Bryant U (W)	2015	Bryant Vs Central Conneticut
 Bryant U (W)	2015	Bryant vs URI
 Bryant U (W)	2015	Bryant Univesity at Iona Colle
 Bryant U (W)	2015	SFC vs Bryant
+Bryant U (W)	2015	NEC CONFERENCE SWIMMING & DIVI
 Bryant U (W)	2015	Bryant Vs UVM NJIT
 Bryant U (W)	2015	UCONN Invite 2015
 Bryant U (W)	2015	Bryant Vs Wagner
@@ -13689,6 +13895,8 @@ Nova S'eastern	2014	Nova Southeastern vs. Indian R
 Nova S'eastern	2014	Nova vs FSC
 Nova S'eastern	2014	2013 FL SWIM Florida Pentathlon
 Nova S'eastern	2014	2013 All Florida Invitational
+Nova S'eastern	2015	2015 GU AGS Sectionals Champs
+Nova S'eastern	2015	2015 GU Speedo Sectionals Champio
 Nova S'eastern	2015	2015 Nova Southeastern vs. Gra
 Nova S'eastern	2015	2015 Sunshine State Time Trial
 Nova S'eastern	2015	2014 Shark Invitational
@@ -13699,6 +13907,7 @@ Nova S'eastern	2015	2014 All Florida Invitational
 Nova S'eastern	2015	2015 Nova Southeastern vs. Bri
 Nova S'eastern	2015	Tampa vs Nova Southeastern
 Nova S'eastern	2015	2015 Sunshine State Conference
+Nova S'eastern	2015	2015 LA Short Course  State Championships
 Nova S'eastern	2015	FIT vs NOVA
 Kansas	2012	KU v. Illinois
 Kansas	2012	MU Swimming and Diving Tiger I
@@ -13743,6 +13952,7 @@ Kansas	2015	2015 CA OBS UCLA v KU v USD
 Kansas	2015	Illinois-Tabor-Kansas
 Kansas	2015	TCU-N Dakota-Kansas
 Kansas	2015	Jayhawk Open
+Kansas	2015	2015 Big 12 Swimming & Diving
 Kansas	2015	Jewell Vs. Truman & KU
 Kansas	2015	Kansas Classic
 Cleveland St	2012	NU vs CSU
@@ -13804,8 +14014,10 @@ Cleveland St	2015	2014 AT&T Winter National Cham
 Cleveland St	2015	Cleveland State vs. Niagara
 Cleveland St	2015	OSU vs CSU
 Cleveland St	2015	2014 Winter National Time Trials
+Cleveland St	2015	Horizon League Championship 20
 Cleveland St	2015	2014 MICA vs Cleveland State
 Cleveland St	2015	Cleveland State vs Valparaiso
+Cleveland St	2015	Last Chance NCAA Qualifier 201
 Cleveland St	2015	Canisius College vs. Cleveland
 IWU	2012	67th Annual CCIW Swimming Cham
 IWU	2012	NCC-IWU-Wheaton 2012
@@ -13920,10 +14132,13 @@ Harvard	2014	The 2014 Virginia Tech Invitat
 Harvard	2014	2013 UT Invite
 Harvard	2014	2014 Men's Ivy League Champion
 Harvard	2014	2014  Womens Ivy League Champi
+Harvard	2015	2015 ECAC Open Swimming Time T
 Harvard	2015	Women's Harvard-Yale-Princeton
-Harvard	2015	MIT Winter Invitational
+Harvard	2015	Womens Meet Brown v Harvard v
 Harvard	2015	Harvard Men vs. Columbia
+Harvard	2015	MIT Winter Invitational
 Harvard	2015	2015 NE W Ivy Champs TT
+Harvard	2015	2015 Men's Ivy League Time T
 Harvard	2015	Ohio State Winter Invite 2015
 Harvard	2015	Harvard Women vs. Columbia
 Harvard	2015	Men's Harvard-Yale-Princeton
@@ -13932,7 +14147,8 @@ Harvard	2015	2015 NE W Ivy Champs
 Harvard	2015	Mens Meet Brown v Harvard v Pe
 Harvard	2015	2014 Texas Invite
 Harvard	2015	Duke Univ. vs S. Carolina vs H
-Harvard	2015	Womens Meet Brown v Harvard v
+Harvard	2015	2015 Men's Ivy League Champion
+Harvard	2015	2015 ECAC Open Swimming & Divi
 Harvard	2015	Harvard vs. Cornell vs. Dartmo
 &nbsp;	2012	Misericordia vs. Kings
 &nbsp;	2012	Southern 2011
@@ -14644,11 +14860,12 @@ Wheaton IL	2015	2015 CCIW Swimming Championshi
 Wheaton IL	2015	Calvin vs Wheaton
 Wheaton IL	2015	Milwaukee vs Wheaton
 Wheaton IL	2015	Illinois-Michigan Quad Meet
+Wheaton IL	2015	Olivet Nazarene vs Wheaton
 Wheaton IL	2015	Carthage vs Wheaton
 Wheaton IL	2015	Wheaton Invitational 2014
 Wheaton IL	2015	Wheaton, North Central, IIT
 Wheaton IL	2015	Wheaton College vs University
-Wheaton IL	2015	Olivet Nazarene vs Wheaton
+Wheaton IL	2015	2015 IL  Illinois Senior SCY C
 Whittier	2012	2012 Whittier vs Cal Lutheran
 Whittier	2012	Bulldog Pentathlon 2011
 Whittier	2012	Whittier vs Pomona-Pitzer
@@ -14944,9 +15161,13 @@ Wyoming (W)	2014	UCSD Dual
 Wyoming (W)	2014	2014 CO A Colorado Senior Meet
 Wyoming (W)	2014	GCU vs Boise State vs SDSU vs
 Wyoming (W)	2015	Denver University vs. Wyoming
+Wyoming (W)	2015	2015 ST American Short Course Cha
 Wyoming (W)	2015	Wyoming v Boise State
+Wyoming (W)	2015	2015 GU AGS Sectionals Champs
+Wyoming (W)	2015	2015 GU Speedo Sectionals Champio
 Wyoming (W)	2015	Wyoming at USAFA
 Wyoming (W)	2015	UNLV vs WY and  NAU
+Wyoming (W)	2015	2015 CO AP Senior Meet
 Wyoming (W)	2015	New Mexico vs. Wyoming
 Wyoming (W)	2015	CSU vs WYO
 Wyoming (W)	2015	WYO vs UCSB
@@ -15649,11 +15870,13 @@ Iowa	2014	Nebraska-Iowa-SDSU Dual Meets
 Iowa	2014	2013 Hawkeye Invitational
 Iowa	2015	Iowa vs Northwestern (1-24-15)
 Iowa	2015	2014 Hawkeye Invitational
-Iowa	2015	Illinois vs. Iowa
+Iowa	2015	Iowa vs Michigan vs Nebraska (
 Iowa	2015	Iowa vs Western Illinois vs UN
 Iowa	2015	Minnesota vs Iowa
-Iowa	2015	Iowa vs Michigan vs Nebraska (
+Iowa	2015	2015 B1G Men's Swimming & Divi
+Iowa	2015	Illinois vs. Iowa
 Iowa	2015	2015 B1G Women's Swim & Dive C
+Iowa	2015	2015 B1G Men's Swimming Time T
 Iowa	2015	Shamrock Invitational
 Iowa	2015	Michigan State vs Iowa
 Iowa	2015	Iowa vs Iowa State (12-12-14)
@@ -15705,13 +15928,15 @@ TCU	2014	Kansas v. TCU
 TCU	2014	2013 ST AAAA Fastest Man In Te
 TCU	2015	SMU vs TCU Men's Dual
 TCU	2015	TCU-N Dakota-Kansas
+TCU	2015	UTPB / TCU Dual Meet
 TCU	2015	TCU v. Iowa State
 TCU	2015	WVU vs TCU
-TCU	2015	UTPB / TCU Dual Meet
+TCU	2015	2015 Big 12 Swimming Time Tria
 TCU	2015	Pentathlon
 TCU	2015	Art Adamson Invitational
 TCU	2015	UT Men & Women vs. TCU
 TCU	2015	TCU v. UNT
+TCU	2015	2015 Big 12 Swimming & Diving
 TCU	2015	Tulane @ TCU
 TCU	2015	FIU/TCU/FAU/CCSU meet
 Saint Lawrence	2012	SMC vs. St. Lawrence 2012
@@ -15836,6 +16061,7 @@ Centenary (LA)	2015	Austin College Invitational 20
 Centenary (LA)	2015	2014 Trinity University Wester
 Centenary (LA)	2015	2015 LA COSS Winter Invite
 Centenary (LA)	2015	Trinity vs Centenary
+Centenary (LA)	2015	2015 LA Short Course  State Championships
 Centenary (LA)	2015	2015 SCAC Swimming and Diving
 King	2012	Lagrange-King-Brenau-Mars Hill
 King	2012	2011 Union College Winter Invi
@@ -15996,11 +16222,13 @@ Florida	2015	UF vs. Minnesota
 Florida	2015	UGA vs Florida
 Florida	2015	Florida vs Auburn
 Florida	2015	UF vs. LSU
-Florida	2015	UF vs. Arkansas
+Florida	2015	2014 Georgia Tech Fall Invitat
+Florida	2015	2015 FL Spring Senior Championship
 Florida	2015	2014 AT&T Winter National Cham
+Florida	2015	UF vs. Arkansas
 Florida	2015	UF vs. Tennessee
 Florida	2015	Florida State University vs Un
-Florida	2015	2014 Georgia Tech Fall Invitat
+Florida	2015	2015 Last Chance Meet
 Florida	2015	2014 All Florida Invitational
 Florida	2015	2015 FL JaxParks Swim Classic
 Florida	2015	2015 FL EAJ Love to Swim 15
@@ -16104,6 +16332,7 @@ UNLV (W)	2014	2014 Mountain West TTs
 UNLV (W)	2014	2014 Mountain West Swimming &
 UNLV (W)	2014	UNLV v DU v AFA v CSUB
 UNLV (W)	2014	2014 Big 12 Invite
+UNLV (W)	2015	2015 Big 12 Last Chance Meet
 UNLV (W)	2015	UNLV vs ASU
 UNLV (W)	2015	Mizzou Invitational
 UNLV (W)	2015	CSUBvsUNLVvsFresnoSt
@@ -16303,7 +16532,9 @@ Rose-Hulman	2015	Heartland Invitational
 Rose-Hulman	2015	Rose-Hulman vs. Valparaiso
 Rose-Hulman	2015	Indiana Intercollegiates 2014
 Rose-Hulman	2015	Rose-Hulman Millikin Lindenwoo
+Rose-Hulman	2015	2015 LA Short Course  State Championships
 Rose-Hulman	2015	Rose-Hulman vs IWU
+Rose-Hulman	2015	2015 IL  Illinois Senior SCY C
 Rose-Hulman	2015	Transylvania Invitational 2014
 SUNY Fredonia	2012	Niagara@FSU
 SUNY Fredonia	2012	Fredonia @ GU
@@ -16425,6 +16656,7 @@ Delaware	2015	DELAWARE - ST PETERS - IONA
 Delaware	2015	2014 LaSalle-Rider
 Delaware	2015	Bucknell Invitational
 Delaware	2015	CAA POD
+Delaware	2015	2015 Colonial Athletics Assoc
 Delaware	2015	2015 Towson University
 North Central	2012	67th Annual CCIW Swimming Cham
 North Central	2012	North Central-Monmouth Dual Me
@@ -16477,9 +16709,11 @@ Seattle U (W)	2014	CSUB vs SU vs GCU
 Seattle U (W)	2015	SFU vs. Seattle University
 Seattle U (W)	2015	Seattle-WSU Dual
 Seattle U (W)	2015	Whitworth University at Seattl
-Seattle U (W)	2015	2014 Husky SCY Invitational
+Seattle U (W)	2015	2015 WAC Swimming & Diving Cha
 Seattle U (W)	2015	Pacific Lutheran at Seattle Un
+Seattle U (W)	2015	2014 Husky SCY Invitational
 Seattle U (W)	2015	Idaho vs. SU and CSU
+Seattle U (W)	2015	2015 WAC Swimming Time Trials
 Seattle U (W)	2015	Seattle-Northern Colorado @ US
 Seattle U (W)	2015	OSU v Liberty, Seattle
 Seattle U (W)	2015	Seattle-UNC @ USAFA
@@ -16624,23 +16858,29 @@ Arizona St	2014	ASU vs. Arizona
 Arizona St	2014	2013 AT&T Winter National Cham
 Arizona St	2014	Cal Mens & Womens Swim/Dive vs
 Arizona St	2014	LEN: European Short Course Championships
-Arizona St	2015	2014 ILOB Girls IHSA Sectional Homewood Flossmoor
-Arizona St	2015	ASU vs. BYU
-Arizona St	2015	Lithuanian SC Championships
-Arizona St	2015	2014 CA OB USC- ARIZONA STATE.
 Arizona St	2015	2014 CA OBS UCLA v ASU
-Arizona St	2015	Oregon State vs. Arizona State
+Arizona St	2015	2015 WOMENS PAC-12 SWIMMING CH
+Arizona St	2015	UNLV vs ASU
+Arizona St	2015	Lithuanian SC Championships
+Arizona St	2015	ASU vs. BYU
+Arizona St	2015	2015 WOMENS PAC-12 SWIMMING IN
+Arizona St	2015	Arizona State vs. Stanford
+Arizona St	2015	Seattle U vs. Grand Canyon/Ari
 Arizona St	2015	Arizona State vs. Minnesota
 Arizona St	2015	Arizona State at Washington St
-Arizona St	2015	Arizona State vs. Wisconsin
-Arizona St	2015	Arizona State vs. Stanford
-Arizona St	2015	Arizona State vs. California
+Arizona St	2015	2015 MEN'S PAC12 INVITE
 Arizona St	2015	Art Adamson Invitational
-Arizona St	2015	12th FINA World Chams (25m)
-Arizona St	2015	UNLV vs ASU
+Arizona St	2015	2015 MEN'S PAC12 SWIMMING/DIVI
+Arizona St	2015	2015 MEN'S PAC12 INVITE TTs
 Arizona St	2015	ASU vs. Utah
 Arizona St	2015	Arizona Vs ASU
-Arizona St	2015	Seattle U vs. Grand Canyon/Ari
+Arizona St	2015	2015 MEN'S PAC12 SWIMMING Time
+Arizona St	2015	2014 ILOB Girls IHSA Sectional Homewood Flossmoor
+Arizona St	2015	2014 CA OB USC- ARIZONA STATE.
+Arizona St	2015	Oregon State vs. Arizona State
+Arizona St	2015	Arizona State vs. Wisconsin
+Arizona St	2015	Arizona State vs. California
+Arizona St	2015	12th FINA World Chams (25m)
 Tiffin	2014	HC vs TU vs AC Meet
 Tiffin	2014	Tiffin vs UF
 Tiffin	2014	Tiffin vs Xavier
@@ -16733,8 +16973,9 @@ Mt St Mary's	2015	Saint Francis vs. Mount Saint
 Mt St Mary's	2015	Rollins vs Gordon and Mt.St. M
 Mt St Mary's	2015	St Francis vs Mount
 Mt St Mary's	2015	Duquesne at Mount St. Mary's U
-Mt St Mary's	2015	McDaniel College at Mount St.
+Mt St Mary's	2015	NEC CONFERENCE SWIMMING & DIVI
 Mt St Mary's	2015	Loyola vs Mt St Mary's
+Mt St Mary's	2015	McDaniel College at Mount St.
 UMBC (M)	2012	2011 UMD vs UMBC
 UMBC (M)	2012	Arab Games 2011
 UMBC (M)	2012	Bucknell vs UMBC
@@ -16782,6 +17023,7 @@ UMBC (M)	2015	2015 CCSA Swimming and Diving
 UMBC (M)	2015	Bucknell vs UMBC
 UMBC (M)	2015	2014 Rider vs UMBC
 UMBC (M)	2015	UMBC 2014
+UMBC (M)	2015	2015 ECAC Open Swimming & Divi
 UMBC (M)	2015	2015 CCSA Swimming Time Trial
 Brooklyn	2012	Brooklyn College vs. John Jay
 Brooklyn	2012	Maritime vs Brooklyn College
@@ -16942,23 +17184,30 @@ California	2014	2014 PC CAL Invite - Approved
 California	2014	Cal vs. Cal Poly Queen of the
 California	2014	2013 AT&T Winter National Cham
 California	2015	Utah vs Cal
-California	2015	Men's Swim & Dive - Hawaii @ C
 California	2015	UGA Fall Invitational 2014
-California	2015	Cal Women's Swim & Dive vs. US
-California	2015	Cal @ Stanford Men
+California	2015	2015 WOMENS PAC-12 SWIMMING CH
 California	2015	Women's Swim & Dive - Texas @
+California	2015	2015 PC CAL Invitational
+California	2015	Cal Women's Swim & Dive vs. St
+California	2015	2015 MEN'S PAC12 INVITE TTs
+California	2015	Cal Men's Swim & Dive vs. Stan
+California	2015	Men's Swim & Dive - Hawaii @ C
+California	2015	Wisconsin @ Cal - Mens and Wom
+California	2015	2015 WOMENS PAC-12 SWIMMING IN
+California	2015	CAL POLY vs CAL Queen and King
+California	2015	Cal Women's Swim & Dive vs. US
+California	2015	Cal Men's Swim & Dive vs. USC
+California	2015	Cal @ Stanford Men
+California	2015	Cal Women's Swim and Dive vs.
+California	2015	2015 ST American Short Course Cha
+California	2015	2014 All Florida Invitational
+California	2015	2015 MEN'S PAC12 INVITE
+California	2015	2015 MEN'S PAC12 SWIMMING/DIVI
+California	2015	Pacific vs Cal Berkeley
+California	2015	2015 MEN'S PAC12 SWIMMING Time
 California	2015	Arizona vs California
 California	2015	Women's Swim - Oregon State @
-California	2015	2014 All Florida Invitational
-California	2015	2015 PC CAL Invitational
 California	2015	Arizona State vs. California
-California	2015	Cal Men's Swim & Dive vs. USC
-California	2015	Pacific vs Cal Berkeley
-California	2015	Cal Men's Swim & Dive vs. Stan
-California	2015	Cal Women's Swim & Dive vs. St
-California	2015	CAL POLY vs CAL Queen and King
-California	2015	Wisconsin @ Cal - Mens and Wom
-California	2015	Cal Women's Swim and Dive vs.
 Georgia	2012	2012 SEC Swimming & Diving Cha
 Georgia	2012	UGA vs UNC-Chapel HIll
 Georgia	2012	ALABAMA v GEORGIA
@@ -17015,6 +17264,7 @@ Georgia	2014	2014 SEC Swimming Time Trials
 Georgia	2014	2014 FL Spring Senior Champion
 Georgia	2014	UT Men & Women vs. Georgia
 Georgia	2014	LEN: European Short Course Championships
+Georgia	2015	Bulldog Invitational 2015
 Georgia	2015	UGA vs Florida
 Georgia	2015	UGA Fall Invitational 2014
 Georgia	2015	UGA vs Texas
@@ -17068,7 +17318,8 @@ North Dakota	2014	2013 USD vs. UND
 North Dakota	2014	AFA vs Seattle, N. Dakota, N.
 North Dakota	2015	UND at SDSU
 North Dakota	2015	Minnesota Challenge
-North Dakota	2015	UND vs. Moorhead ladies dual 2
+North Dakota	2015	2015 WAC Swimming Time Trials
+North Dakota	2015	2015 WAC Swimming & Diving Cha
 North Dakota	2015	2014 UND USD UNC AFA 2
 North Dakota	2015	Minnesota vs North Dakota 2014
 North Dakota	2015	2014 AT&T Winter National Cham
@@ -17082,6 +17333,7 @@ North Dakota	2015	GCU v. North Dakota v. Norther
 North Dakota	2015	Border Battle 2014
 North Dakota	2015	2014 UND-SCSU Swim/Dive Meet
 North Dakota	2015	2014 UND USD UNC AFA 1 Dual
+North Dakota	2015	UND vs. Moorhead ladies dual 2
 Princeton	2012	2012 Women's Ivy Champs
 Princeton	2012	Women's Harvard-Yale-Princeton
 Princeton	2012	2012 OH Central Zone Section 3 Ch
@@ -17130,16 +17382,19 @@ Princeton	2014	Princeton Swimming 'Big Al' Op
 Princeton	2014	Harvard - Yale - Princeton
 Princeton	2015	US Naval Academy vs Princeton
 Princeton	2015	Women's Harvard-Yale-Princeton
+Princeton	2015	FAU vs Princeton
 Princeton	2015	2015 NE W Ivy Champs
+Princeton	2015	Princeton University NCAA Qual
 Princeton	2015	2015 NE W Ivy Champs TT
-Princeton	2015	Princeton at Columbia Women
+Princeton	2015	2015 Men's Ivy League Time T
 Princeton	2015	2014 Winter National Time Trials
 Princeton	2015	2014 AT&T Winter National Cham
 Princeton	2015	Men's Harvard-Yale-Princeton
 Princeton	2015	North Carolina State vs Prince
 Princeton	2015	Ohio State-Princeton-Denson
 Princeton	2015	Princeton at Columbia Men
-Princeton	2015	FAU vs Princeton
+Princeton	2015	2015 Men's Ivy League Champion
+Princeton	2015	Princeton at Columbia Women
 Princeton	2015	Princeton Penn Cornell Double
 Princeton	2015	Brown University Invitational
 Penn St. Altoona	2012	Pitt Bradford vs Penn State Al
@@ -17256,10 +17511,12 @@ West Virginia	2015	Pittsburgh vs WVU
 West Virginia	2015	West Virginia at Iowa State
 West Virginia	2015	2014 AT&T Winter National Cham
 West Virginia	2015	WVU vs TCU
-West Virginia	2015	OSU - WEST VIRGINIA
-West Virginia	2015	2014 West Virginia Games
-West Virginia	2015	WVU vs PSU
 West Virginia	2015	Villanova vs. WVU
+West Virginia	2015	OSU - WEST VIRGINIA
+West Virginia	2015	2015 Big 12 Swimming & Diving
+West Virginia	2015	WVU vs PSU
+West Virginia	2015	2014 West Virginia Games
+West Virginia	2015	Last Chance NCAA Qualifier 201
 Bethany	2012	Hiram vs. Bethany 2011
 Bethany	2012	Urbana v. Bethany
 Bethany	2012	Behrend vs Bethany vs Francisc
@@ -17303,6 +17560,7 @@ Bethany	2015	2015 James E Longnecker Time T
 Bethany	2015	Westminster vs. Bethany
 Bethany	2015	W&J v. Bethany
 Bethany	2015	Bethany vs. Grove City
+Bethany	2015	2015 ECAC Open Swimming & Divi
 LIU Post	2012	Post v. Bridgegport
 LIU Post	2012	Blue Devil Duals
 LIU Post	2012	LIUPost v Siena
@@ -17526,13 +17784,16 @@ Marymount	2014	MU v York 11.2.2013
 Marymount	2014	Howard vs. Marymount
 Marymount	2014	MU v FU v UMW
 Marymount	2014	MU v Salisbury 11.9.2013
+Marymount	2015	2015 ECAC Open Swimming Time T
 Marymount	2015	CAC Championship
-Marymount	2015	vs. Goucher/Marymount (Va.)
 Marymount	2015	R-M C Yellow Jacket Invitation
+Marymount	2015	vs. Goucher/Marymount (Va.)
 Marymount	2015	MU vs. SU 1-17-2015
 Marymount	2015	UMW vs. Marymount & Frostburg
 Marymount	2015	York College v Marymount
 Marymount	2015	CAC Championship Time Trials
+Marymount	2015	2015 LA Short Course  State Championships
+Marymount	2015	2015 ECAC Open Swimming & Divi
 Marymount	2015	Marymount Vs Gallaudet_14-15
 Widener	2012	Elizabethtown vs. Widener
 Widener	2012	2012 MAC Championships
@@ -17668,9 +17929,11 @@ Wright State	2015	Ohio State vs Wright State
 Wright State	2015	UwmVsWsu
 Wright State	2015	Wright State University vs. Xa
 Wright State	2015	2014 UIC vs Wright State Univ
+Wright State	2015	Last Chance NCAA Qualifier 201
+Wright State	2015	2014 IUPUI, Marshall & WSU Tri
 Wright State	2015	2014 Miami University Invitati
 Wright State	2015	Green Bay vs. Wright State
-Wright State	2015	2014 IUPUI, Marshall & WSU Tri
+Wright State	2015	Horizon League Championship 20
 Niagara	2012	Niagara@FSU
 Niagara	2012	nu vs duq 2011
 Niagara	2012	NU vs YSU 2011
@@ -17980,13 +18243,14 @@ Mines	2014	Colorado School of Mines Vs. C
 Mines	2014	WSCU @ Coloarado School of Min
 Mines	2014	Co. School of Mines at Univers
 Mines	2014	USAFA Dual Meet Invitational D
-Mines	2015	Mines, Mesa State @ USAFA
+Mines	2015	2015 CO AP Senior Meet
 Mines	2015	CSM vs. CSU-P
 Mines	2015	2015 RMAC Championships Time T
+Mines	2015	Mines, Mesa State @ USAFA
 Mines	2015	2015 RMAC Championships
-Mines	2015	CSM vs. CMU vs. UNC
-Mines	2015	WSCU vs Mines 2014
 Mines	2015	CSM vs. DU
+Mines	2015	WSCU vs Mines 2014
+Mines	2015	CSM vs. CMU vs. UNC
 Mines	2015	2015 AZ Phoenix Winter Invite
 Mines	2015	2014 CO Falfins Holiday Open
 Mines	2015	Mines vs Colorado College
@@ -18109,6 +18373,7 @@ James Madison	2015	JMU vs. Campbell
 James Madison	2015	2015 Carolina College Cup
 James Madison	2015	Frank Elm Invitational 2014
 James Madison	2015	CAA POD
+James Madison	2015	2015 Colonial Athletics Assoc
 James Madison	2015	Richmond vs JMU
 Juniata	2012	Swarthmore Invitational 2011
 Juniata	2012	Drew&Juniata @ Susquehanna
@@ -18308,6 +18573,7 @@ Hunter	2015	Hunter vs Lehman
 Hunter	2015	Hunter vs Brooklyn College
 Hunter	2015	WCSU v Hunter
 Hunter	2015	Hunter vs St Elizabeth
+Hunter	2015	2015 ECAC Open Swimming & Divi
 Hunter	2015	2015 CUNYAC CHAMPIONSHIP MEET
 Hunter	2015	Hunter College @ Queens Colleg
 New Hampshire	2012	UNH vs UVM
@@ -18344,12 +18610,15 @@ New Hampshire	2014	2014 America East Swim & Dive
 New Hampshire	2014	CCSU vs UNH vs Bryant
 New Hampshire	2014	UNH vs YALE
 New Hampshire	2014	Terrier Invitational 2013
+New Hampshire	2015	2015 ECAC Open Swimming Time T
 New Hampshire	2015	Frank Elm Invitational 2014
+New Hampshire	2015	2015 America East Swim & Dive
 New Hampshire	2015	UVM vs UNH
 New Hampshire	2015	UNH vs Maine
 New Hampshire	2015	UNH vs URI
 New Hampshire	2015	UNH
 New Hampshire	2015	Northeastern Women vs UNH Wome
+New Hampshire	2015	2015 ECAC Open Swimming & Divi
 New Hampshire	2015	UNH vs Rutgers
 New Hampshire	2015	Yale-UNH
 Idaho	2012	NMSU vs Idaho 2012
@@ -18391,6 +18660,7 @@ Idaho	2014	University of Idaho vs. Oregon
 Idaho	2014	2013 Husky SCY Invitational
 Idaho	2014	Idaho at Seattle University
 Idaho	2015	CSU vs Idaho vs SDSU
+Idaho	2015	2015 WAC Swimming & Diving Cha
 Idaho	2015	University of Idaho vs. Boise
 Idaho	2015	University of Idaho vs. Northe
 Idaho	2015	Frank Elm Invitational 2014
@@ -18545,6 +18815,7 @@ Vermont	2014	UVM vs Bryant
 Vermont	2014	UVM vs Northeastern
 Vermont	2014	Wagner vs. Vermont
 Vermont	2015	Middlebury Invitational
+Vermont	2015	2015 America East Swim & Dive
 Vermont	2015	UVM vs CCSU vs Merrimak
 Vermont	2015	UVM vs Wagner
 Vermont	2015	UVM vs URI
@@ -18553,6 +18824,7 @@ Vermont	2015	Bryant Vs UVM NJIT
 Vermont	2015	Bucknell Invitational
 Vermont	2015	Siena vs Vermont
 Vermont	2015	BC-VT @ Maine
+Vermont	2015	2015 ECAC Open Swimming & Divi
 Purdue	2012	2011 IN Indiana Intercollegiates
 Purdue	2012	Women's Big 10s
 Purdue	2012	2012 WI Speedo Champions Serie
@@ -18629,14 +18901,17 @@ Purdue	2014	Michigan State vs Purdue Dual
 Purdue	2014	IU - PU Men
 Purdue	2015	Ohio State Winter Invite 2015
 Purdue	2015	Western Kentucky vs. Purdue Me
+Purdue	2015	2015 B1G Men's Swimming & Divi
 Purdue	2015	ND v Purdue
 Purdue	2015	Minnesota vs. Northwestern vs.
+Purdue	2015	Miami vs. Purdue W-Dual
 Purdue	2015	Michigan State University vs P
 Purdue	2015	OSU vs UC (coed) OSU vs PU (wo
 Purdue	2015	2014 MICA vs Purdue
 Purdue	2015	2014 AT&T Winter National Cham
 Purdue	2015	2015 B1G Women's Swim & Dive C
-Purdue	2015	Miami vs. Purdue W-Dual
+Purdue	2015	2015 B1G Men's Swimming Time T
+Purdue	2015	Boiler-Make-It Qualification C
 Purdue	2015	Indiana Intercollegiates 2014
 Purdue	2015	Ohio State Invitational
 Purdue	2015	2015 Michigan First Chance Mee
@@ -18758,14 +19033,15 @@ Coe	2015	Grinnell Invitational 2015
 Coe	2015	IIT vs Coe 11.15.14
 Coe	2015	Simpson vs Coe 2014
 Coe	2015	Norse Sprint Invite 2015
-Coe	2015	Loras College vs. Coe College
+Coe	2015	Morningside/Coe Dual Meet
+Coe	2015	Pioneer Classic 2014
 Coe	2015	2015 Liberal Arts Championship
 Coe	2015	Iowa Lakes v Lincoln v Coe 201
 Coe	2015	Coe College vs. UNI
-Coe	2015	Pioneer Classic 2014
-Coe	2015	Franklin vs Nebraska Wesleyan
+Coe	2015	Grinnell Last Chance
 Coe	2015	Nebraska Wesleyan vs Coe 2014
-Coe	2015	Morningside/Coe Dual Meet
+Coe	2015	Franklin vs Nebraska Wesleyan
+Coe	2015	Loras College vs. Coe College
 Coe	2015	Coe V. Grinnell Dual
 Coe	2015	Luther vs Coe 15
 Ashland	2012	AU vs GVSU
@@ -18924,6 +19200,7 @@ Saint Peter's	2015	H2ounds Invitational
 Saint Peter's	2015	Frank Elm Invitational 2014
 Saint Peter's	2015	St Peters vs NJIT
 Saint Peter's	2015	2015 MAAC Championships
+Saint Peter's	2015	2015 ECAC Open Swimming & Divi
 Saint Peter's	2015	Sonny Werblin Invitational 201
 Denver (W)	2013	FAU vs Denver
 Denver (W)	2013	UNLV v University of Arizona v
@@ -18983,12 +19260,15 @@ Maine	2014	2014 America East Swim & Dive
 Maine	2014	Harold Anderson Inviational
 Maine	2014	Dartmouth Invitational 2014
 Maine	2014	Maine at Providence
+Maine	2015	2015 ECAC Open Swimming Time T
 Maine	2015	UNH vs Maine
+Maine	2015	2015 ECAC Open Swimming & Divi
 Maine	2015	Maine at Providence College
 Maine	2015	Maine at Bryant
 Maine	2015	Wheaton Invite 2015
 Maine	2015	Bates - University of Maine
 Maine	2015	Rhode Island vs. Maine
+Maine	2015	2015 America East Swim & Dive
 Maine	2015	BC-VT @ Maine
 Maine	2015	Harold Anderson Invitational M
 TAMPA	2012	Tampa at IRSC
@@ -19038,8 +19318,9 @@ TAMPA	2015	2015 Sunshine State Conference
 TAMPA	2015	Tampa vs Nova Southeastern
 TAMPA	2015	Tampa vs St Leo
 TAMPA	2015	Rollins vs Tampa
-TAMPA	2015	2015 Tampa Relay Invite
+TAMPA	2015	2015 FL Spring Senior Championship
 TAMPA	2015	2014 Shark Invitational
+TAMPA	2015	2015 Tampa Relay Invite
 TAMPA	2015	Tampa v Florida Tech
 TAMPA	2015	Tampa v Boston College
 TAMPA	2015	Tampa v Rollins
@@ -19149,12 +19430,15 @@ UNLV (M)	2014	ASU vs. UNLV vs. Denver
 UNLV (M)	2015	UNLV vs ASU
 UNLV (M)	2015	Mizzou Invitational
 UNLV (M)	2015	CSUBvsUNLVvsFresnoSt
-UNLV (M)	2015	UNLV vs BYU
+UNLV (M)	2015	2015 WAC Swimming & Diving Cha
 UNLV (M)	2015	UNLV vs AFA
 UNLV (M)	2015	UNLV vs DENVER
+UNLV (M)	2015	UNLV vs BYU
 UNLV (M)	2015	#A14-322 UNLV FALL INVITATIONA
 UNLV (M)	2015	UNLV vs UCSB
 UNLV (M)	2015	UNLV vs U of A vs Utah
+UNLV (M)	2015	2015 MEN'S PAC12 INVITE
+UNLV (M)	2015	2015 MEN'S PAC12 INVITE TTs
 UNLV (M)	2015	Israel Winter Championship Short Course
 UNLV (M)	2015	UNLV vs WY and  NAU
 Mansfield	2012	Bloomsburg Vs Edinboro Vs Kutz
@@ -19296,14 +19580,19 @@ Virginia	2014	Navy, UVA, Yale 2013
 Virginia	2014	Cavalier Invite
 Virginia	2014	Ohio State Invitational
 Virginia	2014	UVA vs University of Pittsburg
-Virginia	2015	Men Vs Navy Fall 2014
+Virginia	2015	UVA vs. VT 2015
+Virginia	2015	2015 VA SC SR Championships
 Virginia	2015	UVa v. NCSU
 Virginia	2015	UGA Fall Invitational 2014
 Virginia	2015	2015 ACC Women's Championship
-Virginia	2015	Penn State v. Virginia v. Mich
-Virginia	2015	UVA vs. VT 2015
+Virginia	2015	2015 ACC Men's Time Trials
+Virginia	2015	Last Chance Qualifier-Women
+Virginia	2015	Men Vs Navy Fall 2014
 Virginia	2015	2015 Virginia Tech Invitationa
+Virginia	2015	2015 Yellow Jacket Championshi
 Virginia	2015	UVA v. UNC Spring 2015
+Virginia	2015	Penn State v. Virginia v. Mich
+Virginia	2015	2015 ACC Men's Championship
 Alderson Broadd.	2014	Alderson Broaddus at Albion
 Alderson Broadd.	2014	College of Wooster Invite
 Alderson Broadd.	2014	Alderson Broaddus at Davis & E
@@ -19461,8 +19750,11 @@ Miami (Ohio)	2015	2015 WICA vs Toledo
 Miami (Ohio)	2015	2015 MICA vs Ball State
 Miami (Ohio)	2015	2014 MICA vs Cleveland State
 Miami (Ohio)	2015	2014 Miami vs Xavier
+Miami (Ohio)	2015	2015 MAC Mens Championships
 Miami (Ohio)	2015	BSU vs. Miami
 Miami (Ohio)	2015	Ohio State Winter Invite 2015
+Miami (Ohio)	2015	2014 Miami University Invitati
+Miami (Ohio)	2015	2015 OH Tim Myers Ohio Senior S
 Miami (Ohio)	2015	2014 MICA vs Purdue
 Miami (Ohio)	2015	Miami @ Cincinnati
 Miami (Ohio)	2015	2014 WICA vs Butler
@@ -19470,7 +19762,7 @@ Miami (Ohio)	2015	Miami vs. Purdue W-Dual
 Miami (Ohio)	2015	Ohio University v Miami Univer
 Miami (Ohio)	2015	2015 Coed vs Buffalo
 Miami (Ohio)	2015	2014 WICA vs OSU
-Miami (Ohio)	2015	2014 Miami University Invitati
+Miami (Ohio)	2015	2015 MAC Women's Swim and Dive
 Miami (Ohio)	2015	EMU-vs-Miami
 Gallaudet	2012	Frostburg, Gallaudet, Davis &
 Gallaudet	2012	GallaudetvGreensborovHollins
@@ -19537,10 +19829,12 @@ Bucknell	2014	Bucknell Invitational
 Bucknell	2014	Bucknell vs UMBC
 Bucknell	2014	George Washington vs Bucknell
 Bucknell	2014	2014ECAC Swimming & Diving Ope
+Bucknell	2015	2015 ECAC Open Swimming Time T
 Bucknell	2015	Bucknell vs Army
 Bucknell	2015	Pitt vs. Bucknell
 Bucknell	2015	Bucknell vs Lehigh
 Bucknell	2015	Bucknell vs Colgate
+Bucknell	2015	2015 ECAC Open Swimming & Divi
 Bucknell	2015	Bucknell vs Boston U & GW
 Bucknell	2015	Bucknell vs Navy, American, La
 Bucknell	2015	Bucknell@Columbia M & Bucknell
@@ -19663,12 +19957,16 @@ Air Force (M)	2014	GCU v. U.S. Air Force Academy
 Air Force (M)	2014	AFA vs Seattle, N. Dakota, N.
 Air Force (M)	2014	2013 CO CSI Pioneer Open
 Air Force (M)	2015	Air Force vs UCSB
-Air Force (M)	2015	Mines, Mesa State @ USAFA
+Air Force (M)	2015	2015 ST American Short Course Cha
+Air Force (M)	2015	2015 CO AP Senior Meet
+Air Force (M)	2015	2015 WAC Swimming & Diving Cha
 Air Force (M)	2015	2014 UND USD UNC AFA 2
 Air Force (M)	2015	Wyoming at USAFA
 Air Force (M)	2015	2014 NIke Cup Invitational
-Air Force (M)	2015	CMU Intermountain Shootout
+Air Force (M)	2015	Mines, Mesa State @ USAFA
 Air Force (M)	2015	IW-AF-UCSD-SDSU 12-29-14
+Air Force (M)	2015	CMU Intermountain Shootout
+Air Force (M)	2015	2015 WAC Swimming Time Trials
 Air Force (M)	2015	Seattle-Northern Colorado @ US
 Air Force (M)	2015	2014 UND USD UNC AFA 1 Dual
 Air Force (M)	2015	UNLV vs AFA
@@ -19728,12 +20026,13 @@ NC State	2014	Minnesota vs. NC State Dual
 NC State	2014	LEN: European Short Course Championships
 NC State	2014	Florida State vs. NC State, GA
 NC State	2015	NC State vs UNC
+NC State	2015	Bulldog Invitational 2015
 NC State	2015	3rd Annual All-NC Invitational
 NC State	2015	UVa v. NCSU
 NC State	2015	2015 ACC Women's Championship
-NC State	2015	NC State Univeristy vs Univ. o
-NC State	2015	2014 AT&T Winter National Cham
 NC State	2015	2014 NIke Cup Invitational
+NC State	2015	2014 AT&T Winter National Cham
+NC State	2015	NC State Univeristy vs Univ. o
 NC State	2015	2015 Carolina College Cup
 NC State	2015	Vilanova vs NC State
 NC State	2015	2015 ACC Women's Time Trials
@@ -19741,6 +20040,8 @@ NC State	2015	SMU Women's Classic 2014
 NC State	2015	2014 Georgia Tech vs Florida S
 NC State	2015	North Carolina State Univ. vs
 NC State	2015	North Carolina State vs Prince
+NC State	2015	Last Chance NCAA Qualifier 201
+NC State	2015	2015 ACC Men's Championship
 Rhode Island Col	2014	13 Little East Swimming/Diving
 Rhode Island Col	2014	WCSU v RIC
 Rhode Island Col	2014	BSU DOUBEL DUAL (BSU, PSU, RIC
@@ -19799,14 +20100,17 @@ Oregon St	2014	2013 OR CAL vs OSU
 Oregon St	2014	2014 WOMENS PAC-12 SWIMMING In
 Oregon St	2015	SFU Clan Cup International
 Oregon St	2015	OSU vs UCLA
+Oregon St	2015	OSU vs Idaho
 Oregon St	2015	UTAH vs OSU
 Oregon St	2015	Women's Swim - Oregon State @
 Oregon St	2015	Oregon State @ Stanford Women
 Oregon St	2015	Oregon State vs. Arizona State
+Oregon St	2015	2015 WOMENS PAC-12 SWIMMING IN
 Oregon St	2015	OSU vs Boise State 2014
+Oregon St	2015	2015 WOMENS PAC-12 Time Trials
 Oregon St	2015	OSU v USC 2014
 Oregon St	2015	OSU v Liberty, Seattle
-Oregon St	2015	OSU vs Idaho
+Oregon St	2015	2015 WOMENS PAC-12 SWIMMING CH
 Oregon St	2015	UA vs MIZZ vs NAU vs NMS vs OS
 CALU-PA	2012	Pidgeon Memorial Invitational
 CALU-PA	2012	2012 Senior Recognition
@@ -20037,6 +20341,7 @@ Youngstown St	2015	Niagara v Youngstown State
 Youngstown St	2015	St. Francis v Youngstown State
 Youngstown St	2015	Duquesne v Youngstown State
 Youngstown St	2015	Oakland vs. Ohio vs. Youngstow
+Youngstown St	2015	Horizon League Championship 20
 Youngstown St	2015	UIC vs Youngstown 2015
 Youngstown St	2015	BGSU v Youngstown State
 Youngstown St	2015	Akron v Youngstown State
@@ -20140,10 +20445,11 @@ Missouri	2014	2014 Mizzou vs DU
 Missouri	2014	Iowa vs Illinois-Indiana-Misso
 Missouri	2014	2014 SEC Swimming Time Trials
 Missouri	2014	LEN: European Short Course Championships
+Missouri	2015	2015 ST American Short Course Cha
 Missouri	2015	Quad Meet
 Missouri	2015	MU vs Auburn
 Missouri	2015	MU vs Drury
-Missouri	2015	University of SC vs University
+Missouri	2015	Last Chance Qualifier-Women
 Missouri	2015	Tiger Invitational
 Missouri	2015	2015 MV CSC Tiger Invitational
 Missouri	2015	2014 Show Me Showdown
@@ -20152,6 +20458,7 @@ Missouri	2015	MU vs Missouri State Dual
 Missouri	2015	Arkansas vs Missouri Dual Meet
 Missouri	2015	2015 SEC Swimming Time Trials
 Missouri	2015	UA vs MIZZ vs NAU vs NMS vs OS
+Missouri	2015	University of SC vs University
 Missouri	2015	2015 SEC Swimming & Diving Cha
 Cincinnati	2012	Wright State at CinCinnati
 Cincinnati	2012	2012 KY SCY Championship
@@ -20587,14 +20894,16 @@ Army	2014	Army vs Lafayette vs Colgate 1
 Army	2014	Frank Elm Invitational 2013
 Army	2014	UCONN vs Army
 Army	2014	Army/Navy 2013
+Army	2015	2015 ECAC Open Swimming Time T
 Army	2015	Bucknell vs Army
+Army	2015	Demo Meet
 Army	2015	UMass vs Army
 Army	2015	Terrier Invitational
 Army	2015	Army vs. Boston, Mason, Americ
 Army	2015	ARMY & MSU AT BUFFALO
 Army	2015	Army vs. Colgate, Lafayette 20
 Army	2015	Army Navy 2014
-Army	2015	Demo Meet
+Army	2015	2015 ECAC Open Swimming & Divi
 Army	2015	2015 Patriot League Championsh
 King's	2012	2012 MAC Championships
 King's	2012	Misericordia vs. Kings
@@ -20894,6 +21203,7 @@ Hawaii (W)	2014	2014 CA OBS MPSF Swim TTs
 Hawaii (W)	2014	2013 HI "Fall Season Kick-off"
 Hawaii (W)	2014	Cal Poly vs Hawaii vs UCSB
 Hawaii (W)	2014	2013 HI Hawaiian Swimming Senior
+Hawaii (W)	2015	2015 HI Oahu Age Group Meet
 Hawaii (W)	2015	2014 HI Oahu Distance Meet
 Hawaii (W)	2015	2015 MPSF Swim & Dive Time Trials
 Hawaii (W)	2015	2014 HI Senior Meet
@@ -20933,11 +21243,12 @@ Northern Ariz	2014	Idaho at Northern Arizona
 Northern Ariz	2015	NAU vs. New Mexico State
 Northern Ariz	2015	USD-NAU Dual Meet
 Northern Ariz	2015	UNLV vs WY and  NAU
+Northern Ariz	2015	2015 WAC Swimming & Diving Cha
 Northern Ariz	2015	#A14-322 UNLV FALL INVITATIONA
 Northern Ariz	2015	University of New Mexico vs. N
-Northern Ariz	2015	NAU vs. Northern Colorado
 Northern Ariz	2015	NAU-WSU Dual
 Northern Ariz	2015	University of Idaho vs. Northe
+Northern Ariz	2015	NAU vs. Northern Colorado
 Northern Ariz	2015	UA vs MIZZ vs NAU vs NMS vs OS
 Illinois College	2012	Midwest Conference Championshi
 Illinois College	2012	Illinois College vs Knox Colle
@@ -21032,20 +21343,26 @@ Pittsburgh	2014	Pitt v Denison & JMU
 Pittsburgh	2014	UVA vs University of Pittsburg
 Pittsburgh	2014	2013 AT&T Winter National Cham
 Pittsburgh	2014	2013 AM Pittsburgh Invitational
+Pittsburgh	2015	2015 ECAC Open Swimming Time T
 Pittsburgh	2015	Denison vs. Pittsburgh
 Pittsburgh	2015	Pitt vs. Bucknell
 Pittsburgh	2015	Pittsburgh vs WVU
 Pittsburgh	2015	2015 ACC Women's Championship
-Pittsburgh	2015	2014 Winter National Time Trials
-Pittsburgh	2015	2015 ACC Women's Time Trials
+Pittsburgh	2015	2015 ACC Men's Championship
+Pittsburgh	2015	2015 ACC Men's Time Trials
 Pittsburgh	2015	2014 AT&T Winter National Cham
 Pittsburgh	2015	2015 Senior Recognition - West
+Pittsburgh	2015	2015 PV SC Senior Championships
+Pittsburgh	2015	2014 Winter National Time Trials
 Pittsburgh	2015	2014 AM TPIT 53rd Annual Christmas Meet
-Pittsburgh	2015	2014 Georgia Tech v Pitt and G
 Pittsburgh	2015	Pitt vs St. Bonaventure
+Pittsburgh	2015	Vilanova vs Pitt
+Pittsburgh	2015	2015 ACC Women's Time Trials
+Pittsburgh	2015	2014 Georgia Tech v Pitt and G
+Pittsburgh	2015	2015 ECAC Open Swimming & Divi
 Pittsburgh	2015	Pitt vs. Duke
 Pittsburgh	2015	2014 Pittsburgh Invitational
-Pittsburgh	2015	Vilanova vs Pitt
+Pittsburgh	2015	Last Chance NCAA Qualifier 201
 Pittsburgh	2015	ND v VT v Pitt
 Hawaii (M)	2012	2011 HI Senior LCM Championshi
 Hawaii (M)	2012	2012 CA OBS MPSF Swimming & Di
@@ -21396,6 +21713,7 @@ Cabrini	2015	2015 James E Longnecker Time T
 Cabrini	2015	Bethany & Cabrini @ Franciscan
 Cabrini	2015	Cabrini vs Ocean County
 Cabrini	2015	Cabrini vs Ursinus
+Cabrini	2015	2015 ECAC Open Swimming & Divi
 Cabrini	2015	Cabrini vs Bryn Mawr
 South Dakota St	2012	2012 IA SC Championships
 South Dakota St	2012	2012 University of Tampa Relay
@@ -21449,8 +21767,10 @@ South Dakota St	2015	USD at SDSU Nov 7 2014
 South Dakota St	2015	CSB/SJU vs St Catherine's and
 South Dakota St	2015	South Dakota State @ Northern
 South Dakota St	2015	2015 UND vs SDSU
-South Dakota St	2015	SJU vs South Dakota Sate
 South Dakota St	2015	South Dakota State at Iowa Sta
+South Dakota St	2015	SJU vs South Dakota Sate
+South Dakota St	2015	2015 Summit League Championshi
+South Dakota St	2015	2015 Summit League Time Trials
 South Dakota St	2015	2014 Jean Freeman Invitational
 South Dakota St	2015	USD vs. SDSU
 South Dakota St	2015	SCSU at SDSU
@@ -21830,6 +22150,7 @@ Colby-Sawyer	2014	UMD CSC Inivite
 Colby-Sawyer	2014	Colby-Sawyer vs Norwich 2013
 Colby-Sawyer	2014	UNE v CSC v GC 2014
 Colby-Sawyer	2014	Colby-Sawyer College vs Regis
+Colby-Sawyer	2015	2015 ECAC Open Swimming Time T
 Colby-Sawyer	2015	Coby Sawyer College Invitation
 Colby-Sawyer	2015	CSC vs Norwich University
 Colby-Sawyer	2015	3rd Annual Michael Arsenault R
@@ -21841,6 +22162,7 @@ Colby-Sawyer	2015	NEISDA Championships 2015
 Colby-Sawyer	2015	Simmons vs. CSC vs. Regis
 Colby-Sawyer	2015	SMC V Colby Sawyer
 Colby-Sawyer	2015	CSC vs UMass Dartmouth
+Colby-Sawyer	2015	2015 ECAC Open Swimming & Divi
 SUNY Cobleskill	2012	Quad Meet 2011 vs CSR CAZ COB
 SUNY Cobleskill	2014	2014 Men's Sprint Invite (Back
 SUNY Cobleskill	2014	St. Elizabeth vs. Cobleskill
@@ -22005,7 +22327,10 @@ Virginia Tech	2014	VT-UVA-Wisconsin-Harvard-Miami
 Virginia Tech	2014	Virginia Tech Swimming Challen
 Virginia Tech	2014	OSU-VATECH-CSU-DENISON
 Virginia Tech	2014	TN vs VT and MO
+Virginia Tech	2015	Bulldog Invitational 2015
 Virginia Tech	2015	UVA vs. VT 2015
+Virginia Tech	2015	2015 VA SC SR Championships
+Virginia Tech	2015	2015 VA TT SC Senior Champions
 Virginia Tech	2015	Duke University vs Virginia Te
 Virginia Tech	2015	2015 ACC Women's Championship
 Virginia Tech	2015	Polish Winter Championships
@@ -22013,7 +22338,9 @@ Virginia Tech	2015	Virginia Tech vs Kentucky and
 Virginia Tech	2015	Virginia Tech Swimming and Div
 Virginia Tech	2015	UNC v. VATECH
 Virginia Tech	2015	2015 Virginia Tech Invitationa
+Virginia Tech	2015	2015 Yellow Jacket Championshi
 Virginia Tech	2015	2014 H2Okie Fall Invitational
+Virginia Tech	2015	2015 ACC Men's Championship
 Virginia Tech	2015	VT vs GT, UNCW & Miami
 Virginia Tech	2015	ND v VT v Pitt
 Lehman	2012	USMMA vs Lehman
@@ -22122,12 +22449,14 @@ Cornell	2014	Columbia University vs. Cornel
 Cornell	2014	Cornell - Brown
 Cornell	2014	2014  Womens Ivy League Champi
 Cornell	2015	Ithaca College Invitational
-Cornell	2015	Cornell @ Binghamton 14
+Cornell	2015	2015 Men's Ivy League Time T
 Cornell	2015	Cornell - Columbia Men's Meet
 Cornell	2015	Harvard vs. Cornell vs. Dartmo
 Cornell	2015	Princeton Penn Cornell Double
 Cornell	2015	Brown vs Cornell
+Cornell	2015	Cornell @ Binghamton 14
 Cornell	2015	2015 NE W Ivy Champs
+Cornell	2015	2015 Men's Ivy League Champion
 Cornell	2015	Cornell - Yale
 Cornell	2015	Colgate University vs Cornell
 Cornell	2015	Cornell - Columbia Women's Mee
@@ -22336,6 +22665,7 @@ UNC Wilmington	2015	2014 Patriot Invitational
 UNC Wilmington	2015	2015 Carolina College Cup
 UNC Wilmington	2015	UNCW v Liberty v GSU v CofC
 UNC Wilmington	2015	CAA POD
+UNC Wilmington	2015	2015 Colonial Athletics Assoc
 UNC Wilmington	2015	Duke University vs Univ of NC
 UNC Wilmington	2015	VT vs GT, UNCW & Miami
 Wheeling Jesuit	2012	Jesuit vrs Notre Dame
@@ -22658,6 +22988,8 @@ Binghamton	2014	2014 America East Swim & Dive
 Binghamton	2014	Binghamton University
 Binghamton	2014	Bucknell Invitational
 Binghamton	2015	Marist vs Binghamton
+Binghamton	2015	2015 ECAC Open Swimming Time T
+Binghamton	2015	2015 America East Swim & Dive
 Binghamton	2015	Cornell @ Binghamton 14
 Binghamton	2015	2015 NI - STAR Winter Challenge
 Binghamton	2015	FIU Sprint Invite
@@ -22666,6 +22998,7 @@ Binghamton	2015	Bucknell Invitational
 Binghamton	2015	Drexel vs Binghamton
 Binghamton	2015	Bucknell @ Binghamton
 Binghamton	2015	UMass @ Binghamton
+Binghamton	2015	2015 ECAC Open Swimming & Divi
 Binghamton	2015	Colgate @ Binghamton
 Columbia	2012	Yale @ Columbia
 Columbia	2012	Princeton vs. Columbia Women
@@ -22763,9 +23096,13 @@ Columbia	2014	2014 Men's Ivy League Champion
 Columbia	2014	Princeton Swimming 'Big Al' Op
 Columbia	2014	Brown vs Columbia Women
 Columbia	2014	2014  Womens Ivy League Champi
+Columbia	2015	Princeton University NCAA Qual
 Columbia	2015	Cornell - Columbia Men's Meet
 Columbia	2015	Bucknell@Columbia M & Bucknell
 Columbia	2015	Penn v. Columbia (W)
+Columbia	2015	2015 Men's Ivy League Champion
+Columbia	2015	2015 ECAC Open Swimming & Divi
+Columbia	2015	2015 ECAC Open Swimming Time T
 Columbia	2015	2015 MA Middle Atlantic Elite
 Columbia	2015	Navy at Columbia Men
 Columbia	2015	Princeton at Columbia Women
@@ -22780,6 +23117,7 @@ Columbia	2015	Dartmouth vs. Columbia WOMEN
 Columbia	2015	Princeton at Columbia Men
 Columbia	2015	2015 NE W Ivy Champs TT
 Columbia	2015	Demo Meet
+Columbia	2015	2015 Men's Ivy League Time T
 Columbia	2015	Columbia @ Yale
 Columbia	2015	2014 AT&T Winter National Cham
 Columbia	2015	Frank Elm Invitational 2014
@@ -22829,6 +23167,7 @@ George Mason	2015	2014 Patriot Invitational
 George Mason	2015	2014 Winter National Time Trials
 George Mason	2015	2014 AT&T Winter National Cham
 George Mason	2015	GW vs GMU
+George Mason	2015	2015 PV SC Senior Championships
 George Mason	2015	Army vs. Boston, Mason, Americ
 George Mason	2015	2015 A-10 Men's & Women's Cham
 George Mason	2015	GMU/CofC/Towson/Northeastern
@@ -22941,6 +23280,7 @@ Lake Forest	2015	2015 Midwest Invitational
 Lake Forest	2015	Illinois-Michigan Quad Meet
 Lake Forest	2015	LAKE FOREST 2014
 Lake Forest	2015	Carthage Classic 2014
+Lake Forest	2015	2015 IL  Illinois Senior SCY C
 Lake Forest	2015	2015 Midwest Conference Champi
 Lake Forest	2015	2015 Midwest Conference Time T
 Lake Forest	2015	LFC - Lawrence 1-24-2015
@@ -22979,6 +23319,7 @@ Rutgers	2014	American Athletic Conference C
 Rutgers	2014	Sonny Werblin Invitational 201
 Rutgers	2014	RU Wagner Dual Meet
 Rutgers	2015	Rutgers/Providence/Georgetown
+Rutgers	2015	Princeton University NCAA Qual
 Rutgers	2015	UM TU RU January 2015
 Rutgers	2015	Rutgers Quad Meet
 Rutgers	2015	Boston University - Rutgers @
@@ -23094,13 +23435,16 @@ Brigham Young	2015	Denver at BYU
 Brigham Young	2015	UC Davis vs. BYU
 Brigham Young	2015	Colorado Mesa University 5th A
 Brigham Young	2015	UTAH vs BYU
+UMBC (W)	2015	2015 ECAC Open Swimming Time T
 UMBC (W)	2015	Bucknell vs UMBC
 UMBC (W)	2015	2015 ECU vs UMBC
+UMBC (W)	2015	2015 America East Swim & Dive
 UMBC (W)	2015	2014 Patriot Invitational
 UMBC (W)	2015	George Washington vs UMBC
 UMBC (W)	2015	2015 Howard vs UMBC
 UMBC (W)	2015	2014 Rider vs UMBC
 UMBC (W)	2015	UMBC 2014
+UMBC (W)	2015	2015 ECAC Open Swimming & Divi
 UMBC (W)	2015	2014 CCSA North Invite
 UW-Stevens Point	2012	Border Battle 2011
 UW-Stevens Point	2012	UWEC-SCSU-UWSP
@@ -23390,14 +23734,17 @@ William & Mary	2014	Cavalier Invite
 William & Mary	2014	2013 CAA POD Meet
 William & Mary	2014	GU v. Towson & William & Mary
 William & Mary	2014	Duke vs William & Mary Univers
+William & Mary	2015	2015 VA SC SR Championships
 William & Mary	2015	2014 Winter National Time Trials
 William & Mary	2015	2014 H2Okie Fall Invitational
 William & Mary	2015	Davidson College vs College of
 William & Mary	2015	William & Mary vs Mary Washing
 William & Mary	2015	Duke vs William & Mary
 William & Mary	2015	2015 Carolina College Cup
+William & Mary	2015	2015 Yellow Jacket Championshi
 William & Mary	2015	Richmond vs William & Mary
 William & Mary	2015	CAA POD
+William & Mary	2015	2015 Colonial Athletics Assoc
 William & Mary	2015	William and Mary and Georgetow
 William & Mary	2015	East Carolina vs William & Mar
 William & Mary	2015	2014 AT&T Winter National Cham
@@ -23430,6 +23777,7 @@ Col. of Charl.	2015	Wingate Fall Frenzy
 Col. of Charl.	2015	GMU/CofC/Towson/Northeastern
 Col. of Charl.	2015	ECU v. College of Charleston
 Col. of Charl.	2015	2015 Virginia Tech Invitationa
+Col. of Charl.	2015	2015 Colonial Athletics Assoc
 Lebanon Valley	2012	DeSales vs Lebanon Valley Coll
 Lebanon Valley	2012	Marywood vs Lebanon Valley Col
 Lebanon Valley	2012	2012 MAC Championships
@@ -23524,6 +23872,7 @@ St. Francis	2015	Fordham vs. St. Francis (NY)
 St. Francis	2015	SFC vs Bryant
 St. Francis	2015	Iona-Wagner-Sacred Heart-St Fr
 St. Francis	2015	St Francis vs Mount
+St. Francis	2015	NEC CONFERENCE SWIMMING & DIVI
 St. Francis	2015	ECAC WINTER CHAMPIONSHIP 2014
 Eastern Mich	2012	2012 Men's MAC Championship
 Eastern Mich	2012	2012 MI OLY Michigan Open
@@ -23581,16 +23930,19 @@ Eastern Mich	2014	Denison University vs. Eastern
 Eastern Mich	2014	EMU-vs-Akron
 Eastern Mich	2015	Ohio State Winter Invite 2015
 Eastern Mich	2015	2014 EMU Swim and Dive Invitat
-Eastern Mich	2015	EMU-vs-UC
+Eastern Mich	2015	EASTERN MICHIGAN vs WAYNE STAT
+Eastern Mich	2015	2015 MAC Mens Championships
 Eastern Mich	2015	EMU-vs- UA
 Eastern Mich	2015	EMU-vs-UB
-Eastern Mich	2015	EASTERN MICHIGAN vs WAYNE STAT
+Eastern Mich	2015	EMU-vs-UC
 Eastern Mich	2015	2015 Michigan First Chance Mee
 Eastern Mich	2015	EMU-vs-OU
 Eastern Mich	2015	Oakland vs. EMU vs. BG
 Eastern Mich	2015	EMU-vs-NW Men's
 Eastern Mich	2015	2014 Arena Grand Prix at Minneapolis
+Eastern Mich	2015	2015 MAC Women's Swim and Dive
 Eastern Mich	2015	Eastern Michigan-Toledo
+Eastern Mich	2015	2015 IL  Illinois Senior SCY C
 Eastern Mich	2015	EMU-vs-Miami
 Colgate	2012	UCONN vs. Colgate
 Colgate	2012	2011 MA OB Bucknell Invitation
@@ -23621,6 +23973,7 @@ Colgate	2014	UB vs Colgate
 Colgate	2014	Loyola vs Colgate
 Colgate	2014	Binghamton at Colgate
 Colgate	2015	Lehigh @ Colgate
+Colgate	2015	Princeton University NCAA Qual
 Colgate	2015	Bucknell vs Colgate
 Colgate	2015	Canisius vs Colgate
 Colgate	2015	FIU Relays
@@ -23664,10 +24017,11 @@ Eastern Ill	2014	10th House of Champions
 Eastern Ill	2014	BSU vs EIU
 Eastern Ill	2014	2013 AT&T Winter National Cham
 Eastern Ill	2014	2014 Summit Swimming & Diving
-Eastern Ill	2015	2014 Hoosierland Open Invitati
 Eastern Ill	2015	EIU - IUPUI - Butler
+Eastern Ill	2015	2014 Hoosierland Open Invitati
 Eastern Ill	2015	Valparaiso vs EIU
 Eastern Ill	2015	11th House of Champions
+Eastern Ill	2015	2015 Summit League Championshi
 Eastern Ill	2015	EIU vs Ball State
 Wash U. MO	2012	SIU v. Wash U
 Wash U. MO	2012	2011 Show me Show Down
@@ -23838,6 +24192,7 @@ Central Conn St	2015	Wagner vs CCSU
 Central Conn St	2015	2014 AT&T Winter National Cham
 Central Conn St	2015	Bryant Vs Central Conneticut
 Central Conn St	2015	Frank Elm Invitational 2014
+Central Conn St	2015	NEC CONFERENCE SWIMMING & DIVI
 Central Conn St	2015	LIU Post vs CCSU
 Central Conn St	2015	UNH
 Central Conn St	2015	Fairfield vs CCSU/Sacred Heart
@@ -23984,10 +24339,11 @@ Gardner-Webb	2014	Gardner-Webb vs. Gergia Southe
 Gardner-Webb	2014	2013 AT&T Winter National Cham
 Gardner-Webb	2014	QUAD MEET 2013
 Gardner-Webb	2015	2014 SC 21st Annual YSSC Thanksgiving
+Gardner-Webb	2015	2014 AT&T Winter National Cham
 Gardner-Webb	2015	2014 Winter National Time Trials
 Gardner-Webb	2015	2015 Gardner-Webb & Marshall
 Gardner-Webb	2015	Queens University vs Gardner W
-Gardner-Webb	2015	2014 AT&T Winter National Cham
+Gardner-Webb	2015	2015 NC Speedo Champions Serie
 Gardner-Webb	2015	Wingate Fall Frenzy
 Gardner-Webb	2015	Gardner-Webb vs Davidson 2015
 Gardner-Webb	2015	2015 CCSA Swimming Time Trial
@@ -24346,6 +24702,7 @@ Duke	2014	2013 ALL-NC Invitational
 Duke	2014	DUKE vs UNC
 Duke	2014	Duke vs William & Mary Univers
 Duke	2014	Duke at UNCW
+Duke	2015	Bulldog Invitational 2015
 Duke	2015	Duke University vs Virginia Te
 Duke	2015	2015 ACC Women's Championship
 Duke	2015	2014 Winter National Time Trials
@@ -24356,9 +24713,12 @@ Duke	2015	2015 Carolina College Cup
 Duke	2015	Duke vs William & Mary
 Duke	2015	Duke, St Andrews vs ODU
 Duke	2015	Duke Univ. vs S. Carolina vs H
+Duke	2015	2015 ACC Men's Time Trials
 Duke	2015	UNC vs Duke Dual Meet
 Duke	2015	Pitt vs. Duke
 Duke	2015	Duke University vs Univ of NC
+Duke	2015	Last Chance NCAA Qualifier 201
+Duke	2015	2015 ACC Men's Championship
 Gannon	2012	Case v. Grove City v. Kenyon v
 Gannon	2012	Fredonia @ GU
 Gannon	2012	Canisus vs Siena/ Gannon
@@ -24582,22 +24942,26 @@ Stanford	2014	Wisconsin @ Stanford
 Stanford	2014	2014 WOMENS PAC-12 SWIMMING CH
 Stanford	2014	Indiana @ Stanford
 Stanford	2014	2014 CA OBS UCLA v Stanford
-Stanford	2015	Utah vs Stanford
+Stanford	2015	Cal Men's Swim & Dive vs. Stan
 Stanford	2015	Arizona State vs. Stanford
 Stanford	2015	UCLA@ Stanford Women
 Stanford	2015	Wisconsin @ Stanford
-Stanford	2015	Oregon State @ Stanford Women
+Stanford	2015	2015 WOMENS PAC-12 SWIMMING CH
+Stanford	2015	Utah vs Stanford
 Stanford	2015	UOP @ Stanford Men
 Stanford	2015	Hawaii  @ Stanford Men
 Stanford	2015	USC @ Stanford Women
-Stanford	2015	Holiday Classic XXVIII
-Stanford	2015	Art Adamson Invitational
+Stanford	2015	2015 WOMENS PAC-12 Time Trials
 Stanford	2015	Cal @ Stanford Men
-Stanford	2015	Cal Men's Swim & Dive vs. Stan
+Stanford	2015	Art Adamson Invitational
+Stanford	2015	Oregon State @ Stanford Women
+Stanford	2015	Holiday Classic XXVIII
+Stanford	2015	2015 MEN'S PAC12 SWIMMING/DIVI
+Stanford	2015	Arizona Vs Stanford
 Stanford	2015	Cal Women's Swim & Dive vs. St
 Stanford	2015	USC@ Stanford Men
 Stanford	2015	Texas @ Stanford Women
-Stanford	2015	Arizona Vs Stanford
+Stanford	2015	2015 MEN'S PAC12 SWIMMING Time
 Hillsdale	2012	HC vs ONU/Olivet
 Hillsdale	2012	2011 Calvin Winter Invitationa
 Hillsdale	2012	GLIAC 2012
@@ -24716,9 +25080,10 @@ Sacred Heart	2015	Fairfield vs CCSU/Sacred Heart
 Sacred Heart	2015	LIU Post v Sacred Heart
 Sacred Heart	2015	AssumptionColleg vs Sacred Hea
 Sacred Heart	2015	Iona-Wagner-Sacred Heart-St Fr
-Sacred Heart	2015	Sacred Heart University vs. Ma
+Sacred Heart	2015	NEC CONFERENCE SWIMMING & DIVI
 Sacred Heart	2015	Siena vs Sacred Heart
 Sacred Heart	2015	Holy Cross v. Sacred Heart
+Sacred Heart	2015	Sacred Heart University vs. Ma
 Pacific Lutheran	2012	Northwest Invitational Meet
 Pacific Lutheran	2012	2011 NWC Sprint Pentathlon
 Pacific Lutheran	2012	L&C-PLU Dual
@@ -24750,6 +25115,7 @@ Pacific Lutheran	2015	Witman @ PLU Longs 2015
 Pacific Lutheran	2015	2014 NC STAR Triad Tropic
 Pacific Lutheran	2015	L&C @ PLU Longs 11-7-14
 Pacific Lutheran	2015	Willamette vs PLU Long
+Pacific Lutheran	2015	2015 PN AP Daffodil Classic
 Pacific Lutheran	2015	Sprint Invitational
 Pacific Lutheran	2015	2015 Chris Knorr Invitational
 Pacific Lutheran	2015	PLU Dual meet
@@ -25199,6 +25565,7 @@ Oakland	2015	Oakland vs. Ohio vs. Youngstow
 Oakland	2015	Oakland vs. Wayne State 14
 Oakland	2015	Oakland vs. EMU vs. BG
 Oakland	2015	2015 MI OLY Michigan Open
+Oakland	2015	Horizon League Championship 20
 Augsburg	2012	2011 St. Thomas relays
 Augsburg	2012	2012 MIAC Swimming and Diving
 Augsburg	2012	2011 St. Thomas Invitational
@@ -25293,18 +25660,20 @@ U.S. Navy	2014	Army/Navy 2013
 U.S. Navy	2015	US Naval Academy vs Princeton
 U.S. Navy	2015	Georgia Tech
 U.S. Navy	2015	Men Vs Navy Fall 2014
+U.S. Navy	2015	BU INVITE
 U.S. Navy	2015	UNC 2015
 U.S. Navy	2015	Navy at Columbia Men
 U.S. Navy	2015	2014 Winter National Time Trials
 U.S. Navy	2015	Bucknell vs Navy, American, La
 U.S. Navy	2015	2014 AT&T Winter National Cham
 U.S. Navy	2015	2014 NIke Cup Invitational
+U.S. Navy	2015	2015 ECAC Open Swimming Time T
 U.S. Navy	2015	Frank Elm Invitational 2014
 U.S. Navy	2015	Army Navy 2014
 U.S. Navy	2015	JHU
 U.S. Navy	2015	2015 Patriot League Championsh
 U.S. Navy	2015	UMBC 2014
 U.S. Navy	2015	Penn State v. Navy
-U.S. Navy	2015	BU INVITE
+U.S. Navy	2015	2015 ECAC Open Swimming & Divi
 U.S. Navy	2015	GMU
 U.S. Navy	2015	2014 CA December CA NV Section

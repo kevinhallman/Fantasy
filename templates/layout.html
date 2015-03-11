@@ -150,7 +150,7 @@ $def with (content)
 			<li value=4 ><a class="header" href="/times">Top Times</a></li>
 			<li value=5 ><a class="header" href="/placing">Placing</a></li>
 			<li value=6 ><a class="header" href="/improvement">Improvement</a></li>
-			<li value=7 ><a class="header" href="/strength">Strength</a></li>
+			<li value=7 ><a class="header" href="/rankings">Rankings</a></li>
 		</ul>
 		<form id="gendiv">
 			<br/>
@@ -174,12 +174,26 @@ $def with (content)
 				<input type="radio" name="division" value="D2">D2
 				<input type="radio" name="division" value="D3" checked>D3
 			<br>
-			$if context.season==2014:
+			$if context.season==2012:
+				<input type="radio" name="season" value="2015">2015
+				<input type="radio" name="season" value="2014">2014
+				<input type="radio" name="season" value="2013">2013
+				<input type="radio" name="season" value="2012" checked>2012
+			$elif context.season==2013:
+				<input type="radio" name="season" value="2015">2015
+				<input type="radio" name="season" value="2014">2014
+				<input type="radio" name="season" value="2013" checked>2013
+				<input type="radio" name="season" value="2012">2012
+			$elif context.season==2014:
 				<input type="radio" name="season" value="2015">2015
 				<input type="radio" name="season" value="2014" checked>2014
+				<input type="radio" name="season" value="2013">2013
+				<input type="radio" name="season" value="2012">2012
 			$elif context.season==2015:
 				<input type="radio" name="season" value="2015" checked>2015
 				<input type="radio" name="season" value="2014">2014
+				<input type="radio" name="season" value="2013">2013
+				<input type="radio" name="season" value="2012">2012
 		</form>
 
 		$:content

@@ -123,7 +123,7 @@ $ teams = divTeams[context.division]
 <form id="teamForm" method="GET">
 	<button type="button" onclick="add(this.form);">Add New Team</button>
 	<br> <br>
-	Team:<select name="division1" onchange="getTeams(this)">
+	Team: <select name="division1" onchange="getTeams(this)">
 		$for division in ['D1', 'D2', 'D3']:
 			$if division==context.division:
 				<option selected> $division </option>

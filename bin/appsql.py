@@ -11,7 +11,7 @@ eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
 
 urls = ('/', 'Home',
-		'/home', 'Home',
+	'/home', 'Home',
 	'/swimulate', 'Swim',
 	'/fantasy', 'Fantasy',
 	'/conference', 'Conf',
@@ -19,10 +19,11 @@ urls = ('/', 'Home',
 	'/duals', 'Duals',
 	'/placing', 'Placing',
 	'/improvement', 'Improvement',
+	'/rankings', 'Rankings',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = True
+prod = False
 if prod:
 	urlparse.uses_netloc.append("postgres")
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -311,13 +312,7 @@ class Improvement():
 			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
 												   season3=season3, season4=season4, teams=confList[form.conference])
 			table = googleCandle(teamImp)
-			'''
-			for team in indImp:
-				print team
-				for swimmer in indImp[team]:
-					for event in indImp[team][swimmer]:
-						print swimmer, event, indImp[team][swimmer][event]
-			'''
+
 		elif form.conference == 'All':
 			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
 												   season3=season3, season4=season4, teams=allTeams[division])
@@ -328,15 +323,72 @@ class Improvement():
 
 		return render.improvement(conferences=sorted(confList.keys()), table=table)
 
+class Rankings():
+	def GET(self):
+		confList = conferences[session.division]
+		form = web.input(conference=None, dual=None, season=None)
+
+		if form.dual == 'Dual':
+			dual = True
+		else:
+			dual = False
+		if form.season in {'2015', '2014', '2013', '2012'}:
+			seasons = {int(form.season)}
+			bar = True
+		else:
+			seasons = {2015, 2014, 2013, 2012}
+			bar = False
+		scores = {}
+		if form.conference in confList:
+			teams = confList[form.conference]
+		elif form.conference == 'All':
+			teams = allTeams[session.division]
+		else:
+			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
+
+		for team in teams:
+			scores[team] = {}
+			for season in seasons:
+				scores[team][season] = database.topTeamScore(team=team, dual=dual, season=season,
+															  gender=session.gender, division=session.division)
+		# remove nulls
+		remove = set()
+		for team in scores:
+			remove.add(team)
+			for season in scores[team]:
+				if scores[team][season]:
+					remove.remove(team)
+					break
+		for team in remove:
+			del scores[team]
+
+
+		if bar:
+			table = googleBar(scores)
+		else:
+			table = googleLine(scores)
+		return render.rankings(conferences=sorted(confList.keys()), table=table, bar=bar)
+
 class teamMeets():
 	def POST(self):
-		form = web.input(team=None, season=None)
+		form = web.input(team=None, season=None, division=None)
 		web.header("Content-Type", "application/json")
 
 		if form.team in meetList:
 			seasonMeets = meetList[form.team]
 			if form.season and int(form.season) in seasonMeets:
-				return json.dumps(seasonMeets[int(form.season)])
+				meetScores = []
+				for meet in seasonMeets[int(form.season)]:
+					score = sqlmeets.Meet(meet, teams=form.team, season=form.season).expectedScores(
+						division=form.division)[
+						form.team]
+					meetScores.append([meet, score])
+				meets = []
+				for meet, score in sorted(meetScores, key=lambda score: score[1]):
+					meets.append(meet + ": " + str(score))
+				return json.dumps(meets)  # seasonMeets[int(form.season)])
+
+			#on first load, default season
 			return json.dumps(seasonMeets)
 		else:
 			return
@@ -434,7 +486,7 @@ def googleCandle(confImp):
 	table = []
 	teamord = []
 	for team in confImp:
-		if confImp[team]==[]: continue
+		if confImp[team] == []: continue
 		teamord.append((team, numpy.median(confImp[team])))
 	for team, med in sorted(teamord, key=lambda score: score[1], reverse=True):
 		nums = confImp[team]
@@ -442,6 +494,59 @@ def googleCandle(confImp):
 		table.append("['" + teamName + "'," + str(min(nums))+","+str(numpy.percentile(nums, 25))+","+str(numpy.percentile(
 			nums, 75))+","+str(max(nums)) + ",'" + str(round(med, 2)) + ' n=' + str(len(nums)) + "'],")
 	return table
+
+def googleLine(teams):
+	table = []
+	line = "['Season'"
+	for team in teams:
+		teamName = re.sub("'", "", team)
+		line += ",'{}'".format(teamName)
+	line += "],"
+	table.append(line)
+
+	for team in teams:
+		seasons = teams[team].keys()
+		break
+	for season in seasons:
+		line = "['{0}'".format(season)
+		for team in teams:
+			score = teams[team][season]
+			if score == None:
+				score = 0
+			line += ",{0}".format(score)
+		line += "],"
+		table.append(line)
+	return table
+
+def googleBar(teamsOld):
+	table = ["['Team', 'Score'],"]
+	teams = []
+	for team in teamsOld:
+		for season in teamsOld[team]:  # should only be one
+			teams.append((team, teamsOld[team][season]))
+
+	for team, score in sorted(teams, key=lambda score: score[1]):
+		teamName = re.sub("'", "", team)
+		line = "['{0}',{1}],".format(teamName, score)
+		table.append(line)
+	return table
+
+def googleJSON(teams):
+	description = {"season": ("string", "Season")}
+	for team in teams:
+		description[team] = ("string", team)
+
+	for team in teams:
+		seasons = teams[team].keys()
+		break
+
+	data = []
+	for season in seasons:
+		line = {'season': season}
+		for team in teams:
+			line[team] = teams[team][season]
+		data.append(line)
+
 
 if __name__ == "__main__":
 	app.run()
