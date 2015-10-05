@@ -23,9 +23,8 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets'
 )
 
-prod = True
-if prod:
-	urlparse.uses_netloc.append("postgres")
+urlparse.uses_netloc.append("postgres")
+if "DATABASE_URL" in os.environ:  # production
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
 	db = PostgresqlDatabase(database=url.path[1:],
     	user=url.username,
@@ -121,16 +120,18 @@ class Swim(object):
 
 		#use topDual if no meet?
 		remove = set()
-		optimizeTeams = set()
+		optimizeTeams = {}
 		for num in formMeets:
 			tm = formMeets[num]
 			if not tm[0] or not tm[1]:
 				remove.add(num)
 			elif tm[1] == 'Create Lineup':
-				optimizeTeams.add(tm[0])
+				optimizeTeams[tm[0]] = int(tm[3])
 				remove.add(num)
 		for tm in remove:
 			del(formMeets[tm])
+
+		print optimizeTeams
 
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return render.swimulator(divTeams=allTeams, scores=None, teamScores=None, finalScores=None)
@@ -321,6 +322,7 @@ class Improvement():
 		elif form.season == 'High School':
 			teamImp, indImp = database.HSImprovement(gender=gender, teams=teams)
 
+			#print indImp, teamImp
 			table =googleCandle(teamImp)
 		else:
 			table = None
@@ -332,12 +334,17 @@ class Rankings():
 		confList = conferences[session.division]
 		form = web.input(conference=None, dual=None, season=None)
 
+		recruits = False
 		if form.dual == 'Dual':
 			dual = True
 		else:
 			dual = False
 		if form.season in {'2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
+			bar = True
+		elif form.season == 'Recruits':
+			seasons = {'All Recruits'}
+			recruits = True
 			bar = True
 		else:
 			seasons = {2015, 2014, 2013, 2012}
@@ -350,11 +357,13 @@ class Rankings():
 		else:
 			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
 
+		print form.season, recruits
 		for team in teams:
 			scores[team] = {}
 			for season in seasons:
 				scores[team][season] = database.topTeamScore(team=team, dual=dual, season=season,
-															  gender=session.gender, division=session.division)
+															  gender=session.gender, division=session.division,
+															  recruits=recruits)
 		# remove nulls
 		remove = set()
 		for team in scores:
