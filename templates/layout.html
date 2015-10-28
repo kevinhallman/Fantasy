@@ -121,13 +121,16 @@ $def with (content)
 				var url = \$(location).attr('href');
     			\$('input[type=radio]').change(function() {
     				if (this.name == 'gender') {
-            			\$.post('home', {gender: this.value}, reload);
+            			\$.post('home', {gender: this.value});
+            			setTimeout(reload, 200);
             		}
             		else if (this.name == 'division') {
-            			\$.post('home', {division: this.value}, reload);
+            			\$.post('home', {division: this.value});
+            			setTimeout(reload, 200);
             		}
             		else if (this.name == 'season') {
-            			\$.post('home', {season: this.value}, reload);
+            			\$.post('home', {season: this.value});
+            			setTimeout(reload, 200);
             		}
     			});
 			});
