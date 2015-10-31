@@ -120,18 +120,24 @@ $def with (content)
 			\$(document).ready(function() {
 				var url = \$(location).attr('href');
     			\$('input[type=radio]').change(function() {
+
     				if (this.name == 'gender') {
-            			\$.post('home', {gender: this.value});
-            			setTimeout(reload, 200);
+    					json = {gender: this.value}
             		}
             		else if (this.name == 'division') {
-            			\$.post('home', {division: this.value});
-            			setTimeout(reload, 200);
+            			json = {division: this.value}
             		}
             		else if (this.name == 'season') {
-            			\$.post('home', {season: this.value});
-            			setTimeout(reload, 200);
+            			json = {season: this.value}
             		}
+					jQuery.ajax({
+        				type: "POST",
+        				async: true,
+        				url: 'home',
+        				data:  json,
+        				success: reload,
+        				error: reload
+    				});
     			});
 			});
 
