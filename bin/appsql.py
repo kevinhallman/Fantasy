@@ -97,7 +97,7 @@ class Home():
 		session.season = int(form.season)
 
 		web.header("Content-Type", "application/json")
-		return
+		return 'an error'
 
 class Swim(object):
 	def GET(self):
@@ -131,7 +131,7 @@ class Swim(object):
 		for tm in remove:
 			del(formMeets[tm])
 
-		print optimizeTeams
+		#print optimizeTeams
 
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return render.swimulator(divTeams=allTeams, scores=None, teamScores=None, finalScores=None)
@@ -339,7 +339,7 @@ class Rankings():
 			dual = True
 		else:
 			dual = False
-		if form.season in {'2015', '2014', '2013', '2012'}:
+		if form.season in {'2016', '2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
 			bar = True
 		elif form.season == 'Recruits':
@@ -357,7 +357,7 @@ class Rankings():
 		else:
 			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
 
-		print form.season, recruits
+		#print form.season, recruits
 		for team in teams:
 			scores[team] = {}
 			for season in seasons:
