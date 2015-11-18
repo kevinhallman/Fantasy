@@ -386,10 +386,11 @@ class teamMeets():
 	def POST(self):
 		form = web.input(team=None, season=None, division=None)
 		web.header("Content-Type", "application/json")
-
 		if form.team in meetList:
 			seasonMeets = meetList[form.team]
 			if form.season and int(form.season) in seasonMeets:
+				meets = seasonMeets[int(form.season)]
+				'''
 				meetScores = []
 				for meet in seasonMeets[int(form.season)]:
 					score = sqlmeets.Meet(meet, teams=form.team, season=form.season).expectedScores(
@@ -399,6 +400,7 @@ class teamMeets():
 				meets = []
 				for meet, score in sorted(meetScores, key=lambda score: score[1]):
 					meets.append(meet + ": " + str(score))
+				'''
 				return json.dumps(meets)  # seasonMeets[int(form.season)])
 
 			#on first load, default season
