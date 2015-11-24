@@ -7,6 +7,7 @@ from datetime import date as Date
 import time
 import urlparse
 
+
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
