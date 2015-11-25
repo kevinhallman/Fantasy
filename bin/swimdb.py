@@ -201,8 +201,10 @@ def load():
 	print len(swims)
 
 	db.connect()
-	with db.transaction():
-		Swim.insert_many(swims).execute()
+	for i in range(len(swims) / 100):
+		print i
+		with db.transaction():
+			Swim.insert_many(swims[i*100:(i+1)*100]).execute()
 
 	#return divisions
 
