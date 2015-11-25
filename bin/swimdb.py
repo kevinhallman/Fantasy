@@ -1,5 +1,3 @@
-__author__ = 'hallmank'
-
 from peewee import *
 import os
 import re
