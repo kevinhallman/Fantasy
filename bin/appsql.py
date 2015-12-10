@@ -68,7 +68,7 @@ def clean(meetList):
 
 web.config.debug = False
 app = web.application(urls, globals())
-session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division':
+session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Men', 'division':
 	'D3','season': 2016})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
