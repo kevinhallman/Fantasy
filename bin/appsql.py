@@ -6,6 +6,7 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
+from datetime import date
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
@@ -67,8 +68,8 @@ def clean(meetList):
 
 web.config.debug = False
 app = web.application(urls, globals())
-session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Men', 'division':
-	'D3','season': 2015})
+session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division':
+	'D3','season': 2016})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
 app.add_processor(connection_processor)
@@ -138,7 +139,7 @@ class Swim(object):
 		
 		else:
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
-										selectEvents=True,
+										selectEvents=False,
 										resetTimes=True)
 			if optimizeTeams:
 				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
@@ -163,7 +164,17 @@ class Conf(object):
 		gender = session.gender
 		season = session.season
 		confList = conferences[division]
-		form = web.input(conference=None, taper=None, _unicode=False)
+		form = web.input(conference=None, taper=None, date=None, _unicode=False)
+		if form.date and form.date != 'Whole Season':
+			(month, day) = re.split('/', form.date)
+			if month in ['10', '11', '12']:
+				year = str(season - 1)
+			else:
+				year = str(season)
+			swimdate = year + '-' + month + '-' + day
+		else:
+			swimdate = None
+		print swimdate
 		if form.conference:
 			if form.taper == 'Top Time':
 				topTimes = True
@@ -176,7 +187,7 @@ class Conf(object):
 				teamScores = confMeet.scoreReport(printout=False, repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
-											   season=season, divisions=division)
+											   season=season, divisions=division, date=swimdate)
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport(printout=False)
 		else:
@@ -292,7 +303,7 @@ class Improvement():
 		division = session.division
 		gender = session.gender
 		#season = session.season - 1
-		season = 2015
+		season = 2016
 		confList = conferences[division]
 		form = web.input(conference=None, season=None)
 
@@ -303,7 +314,7 @@ class Improvement():
 		else:
 			return render.improvement(conferences=sorted(confList.keys()), table=None)
 
-		if form.season in {'2015', '2014', '2013'}:
+		if form.season in {'2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			season3 = None
