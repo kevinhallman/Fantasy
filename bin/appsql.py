@@ -303,7 +303,7 @@ class Improvement():
 		division = session.division
 		gender = session.gender
 		#season = session.season - 1
-		season = 2016
+		season = 2015
 		confList = conferences[division]
 		form = web.input(conference=None, season=None)
 
@@ -317,23 +317,17 @@ class Improvement():
 		if form.season in {'2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
-			season3 = None
-			season4 = None
-			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
-												   season3=season3, season4=season4, teams=teams)
+			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		elif form.season == 'All':
 			season1 = season
-			season2 = season - 1
-			season3 = season - 2
-			season4 = season - 3
-			teamImp, indImp = database.improvement(gender=gender, season1=season1, season2=season2,
-												   season3=season3, season4=season4, teams=teams)
+			season2 = season - 3
+			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		elif form.season == 'High School':
-			teamImp, indImp = database.HSImprovement(gender=gender, teams=teams)
+			teamImp = database.HSImprovement(gender=gender, teams=teams)
 
-			#print indImp, teamImp
+			#print teamImp
 			table =googleCandle(teamImp)
 		else:
 			table = None
