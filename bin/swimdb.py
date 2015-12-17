@@ -47,6 +47,25 @@ class HSSwim(Model):
 	class Meta:
 		database = db
 
+class Improvement(Model):
+	name = CharField()
+	event = CharField()
+	improvement = FloatField()
+	fromTime = FloatField()
+	toTime = FloatField()
+	fromSeason = IntegerField()
+	toSeason = IntegerField()
+	team = CharField()
+	gender = CharField()
+	conference = CharField()
+	division = CharField()
+	fromYear = CharField()
+	toYear = CharField()
+
+	class Meta:
+		database = db
+
+
 def seasonString(dateString):
 	dateParts = re.split('/', dateString)
 	year = int(dateParts[2])
@@ -220,7 +239,7 @@ if __name__ == '__main__':
 	#db.get_indexes(Swim)
 	#swims = {}
 	#db.drop_tables([HSSwim])
-	#db.create_tables([HSSwim])
+	#db.create_tables([Improvement])
 	start = time.time()
 	#for swim in HSSwim.select():
 	#	print swim
