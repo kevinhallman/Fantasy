@@ -67,7 +67,7 @@ class Team(Model):
 	class Meta:
 		database = db
 
-db.drop_tables([Team])
+#db.drop_tables([Team])
 db.create_tables([Team])
 
 
