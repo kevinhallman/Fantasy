@@ -6,7 +6,7 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
-from datetime import date
+from operator import itemgetter
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
@@ -21,7 +21,8 @@ urls = ('/', 'Home',
 	'/placing', 'Placing',
 	'/improvement', 'Improvement',
 	'/rankings', 'Rankings',
-	'/teamMeets', 'teamMeets'
+	'/teamMeets', 'teamMeets',
+	'/programs', 'Programs'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -139,8 +140,7 @@ class Swim(object):
 		
 		else:
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
-										selectEvents=False,
-										resetTimes=True)
+										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
 				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
 			if len(formMeets) > 2:
@@ -387,6 +387,91 @@ class Rankings():
 			table = googleLine(scores)
 		return render.rankings(conferences=sorted(confList.keys()), table=table, bar=bar)
 
+class Programs():
+	def GET(self):
+		division = session.division
+		gender = session.gender
+		form = web.input(conference=None)
+		allConfs = conferences[division]
+		teams = []
+
+		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
+			return render.programs(conferences=sorted(confs.keys()), rankings=None)
+		teamRecruits = {}
+		teamImprovement = {}
+		teamAttrition = {}
+
+
+		if form.conference != 'All':
+			confs = [form.conference]
+		else:
+			confs = allConfs
+
+		for conference in confs:
+			for team in conferences[division][conference]:
+				for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
+																					 Team.gender==gender):
+
+					teamRecruits[team] = stats.strengthinvite
+					teamAttrition[team] = stats.attrition
+					teamImprovement[team] = stats.improvement
+
+		'''
+		for conf in conferences[division]:
+			for team in conferences[division][conf]:
+				#get recruit scores
+				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
+											 dual=False)
+				dualScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
+											 dual=True)
+
+				#get attrition rate
+				attrition = database.attrition([team], gender=gender)
+				if attrition == {}:
+					attrition = 0
+				else:
+					attrition = -attrition
+
+				#get improvement
+				drops = database.improvement2(teams=[team], gender=gender, season1=2015, season2=2012)
+				if drops != {}:
+					improvement = numpy.mean(drops)
+				else:
+					improvement = 0
+
+				if invScore != 0 or attrition != 0 or improvement != 0:
+					teamRecruits[team] = invScore
+					teamAttrition[team] = attrition
+					teamImprovement[team] = improvement
+
+					newTeam = {	'name': team,
+						'improvement': improvement,
+						'attrition': attrition,
+						'strengthdual': dualScore,
+						'strengthinvite': invScore,
+						'conference': conf,
+						'division': division,
+						'gender': gender}
+					teams.append(newTeam)
+		print teams
+		db.connect()
+		with db.transaction():
+			Team.insert_many(teams).execute()
+		'''
+
+		teamRank = {}
+		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
+			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
+				(team, score) = teamScore
+				if not team in teamRank:
+					teamRank[team] = []
+					teamRank[team].append(0)
+				teamRank[team][0] += idx
+				teamRank[team].append((idx, score))
+
+		html = showPrograms(teamRank)
+		return render.programs(conferences=allConfs, rankings=html)
+
 class teamMeets():
 	def POST(self):
 		form = web.input(team=None, season=None, division=None)
@@ -484,6 +569,56 @@ def showConf(scores, newSwims):
 
 	return html
 
+
+def showPrograms(teamRank):
+	html = ''
+	html += '<table class="conf">'
+	html += '<tr>'
+	html += '<th>Team</th>'
+	html += '<th>Combined Score</th>'
+	html += '<th>Strength Rank</th>'
+	html += '<th>Team Strength</th>'
+	html += '<th>Attrition Rank</th>'
+	html += '<th>Attrition Rate</th>'
+	html += '<th>Improvement Rank</th>'
+	html += '<th>Improvement %</th>'
+	html += '</tr>'
+	for teamStats in sorted(teamRank.items(), key=itemgetter(1)):
+		#('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
+		(team, rank) = teamStats
+		html += '<tr>'
+		html += '<td>' + team + '</td>'
+		html += '<td>' + str(rank[0]) + '</td>'
+		for (idx, part) in enumerate(rank[1:]):
+			html += '<td>' + str(part[0]) + '</td>'
+			html += '<td>' + str(round(part[1], 3)) + '</td>'
+		html += '<tr>'
+
+	html += '</table>'
+
+	'''
+	(team, rank) = teamStats
+	html += '<div id="container">'
+	html += '<table class="conf">'
+	html += '<tr><th>'
+	html += team + ': ' + str(rank[0])
+	#print team + str(rank[0])
+	html += '</th></tr>'
+	for (idx, part) in enumerate(rank[1:]):
+		html += '<tr><td>'
+		if idx == 0: label = 'Team Score: '
+		elif idx == 1: label = 'Attrition: '
+		else: label = 'Improvement: '
+		html += str(part[0]) + ' - '
+		html += label + '<b>' + str(round(part[1], 3)) + '<b>'
+		html += '</td><tr>'
+	html += '</table>'
+	html += '</div>'
+	'''
+
+	return html
+
+
 def googleTable(teamScores, scores):
 	table = ["['Name','Parent','Score'],"]
 	table.append("['All Teams', null, 0],")
@@ -568,5 +703,21 @@ def googleJSON(teams):
 		data.append(line)
 
 
+
+class Team(Model):
+	name = CharField()
+	improvement = FloatField()
+	attrition = FloatField()
+	strengthdual = FloatField()
+	strengthinvite = FloatField()
+	conference = CharField()
+	division = CharField()
+	gender = CharField()
+
+	class Meta:
+		database = db
+
 if __name__ == "__main__":
+	#db.drop_tables([Team])
+	#db.create_tables([Team])
 	app.run()

@@ -1,0 +1,46 @@
+$def with(conferences, rankings)
+
+<style>
+input[type=text] {
+	width:24px;
+	border-radius: none;
+	appearance: none;
+	border: solid 1px #dcdcdc;
+	margin: 0;
+}
+
+#container {
+	margin-bottom: 10px;
+	margin-right: 10px:
+	float: left;
+	border: 1px;
+	width: 20%
+}
+
+#rankingTable {
+	width: 100%
+}
+</style>
+
+<h1>
+Program Rankings
+</h1>
+
+<p>
+Which team is the best.
+</p>
+
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		<option>All</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+	<br>
+	<input type="submit" value="Rate Programs">
+</form>
+
+<div id="rankingTable">
+$if rankings:
+	$:rankings
+</div>
