@@ -68,7 +68,7 @@ class Team(Model):
 		database = db
 
 #db.drop_tables([Team])
-db.create_tables([Team])
+#db.create_tables([Team])
 
 
 
@@ -83,6 +83,7 @@ for gender in ['Men', 'Women']:
 	for division in conferences:
 		for conf in conferences[division]:
 			for team in conferences[division][conf]:
+				if team != 'Carleton': continue
 				#get recruit scores
 				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
 									 dual=False)
@@ -118,6 +119,9 @@ for gender in ['Men', 'Women']:
 					teams.append(newTeam)
 				print team
 print teams
+
+Team.delete().where(Team.name=='Carleton')
+
 db.connect()
 with db.transaction():
 	Team.insert_many(teams).execute()
