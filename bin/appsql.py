@@ -396,7 +396,7 @@ class Programs():
 		teams = []
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
-			return render.programs(conferences=sorted(confs.keys()), rankings=None)
+			return render.programs(conferences=sorted(allConfs.keys()), rankings=None)
 		teamRecruits = {}
 		teamImprovement = {}
 		teamAttrition = {}
@@ -416,49 +416,6 @@ class Programs():
 					teamAttrition[team] = stats.attrition
 					teamImprovement[team] = stats.improvement
 
-		'''
-		for conf in conferences[division]:
-			for team in conferences[division][conf]:
-				#get recruit scores
-				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
-											 dual=False)
-				dualScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
-											 dual=True)
-
-				#get attrition rate
-				attrition = database.attrition([team], gender=gender)
-				if attrition == {}:
-					attrition = 0
-				else:
-					attrition = -attrition
-
-				#get improvement
-				drops = database.improvement2(teams=[team], gender=gender, season1=2015, season2=2012)
-				if drops != {}:
-					improvement = numpy.mean(drops)
-				else:
-					improvement = 0
-
-				if invScore != 0 or attrition != 0 or improvement != 0:
-					teamRecruits[team] = invScore
-					teamAttrition[team] = attrition
-					teamImprovement[team] = improvement
-
-					newTeam = {	'name': team,
-						'improvement': improvement,
-						'attrition': attrition,
-						'strengthdual': dualScore,
-						'strengthinvite': invScore,
-						'conference': conf,
-						'division': division,
-						'gender': gender}
-					teams.append(newTeam)
-		print teams
-		db.connect()
-		with db.transaction():
-			Team.insert_many(teams).execute()
-		'''
-
 		teamRank = {}
 		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
 			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
@@ -470,7 +427,7 @@ class Programs():
 				teamRank[team].append((idx, score))
 
 		html = showPrograms(teamRank)
-		return render.programs(conferences=allConfs, rankings=html)
+		return render.programs(conferences=sorted(allConfs.keys()), rankings=html)
 
 class teamMeets():
 	def POST(self):
