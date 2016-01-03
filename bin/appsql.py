@@ -410,7 +410,8 @@ class Programs():
 		for conference in confs:
 			for team in conferences[division][conference]:
 				for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
-																					 Team.gender==gender):
+																					 Team.gender==gender,
+																					 Team.division==division):
 
 					teamRecruits[team] = stats.strengthinvite
 					teamAttrition[team] = stats.attrition
