@@ -83,7 +83,8 @@ for gender in ['Men', 'Women']:
 	for division in conferences:
 		for conf in conferences[division]:
 			for team in conferences[division][conf]:
-				if team != 'Carleton': continue
+				if team != 'Richmond' and team!= 'Connecticut': continue
+
 				#get recruit scores
 				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
 									 dual=False)
@@ -120,9 +121,12 @@ for gender in ['Men', 'Women']:
 				print team
 print teams
 
-Team.delete().where(Team.name=='Carleton')
+
+Team.delete().where(Team.name=='Richmond')
+Team.delete().where(Team.name=='Connecticut')
 
 db.connect()
 with db.transaction():
 	Team.insert_many(teams).execute()
+
 
