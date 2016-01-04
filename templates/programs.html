@@ -21,13 +21,22 @@ input[type=text] {
 	width: 100%
 }
 </style>
-
+<script>
+	\$(document).ready(function()
+    {
+        \$("#programs").tablesorter();
+    }
+);
+</script>
 <h1>
 Program Rankings
 </h1>
 
 <p>
-Programs are ranked on their overall team strength, attrition rate, and swimmer improvement.
+Programs are ranked on their overall team strength, attrition rate, and swimmer improvement. A small attrition rate,
+	a high strength rating, and a high positive swimmer improvement percentage are good.
+
+	
 </p>
 
 <form name=confForm method="GET">

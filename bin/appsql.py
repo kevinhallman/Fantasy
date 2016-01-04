@@ -530,8 +530,8 @@ def showConf(scores, newSwims):
 
 def showPrograms(teamRank):
 	html = ''
-	html += '<table class="conf">'
-	html += '<tr>'
+	html += '<table id="programs">'
+	html += '<thead><tr>'
 	html += '<th>Team</th>'
 	html += '<th>Combined Score</th>'
 	html += '<th>Strength Rank</th>'
@@ -540,7 +540,8 @@ def showPrograms(teamRank):
 	html += '<th>Attrition Rate</th>'
 	html += '<th>Improvement Rank</th>'
 	html += '<th>Improvement %</th>'
-	html += '</tr>'
+	html += '</tr></thead>'
+	html += '<tbody>'
 	for teamStats in sorted(teamRank.items(), key=itemgetter(1)):
 		#('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
 		(team, rank) = teamStats
@@ -552,27 +553,8 @@ def showPrograms(teamRank):
 			html += '<td>' + str(round(part[1], 3)) + '</td>'
 		html += '<tr>'
 
+	html += '</tbody>'
 	html += '</table>'
-
-	'''
-	(team, rank) = teamStats
-	html += '<div id="container">'
-	html += '<table class="conf">'
-	html += '<tr><th>'
-	html += team + ': ' + str(rank[0])
-	#print team + str(rank[0])
-	html += '</th></tr>'
-	for (idx, part) in enumerate(rank[1:]):
-		html += '<tr><td>'
-		if idx == 0: label = 'Team Score: '
-		elif idx == 1: label = 'Attrition: '
-		else: label = 'Improvement: '
-		html += str(part[0]) + ' - '
-		html += label + '<b>' + str(round(part[1], 3)) + '<b>'
-		html += '</td><tr>'
-	html += '</table>'
-	html += '</div>'
-	'''
 
 	return html
 
