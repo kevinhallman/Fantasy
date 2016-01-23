@@ -34,6 +34,28 @@ $if table:
 	}
   </script>
 
+<script>
+	\$(document).ready(function() {
+		var url = \$(location).attr('href');
+    	\$('input[type=radio]').change(function() {
+    		json = {conference: \$('conference').value, dual:\$('dual').value, \$('season').value}
+				jQuery.ajax({
+        			type: "POST",
+        			async: true,
+        			url: 'home',
+        			data:  json,
+        			success: reload,
+        			error: reload
+    			});
+    		});
+		});
+
+		function reload() {
+			var url = \$(location).attr('href');
+           	\$('body').load(url.split("?")[0]);
+		}
+</script>
+
 <h1>
 Team Rankings
 </h1>
@@ -41,7 +63,6 @@ See how strong a team is compared to other teams in its division. Projected scor
 of a team's top times.
 <form name=confForm method="GET">
 	Conference: <select name="conference">
-		<option>All</option>
 		$for name in conferences:
 			<option>$name</option>
 	</select>

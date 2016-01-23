@@ -69,8 +69,7 @@ def clean(meetList):
 
 web.config.debug = False
 app = web.application(urls, globals())
-session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Men', 'division':
-	'D3','season': 2016})
+session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Men', 'division': 'D3'})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
 app.add_processor(connection_processor)
@@ -93,10 +92,10 @@ class Home():
 		return render.home()
 
 	def POST(self):
-		form = web.input(gender=session.gender, division=session.division, season=session.season, _unicode=False)
+		form = web.input(gender=session.gender, division=session.division, _unicode=False)
 		session.gender = form.gender
 		session.division = form.division
-		session.season = int(form.season)
+		print session.gender, session.division
 
 		web.header("Content-Type", "application/json")
 		return 'an error'
@@ -162,9 +161,14 @@ class Conf(object):
 	def GET(self):
 		division = session.division
 		gender = session.gender
-		season = session.season
 		confList = conferences[division]
-		form = web.input(conference=None, taper=None, date=None, _unicode=False)
+		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False)
+
+		if form.conference is None:
+			return render.conference(conferences=sorted(confList.keys()), scores=None, teamScores=None,
+									 finalScores=None, table='')
+
+		season = int(form.season)
 		if form.date and form.date != 'Whole Season':
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
@@ -203,11 +207,11 @@ class Times(object):
 	def GET(self):
 		division = session.division
 		gender = session.gender
-		season = session.season
 		confList = conferences[division]
-		form = web.input(conference=None, event=None, _unicode=False)
+		form = web.input(conference=None, event=None, season=None, _unicode=False)
 		scores = None
 		if form.conference and form.event:
+			season = form.season
 			if form.conference == 'All':
 				teams = []
 				for conference in confList:
@@ -259,37 +263,32 @@ class Placing(object):
 	def GET(self):
 		division = session.division
 		gender = session.gender
-		season = session.season
 		form = web.input(_unicode=False)
 		if len(form.keys()) == 0:  # initial load
 			confTable = ''
 		else:
-			times = [0, 0, 0]
-			events = ['', '', '']
+			time = 0
+			event = ''
 			improvement = False
 			for key in form.keys():
 				if key == 'improvement':
 					improvement = True
 				else:
-					num = int(key[-1]) - 1
 					try:
 						if 'min' in key:
-							times[num] += 60*int(form[key])
+							time += 60*int(form[key])
 						elif 'sec' in key:
-							times[num] += int(form[key])
+							time += int(form[key])
 						elif 'hun' in key:
-							times[num] += .01*int(form[key])
+							time += .01*int(form[key])
 						elif 'event' in key:
-							events[num] = form[key]
+							event = form[key]
 					except ValueError:
 						pass
 			newSwims = set()
-			for i in range(len(events)):
-				if times[i] == 0:  # remove nonexistant swims
-					continue
-				elif improvement:
-					times[i] *= 0.975
-				newSwims.add((events[i], times[i]))
+			if improvement:
+				time *= 0.975
+			newSwims.add((event, time))
 			if len(newSwims) > 0:
 				confPlaces = database.conferencePlace(division=division, gender=gender, newSwims=newSwims)
 				confTable = showConf(confPlaces, newSwims)
@@ -391,9 +390,8 @@ class Programs():
 	def GET(self):
 		division = session.division
 		gender = session.gender
-		form = web.input(conference=None)
+		form = web.input(conference=None, tableOnly=False)
 		allConfs = conferences[division]
-		teams = []
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
 			return render.programs(conferences=sorted(allConfs.keys()), rankings=None)
@@ -432,7 +430,7 @@ class Programs():
 
 class teamMeets():
 	def POST(self):
-		form = web.input(team=None, season=None, division=None)
+		form = web.input(team=None, division=None, season=None)
 		web.header("Content-Type", "application/json")
 		if form.team in meetList:
 			seasonMeets = meetList[form.team]
@@ -532,6 +530,7 @@ def showPrograms(teamRank):
 	html = ''
 	html += '<table id="programs">'
 	html += '<thead><tr>'
+	html += '<th>Rank</th>'
 	html += '<th>Team</th>'
 	html += '<th>Combined Score</th>'
 	html += '<th>Strength Rank</th>'
@@ -542,10 +541,11 @@ def showPrograms(teamRank):
 	html += '<th>Improvement %</th>'
 	html += '</tr></thead>'
 	html += '<tbody>'
-	for teamStats in sorted(teamRank.items(), key=itemgetter(1)):
+	for (teamRank, teamStats) in enumerate(sorted(teamRank.items(), key=itemgetter(1))):
 		#('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
 		(team, rank) = teamStats
 		html += '<tr>'
+		html += '<td>' + str(teamRank+1) + '</td>'
 		html += '<td>' + team + '</td>'
 		html += '<td>' + str(rank[0]) + '</td>'
 		for (idx, part) in enumerate(rank[1:]):
@@ -658,6 +658,4 @@ class Team(Model):
 		database = db
 
 if __name__ == "__main__":
-	#db.drop_tables([Team])
-	#db.create_tables([Team])
 	app.run()

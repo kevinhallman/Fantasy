@@ -2,35 +2,26 @@ $def with (conferences,scores,teamScores,finalScores,table)
 <h1>
 Taper Meet
 </h1>
+<p>
 Simulate a conference or national swim meet using either a swimmer's top times or their median times.
-<form name=confForm method="GET">
-	Conference: <select name="conference">
-		<option>Nationals</option>
-		$for name in conferences:
-			<option>$name</option>
-	</select>
-	<br>
-	Time Selection: <select name="taper">
-	<option>Top Time</option>
-	<option>Median Time</option>
-	</select>
-	<br>
-	As of date: <select name="date">
-	<option>Whole Season</option>
-	$for month in ['10', '11', '12', '1', '2', '3']:
-		$ days = 31
-		$ if month=='11':days = 30
-		$ if month=='1':days = 29
-		$for day in range(1, days+1):
-			<option>$month/$day</option>
-	</select>
-	<br>
-	<input type="submit" value="Swimulate">
-</form>
+</p>
 
-$if scores:
-	<div id="chart" style="width: 1000px; height: 400px; float:none; margin-left: auto; margin-right: auto;"> </div>
-	<script>
+<script type="text/javascript">
+	/*this will reload just the data part of the page with ajax leaving the form intact
+	function swimulateConf(form){
+		var baseurl = $$(location).attr('href');
+		var getURL = baseurl + "?" + $$.param({
+			conference: $$("select[name=conference]").find(":selected").text(),
+			season: $$("select[name=season]").find(":selected").text(),
+			taper: $$("select[name=taper]").find(":selected").text(),
+			date: $$("select[name=date]").find(":selected").text()
+		});
+		$$('#swimdata').load(getURL + " #swimdata", function(response, status) {alert(status, response);});
+		document.location = getURL;
+	};*/
+</script>
+
+<script type="text/javascript">
 	google.load("visualization", "1", {packages:["treemap"]});
     google.setOnLoadCallback(drawChart);
 
@@ -57,7 +48,54 @@ $if scores:
     		return '<div>' + 'Score: ' + data.getValue(row, 2) + ' </div>';
   		};
     }
-	</script>
+</script>
+
+<form id="confForm" name=confForm>
+	<p>
+		<label>Conference:</label>
+		<select name="conference">
+		<option>Nationals</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+	</p>
+
+	<p>
+		<label>Season:</label>
+		<select name="season">
+		$for season in [2016, 2015, 2014, 2013, 2012]:
+			<option>$season</option>
+		</select>
+	</p>
+
+	<p>
+	<label>Time Selection:</label>
+	<select name="taper">
+		<option>Top Time</option>
+		<option>Median Time</option>
+	</select>
+	</p>
+
+	<p>
+		<label>As of date:</label>
+		<select name="date">
+		<option>Whole Season</option>
+		$for month in ['10', '11', '12', '1', '2', '3']:
+			$ days = 31
+			$ if month=='11':days = 30
+			$ if month=='1':days = 29
+			$for day in range(1, days+1):
+				<option>$month/$day</option>
+		</select>
+	</p>
+
+	<input type="submit" value="Swimulate">
+</form>
+
+<div id="swimdata">
+$if scores and False:
+	<div id="chart" style="width: 1000px; height: 400px; float:none; margin-left: auto; margin-right: auto;"></div>
+
 <div id="scoreTable">
 $if scores:
 	$:scores
@@ -71,4 +109,5 @@ $if teamScores:
 <div id="finalScores">
 $if finalScores:
 	$:finalScores
+</div>
 </div>

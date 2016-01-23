@@ -7,9 +7,8 @@
 		border-width: 20px;
 		border-radius: 20px;
 	}
-	body {
-		padding-left:50px;
-		padding-right:50px;
+	body,html {
+		height:100%;
 	}
 	table, th, td {
     	border: 0px solid black;
@@ -24,10 +23,47 @@
     	border-bottom: solid black;
 	}
 	ul {
-		list-style-type: none;
-		margin: 0;
-		padding: 10;
-		overflow: hidden;
+    	list-style-type: none;
+    	margin: 0;
+    	padding: 0;
+    	overflow: hidden;
+    	background-color: #333;
+    	display: block;
+    	float: left;
+    }
+    li {
+    	float:left;
+    }
+    li a {
+    	text-transform: uppercase;
+    	display: block;
+    	color: white;
+    	text-align: center;
+    	padding: 14px 16px;
+    	text-decoration: none;
+	}
+	div.sidebar ul {
+		background-color:darkred;
+		padding-bottom:20px;
+		padding-top:20px;
+	}
+	div.sidebar li {
+    	text-transform: uppercase;
+    	display: block;
+    	color: white;
+    	padding: 14px 16px;
+    	text-decoration: none;
+    	width:50%;
+    	background-color:#333;
+	}
+	div.sidebar li:hover {
+		background-color: #111;
+	}
+	div.sidebar li.active {
+		background-color: #888;
+	}
+    li a:hover {
+		background-color: #111;
 	}
 	select, form, input, button {
 		font-size: 100%;
@@ -36,31 +72,14 @@
 		margin: 1px;
 		margin-top: 5px;
 	}
-	.banner {
-    	float: left;
-		display: block;
-		color: #FFFFFF;
-		background-color: #98bf21;
-		text-align: center;
-		padding: 8px;
-		text-decoration: none;
-		text-transform: uppercase;
-		border-left-style:solid;
-		cursor: pointer;
-	}
-	.header:hover, .header:active {
-		background-color: #7A991A;
-	}
-	div { float:left; }
-	#scoreTable {max-width: 68%; }
-	#report {padding-left:20px; width:15%; }
-	#finalScores {padding-left:20px; width:12%; }
+	#scoreTable {max-width: 63%; float:left;}
+	#report {padding-left:1%; width:20%; float:left;}
+	#finalScores {padding-left:1%; width:15%; float:left;}
 	.hidden { display:none}
 	body {
 		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		margin: auto;
 		position: relative;
-		width: 90%;
 	}
 	.node {
 		border: solid 1px white;
@@ -70,3 +89,27 @@
 		position: absolute;
 		text-indent: 2px;
 	}
+	.container {
+		height:100%;
+		position:relative;
+	}
+	.sidebar {
+    	position:absolute;
+    	top:0; bottom:0; left:0%;
+    	width:10%;
+    	height:100%;
+    	background-color:darkred;
+	}
+	.header {
+		overflow:auto;
+		margin-left:10%;
+    }
+    .content {
+    	margin-left:11%;
+    	margin-right:10%;
+    }
+    form  { display: table;      }
+	form p     { display: table-row;  }
+	form label { display: table-cell; }
+	form input { display: table-cell; }
+	thead th:hover{ background-color:darkred}

@@ -10,7 +10,7 @@ $def with (divTeams,scores,teamScores,finalScores)
 			divTeams["$division"].push("$:team");
 
 	currentDiv = "$(context.division)";
-	currentSeason = "$(context.season)";
+	currentSeason = "2016";
 	numTeams = 2;
 
 	function add() {
@@ -122,7 +122,7 @@ $def with (divTeams,scores,teamScores,finalScores)
 $ teams = divTeams[context.division]
 <form id="teamForm" method="GET">
 	<button type="button" onclick="add(this.form);">Add New Team</button>
-	<br> <br>
+	<p>
 	Team: <select name="division1" onchange="getTeams(this)">
 		$for division in ['D1', 'D2', 'D3']:
 			$if division==context.division:
@@ -136,12 +136,12 @@ $ teams = divTeams[context.division]
 		$for name in teams:
 			<option>$:name</option>
 	</select>
-	<br>
-
+	</p>
+	<p>
 	Meet: <select name="season1" onchange="meets(this)">	</select>
 	<select name="meet1">	</select>
-	<br>
-
+	</p>
+	<p>
 	Team: <select name="division2" onchange="getTeams(this)">
 		$for division in ['D1', 'D2', 'D3']:
 			$if division==context.division:
@@ -154,11 +154,11 @@ $ teams = divTeams[context.division]
 		$for name in teams:
 			<option>$:name</option>
 	</select>
-	<br>
-
+	</p>
+	<p>
 	Meet: <select name="season2" onchange="meets(this)">	</select>
 	<select name="meet2">	</select>
-	<br>
+	</p>
 
 	<input id="swim" type="submit" value="Swimulate">
 </form>

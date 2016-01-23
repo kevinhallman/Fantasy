@@ -17,6 +17,8 @@ $def with (content)
 		  ga('send', 'pageview');
 
 		</script>
+		<style>
+		</style>
 		<script type="text/javascript">
 			function sumType (form) {
 				var select = document.getElementById("summaryType");
@@ -52,9 +54,6 @@ $def with (content)
             		else if (this.name == 'division') {
             			json = {division: this.value}
             		}
-            		else if (this.name == 'season') {
-            			json = {season: this.value}
-            		}
 					jQuery.ajax({
         				type: "POST",
         				async: true,
@@ -64,6 +63,51 @@ $def with (content)
         				error: reload
     				});
     			});
+
+
+				document.getElementById("gender").addEventListener("click",function(genderClick) {
+        			if(genderClick.target && genderClick.rangeParent.data) {
+        		    	jQuery.ajax({
+        					type: "POST",
+        					async: true,
+        					url: 'home',
+        					data:  {gender: genderClick.rangeParent.data},
+        					success: reload,
+        					error: reload
+    					});
+        			}
+    			});
+
+    			document.getElementById("division").addEventListener("click",function(genderClick) {
+        			if(genderClick.target && genderClick.rangeParent.data) {
+        		    	jQuery.ajax({
+        					type: "POST",
+        					async: true,
+        					url: 'home',
+        					data:  {division: genderClick.rangeParent.data},
+        					success: reload,
+        					error: reload
+    					});
+        			}
+    			});
+
+    			$if context.gender=="Women":
+    				$$("#Women").addClass('active');
+    			$else:
+    				$$("#Men").addClass('active');
+
+    			$if context.division=="D1":
+    				$$("#D1").addClass('active');
+    				$$("#D2").removeClass('active');
+    				$$("#D3").removeClass('active');
+    			$elif context.division=="D2":
+    				$$("#D2").addClass('active');
+    				$$("#D1").removeClass('active');
+    				$$("#D3").removeClass('active');
+    			$elif context.division=="D3":
+    				$$("#D3").addClass('active');
+    				$$("#D2").removeClass('active');
+    				$$("#D1").removeClass('active');
 			});
 
 			function reload() {
@@ -72,77 +116,45 @@ $def with (content)
 			}
 		</script>
 
+		<script type="text/javascript">
+		</script>
+
 		<title>Swimming Simulator</title>
 		<meta name="description"
 			  content="The swimulator allows you to simulate potential collegiate swim meets as well as providing other statistics about college swimming.">
 	</head>
 
 	<body>
-		<ul>
-			<li value=1 ><a class="banner" href="/">Home</a></li>
-			<li value=2 ><a class="banner" href="/conference">Conference</a> </li>
-			<li value=3 ><a class="banner" href="/swimulate">Head to Head</a></li>
-			<li value=4 ><a class="banner" href="/times">Top Times</a></li>
-			<li value=5 ><a class="banner" href="/placing">Placing</a></li>
-			<!--<li value=6 ><a class="banner" href="/improvement">Improvement</a></li>-->
-			<!--<li value=7 ><a class="banner" href="/rankings">Rankings</a></li>-->
-			<li value=6 ><a class="banner" href="/programs">Programs</a></li>
-		</ul>
-		<form id="gendiv">
-			<br/>
-			$if context.gender=='Women':
-				<input type="radio" name="gender" value="Women" checked>Women
-				<input type="radio" name="gender" value="Men">Men
-			$else:
-				<input type="radio" name="gender" value="Women">Women
-				<input type="radio" name="gender" value="Men" checked>Men
-			<br>
-			$if context.division=='D1':
-				<input type="radio" name="division" value="D1" checked>D1
-				<input type="radio" name="division" value="D2">D2
-				<input type="radio" name="division" value="D3">D3
-			$elif context.division=='D2':
-				<input type="radio" name="division" value="D1">D1
-				<input type="radio" name="division" value="D2" checked>D2
-				<input type="radio" name="division" value="D3">D3
-			$elif context.division=='D3':
-				<input type="radio" name="division" value="D1">D1
-				<input type="radio" name="division" value="D2">D2
-				<input type="radio" name="division" value="D3" checked>D3
-			<br>
-			$if context.season==2012:
-				<input type="radio" name="season" value="2016">2016
-				<input type="radio" name="season" value="2015">2015
-				<input type="radio" name="season" value="2014">2014
-				<input type="radio" name="season" value="2013">2013
-				<input type="radio" name="season" value="2012" checked>2012
-			$elif context.season==2013:
-				<input type="radio" name="season" value="2016">2016
-				<input type="radio" name="season" value="2015">2015
-				<input type="radio" name="season" value="2014">2014
-				<input type="radio" name="season" value="2013" checked>2013
-				<input type="radio" name="season" value="2012">2012
-			$elif context.season==2014:
-				<input type="radio" name="season" value="2016">2016
-				<input type="radio" name="season" value="2015">2015
-				<input type="radio" name="season" value="2014" checked>2014
-				<input type="radio" name="season" value="2013">2013
-				<input type="radio" name="season" value="2012">2012
-			$elif context.season==2015:
-				<input type="radio" name="season" value="2016">2016
-				<input type="radio" name="season" value="2015" checked>2015
-				<input type="radio" name="season" value="2014">2014
-				<input type="radio" name="season" value="2013">2013
-				<input type="radio" name="season" value="2012">2012
-			$elif context.season==2016:
-				<input type="radio" name="season" value="2016" checked>2016
-				<input type="radio" name="season" value="2015">2015
-				<input type="radio" name="season" value="2014">2014
-				<input type="radio" name="season" value="2013">2013
-				<input type="radio" name="season" value="2012">2012
-		</form>
+	<div class="container">
+		<div class="sidebar">
+			<ul id="gender">
+				<li id="Women"><span>Women</span></li>
+				<li id="Men"><span>Men</span></li>
+			</ul>
+			<ul id="division">
+				<li id="D1"><span>D1</span></li>
+				<li id="D2"><span>D2</span></li>
+				<li id="D3"><span>D3</span></li>
+			</ul>
+		</div>
 
-		$:content
+		<div class="header">
+			<ul class="bannerList">
+				<li value=1 ><a href="/">Home</a></li>
+				<li value=2 ><a href="/conference">Conference</a> </li>
+				<li value=3 ><a href="/swimulate">Head to Head</a></li>
+				<li value=4 ><a href="/times">Top Times</a></li>
+				<li value=5 ><a href="/placing">Placing</a></li>
+				<!--<li value=6 ><a class="banner" href="/improvement">Improvement</a></li>-->
+				<!--<li value=7 ><a class="banner" href="/rankings">Rankings</a></li>-->
+				<li value=6 ><a href="/programs">Programs</a></li>
+			</ul>
+		</div>
+
+		<div class="content">
+			$:content
+		</div>
+	</div>
 
 	</body>
 </html>

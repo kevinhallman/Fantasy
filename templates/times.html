@@ -5,20 +5,41 @@ Top Times
 </h1>
 
 <form name=confForm method="GET">
-	Conference: <select name="conference">
-		<option>All</option>
-		$for name in conferences:
-			<option>$name</option>
-	</select>
-
-	<br>
-	Event: <select name="event">
-		<option>All</option>
-		$for event in events:
-			<option>$event</option>
-	</select>
-
-	<br>
+	<p>
+		<label>Conference:</label>
+		<select name="conference">
+			<option>All</option>
+			$for name in conferences:
+				<option>$name</option>
+		</select>
+	</p>
+	<p>
+		<label>Season:</label>
+		<select name="season">
+			$for season in [2016, 2015, 2014, 2013, 2012]:
+				<option>$season</option>
+		</select>
+	</p>
+	<p>
+		<label>Event:</label>
+		<select name="event">
+			<option>All</option>
+			$for event in events:
+				<option>$event</option>
+		</select>
+	</p>
+	<p>
+	<label>As of date:</label>
+		<select name="date">
+		<option>Whole Season</option>
+		$for month in ['10', '11', '12', '1', '2', '3']:
+			$ days = 31
+			$ if month=='11':days = 30
+			$ if month=='1':days = 29
+			$for day in range(1, days+1):
+				<option>$month/$day</option>
+		</select>
+	</p>
 	<input type="submit" value="Get Top Times">
 </form>
 
