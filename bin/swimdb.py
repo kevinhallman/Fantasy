@@ -65,6 +65,43 @@ class Improvement(Model):
 	class Meta:
 		database = db
 
+class Swimmer(Model):
+	name = CharField()
+	season = IntegerField()
+	team = CharField()
+	gender = CharField()
+	year = CharField()
+
+	class Meta:
+		database = db
+
+class TeamSeason(Model):
+	#name = CharField()
+	season = IntegerField()
+	team = CharField()
+	gender = CharField()
+	conference = CharField(null=True)
+	division = CharField()
+
+	class Meta:
+		database = db
+
+class Meet(Model):
+	season = IntegerField()
+	meet = CharField()
+	gender = CharField()
+	date = DateField()
+
+	class Meta:
+		database = db
+
+class TeamMeet(Model):
+	team = ForeignKeyField(TeamSeason)
+	meet = ForeignKeyField(Meet)
+
+	class Meta:
+		database = db
+
 
 def seasonString(dateString):
 	dateParts = re.split('/', dateString)
@@ -144,7 +181,16 @@ def normalizeTeams():
 def load():
 	#load the swims
 	swims = []
+	swimmers = []
+	swimmerKeys = set()
+	newTeams = []
+	teamKeys = set()
+	meets = []
+	meetKeys = set()
+	teamMeets = []
+	teamMeetKeys = set()
 	root = 'data'
+
 	teams = getConfs('data/conferences.txt')
 	divisions = {}
 	for swimFileName in os.listdir(root):
@@ -154,7 +200,7 @@ def load():
 		#print match.groups()
 		div, year, gender = match.groups()
 
-		if not int(year) == 16:
+		if not (int(year) == 16):  #and gender=='m'):
 			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
@@ -208,55 +254,71 @@ def load():
 					   'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
 					division, 'relay': relay}
 				swims.append(newSwim)
-				'''try:
-					swim = Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-								   Swim.date==swimDate)
-					print swim.name, swim.time, swim.event, swim.date
-					print name, time, event, swimDate
-				except Swim.DoesNotExist:
-					#print 'nope'
-					swims.append(newSwim)'''
 
+				'''
+				key = str(season) + name + year + team + gender
+				if not relay and not key in swimmerKeys:
+					newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender': gender}
+					swimmers.append(newSwimmer)
+					swimmerKeys.add(key)
+				'''
+				'''
+				key = str(season) + team + gender + conference + division
+				if not relay and not key in teamKeys:
+					newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
+						gender, 'division': division}
+					newTeams.append(newTeam)
+					teamKeys.add(key)
+				'''
+				'''
+				key = str(season) + meet + gender + str(swimDate)
+				if not relay and not key in meetKeys:
+					newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
+					meets.append(newMeet)
+					meetKeys.add(key)
+				'''
+				'''
+				key = str(season) + meet + gender + team
+
+				if not relay and not key in teamMeetKeys:
+					newTeamMeet = {'season': season, 'gender': gender, 'meet': meet, 'team': team}
+					teamMeets.append(newTeamMeet)
+					teamMeetKeys.add(key)
+				'''
+	'''
+	print len(teamMeets)
+	for meet in teamMeets:
+		print meet
+	'''
+	#db.connect()
+	#Meet.insert_many(meets).execute()
+	for (i, swim) in enumerate(swims):
+		if i % 1000 == 0:
+			print i
+		try:
+			Swim.insert(swim).execute()
+			print swim
+		except Exception as e:
+			pass
+
+	'''
 	print len(swims)
-
-	db.connect()
 	for i in range(len(swims) / 100):
 		print i
 		with db.transaction():
 			Swim.insert_many(swims[i*100:(i+1)*100]).execute()
-
+	'''
 	#return divisions
 
-'''
-for new, old in [("50 Yard Freestyle", '50 Freestyle'), ("100 Yard Freestyle", '100 Freestyle'), ("200 Yard "
-																									  "Freestyle",
-																									  '200 Freestyle'),
-					 ("500 Yard Freestyle", '500 Freestyle'), ("1000 Yard Freestyle", '1000 Freestyle'), ("1650 Yard "
-																										  "Freestyle", '1650 Freestyle'), ("100 Yard Butterfly", '100 Butterfly'), ("200 Yard Butterfly", '200 Butterfly'), ("100 Yard Backstroke", '100 Backstroke'), ("200 Yard Backstroke", '200 Backstroke'), ("100 Yard Breastroke", '100 Breastroke'), ("200 Yard Breastroke", '200 Breastroke'), ("200 Yard Individual Medley", '200 IM'), ("400 Yard Individual Medley", '400 IM'), ("200 Yard Medley Relay", '200 Medley Relay'), ("400 Yard Medley Relay", '400 Medley Relay'), ("200 Yard Freestyle Relay", '200 Freestyle Relay'), ("400 Yard Freestyle Relay", '400 Freestyle Relay'), ("800 Yard Freestyle Relay",'800 Freestyle Relay')]:
-'''
+
 
 if __name__ == '__main__':
 	#db.get_indexes(Swim)
 	#swims = {}
-	#db.drop_tables([HSSwim])
-	#db.create_tables([Improvement])
+
+	#db.drop_tables([TeamSeason])
+	#db.create_tables([TeamMeet])
 	start = time.time()
-	#for swim in HSSwim.select():
-	#	print swim
-	#for team in HSSwim.select(HSSwim.team).where(HSSwim.team=='Carleton'):
-	#	print team.team
-	#q = HSSwim.update(team='Carleton').where(HSSwim.team=='Carleton College')
-	#print q.execute()
 	load()
-	#for swim in Swim.select().where(Swim.name=='St. Thomas Relay', Swim.season==2016):
-	#	print swim.name, swim.date, swim.event, swim.time
-	#normalizeTeams()
-	#divisions = load()
-	#db.connect()
-	#for team in divisions:
-	#	q = Swim.update(division=divisions[team]).where(Swim.team==team, Swim.division=='')
-	#	print team, q.execute()
 	stop = time.time()
 	print stop - start
-
-#dq = Swim.delete().where(Swim.team=='Connecticut')
