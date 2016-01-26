@@ -64,32 +64,28 @@ $def with (content)
     				});
     			});
 
+				$$("#gender li").click(function() {
+					jQuery.ajax({
+        				type: "POST",
+        				async: true,
+        				url: 'home',
+        				data:  {gender: this.id},
+        				success: reload,
+        				error: reload
+    				});
+				});
 
-				document.getElementById("gender").addEventListener("click",function(genderClick) {
-        			if(genderClick.target && genderClick.rangeParent.data) {
-        		    	jQuery.ajax({
-        					type: "POST",
-        					async: true,
-        					url: 'home',
-        					data:  {gender: genderClick.rangeParent.data},
-        					success: reload,
-        					error: reload
-    					});
-        			}
-    			});
+				$$("#division li").click(function() {
+					jQuery.ajax({
+        				type: "POST",
+        				async: true,
+        				url: 'home',
+        				data:  {division: this.id},
+        				success: reload,
+        				error: reload
+    				});
+				});
 
-    			document.getElementById("division").addEventListener("click",function(genderClick) {
-        			if(genderClick.target && genderClick.rangeParent.data) {
-        		    	jQuery.ajax({
-        					type: "POST",
-        					async: true,
-        					url: 'home',
-        					data:  {division: genderClick.rangeParent.data},
-        					success: reload,
-        					error: reload
-    					});
-        			}
-    			});
 
     			$if context.gender=="Women":
     				$$("#Women").addClass('active');
