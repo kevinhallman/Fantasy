@@ -121,7 +121,8 @@ def toTime(time):
 		time=time[1:]
 	if re.match(".*:.*",time) == None:
 		return float(time)
-	return float(re.split(":",time)[0])*60 +float(re.split(":",time)[1])
+	num = float(re.split(":",time)[0])*60 +float(re.split(":",time)[1])
+	return int(num) + round(num%1, 2)  # round to two decimals
 
 def getConfs(confFile):
 	with open(confFile,'r') as file:
@@ -255,6 +256,16 @@ def load():
 					division, 'relay': relay}
 				swims.append(newSwim)
 
+
+				try:
+					swim = Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+								   Swim.date==swimDate)
+					#print swim.name, swim.time, swim.event, swim.date
+					#print name, time, event, swimDate
+				except Swim.DoesNotExist:
+					#print newSwim
+					swims.append(newSwim)
+
 				'''
 				key = str(season) + name + year + team + gender
 				if not relay and not key in swimmerKeys:
@@ -285,29 +296,30 @@ def load():
 					teamMeets.append(newTeamMeet)
 					teamMeetKeys.add(key)
 				'''
-	'''
-	print len(teamMeets)
-	for meet in teamMeets:
-		print meet
-	'''
+
+	#print len(teamMeets)
+	#for meet in teamMeets:
+	#	print meet
+
 	#db.connect()
 	#Meet.insert_many(meets).execute()
-	for (i, swim) in enumerate(swims):
-		if i % 1000 == 0:
-			print i
-		try:
-			Swim.insert(swim).execute()
-			print swim
-		except Exception as e:
-			pass
-
+	db.connect()
+	#print len(swims)
+	#print Swim.insert_many(swims).execute()
 	'''
-	print len(swims)
-	for i in range(len(swims) / 100):
+	for i in range(len(newSwims) / 100):
 		print i
 		with db.transaction():
-			Swim.insert_many(swims[i*100:(i+1)*100]).execute()
+			print newSwims[i*100:(i+1)*100]
+			Swim.insert_many(newSwims[i*100:(i+1)*100]).execute()
 	'''
+
+	'''
+	Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
+        'ROW_NUMBER() OVER (partition BY meet, name, event, time ORDER BY id) AS rnum '
+        'FROM Swim) t '
+        'WHERE t.rnum > 1)')
+    '''
 	#return divisions
 
 
@@ -317,7 +329,7 @@ if __name__ == '__main__':
 	#swims = {}
 
 	#db.drop_tables([TeamSeason])
-	#db.create_tables([TeamMeet])
+	db.create_tables([TeamMeet])
 	start = time.time()
 	load()
 	stop = time.time()
