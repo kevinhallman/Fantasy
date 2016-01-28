@@ -329,7 +329,7 @@ if __name__ == '__main__':
 	#swims = {}
 
 	#db.drop_tables([TeamSeason])
-	db.create_tables([TeamMeet])
+	#db.create_tables([TeamMeet])
 	start = time.time()
 	load()
 	stop = time.time()
