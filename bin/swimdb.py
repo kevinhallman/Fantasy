@@ -30,6 +30,47 @@ class Swim(Model):
 	division = CharField()
 	relay = BooleanField()
 	year = CharField()
+	place = None
+	score = None
+	scoreTeam = None
+	scoreTime = None
+	split = False
+
+	def getScoreTeam(self):
+		if self.scoreTeam:
+			return self.scoreTeam
+		if self.team:
+			return self.team
+		return ''
+
+	def getScoreTime(self):
+		if self.scoreTime:
+			return	self.scoreTime
+		return self.time
+
+	def getScore(self):
+		if self.score:
+			return self.score
+		return 0
+
+	def printScore(self, br='\t', gender=True):
+		time = swimTime(self.getScoreTime())
+		if gender:
+			genderStr = br + self.gender
+		else:
+			genderStr = ''
+		if self.relay:
+			name = 'Relay'
+		else:
+			name = self.name
+		if self.meet:
+			meet = str(self.meet)
+		else:
+			meet = ''
+		return name+br+self.getScoreTeam()+genderStr+br+self.event+br+time+br+meet
+
+	def __str__(self):
+		return self.name+self.team+self.event+str(toTime(self.time))
 
 	class Meta:
 		database = db
@@ -116,6 +157,24 @@ def seasonString(dateString):
 		year = date.year
 	return year, date
 
+#make time look nice
+def swimTime(time):
+	(seconds, point) = re.split("\.", str(time))
+	if int(seconds) < 60:
+		time = round(time, 2)
+		time = str(time)
+		while len(time) < 5:
+			time += '0'
+		return time
+	minutes = str(int(seconds) / 60)
+	seconds = str(int(seconds) % 60)
+	while len(seconds) < 2:
+		seconds = '0' + seconds
+	while len(point) < 2:
+		point = point + '0'
+	return  minutes + ":" + seconds + "." + point[:2]
+
+#turn time into seconds, round to two digits
 def toTime(time):
 	if time[0]=="X" or time[0]=="x":
 		time=time[1:]
@@ -179,8 +238,12 @@ def normalizeTeams():
 		q = HSSwim.update(team=teamMap2[team]).where(HSSwim.team==team)
 		print q.execute()
 
-def load():
-	#load the swims
+
+'''
+load in new swim times
+can load in to all SQL tables if params are true
+'''
+def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
@@ -198,7 +261,6 @@ def load():
 		match = re.search('(\D+)(\d+)([mf])', swimFileName)
 		if not match:
 			continue
-		#print match.groups()
 		div, year, gender = match.groups()
 
 		if not (int(year) == 16):  #and gender=='m'):
@@ -224,9 +286,6 @@ def load():
 				event = swimArray[6]
 				time = toTime(swimArray[7])
 
-				if swimDate < Date(2015, 2, 15):
-					continue
-
 				if not team in divisions:
 					divisions[team] = division
 
@@ -241,71 +300,97 @@ def load():
 						conference = 'American Athletic Conf'
 					else:
 						conference = 'NESCAC'
-				
 
-				if 'Relay' in event:
-					relay = True
-				else:
-					relay = False
+				if 'Relay' in event: relay = True
+				else: relay = False
 
 				if relay:
 					name = team + ' Relay'
 
-				newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
-					   'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
-					division, 'relay': relay}
-				swims.append(newSwim)
+				if loadSwims:
+					try:
+						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+							Swim.date==swimDate)  # floats in SQL and python evidently different precision
+					except Swim.DoesNotExist:
+						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
+					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
+							division, 'relay': relay}
+						swims.append(newSwim)
+
+				if loadSwimmers:
+					key = str(season) + name + year + team + gender
+					if not relay and not key in swimmerKeys:
+						swimmerKeys.add(key)
+						try:
+							Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team)
+						except Swimmer.DoesNotExist:
+							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender': gender}
+							swimmers.append(newSwimmer)
 
 
-				try:
-					swim = Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-								   Swim.date==swimDate)
-					#print swim.name, swim.time, swim.event, swim.date
-					#print name, time, event, swimDate
-				except Swim.DoesNotExist:
-					#print newSwim
-					swims.append(newSwim)
+				if loadTeams:
+					key = str(season) + team + gender + conference + division
+					if not relay and not key in teamKeys:  # try each team once
+						teamKeys.add(key)
+						try:  # don't double add for meets not loaded yet
+							TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.conference==conference)
+						except TeamSeason.DoesNotExist:
+							newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
+								gender, 'division': division}
+							newTeams.append(newTeam)
 
-				'''
-				key = str(season) + name + year + team + gender
-				if not relay and not key in swimmerKeys:
-					newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender': gender}
-					swimmers.append(newSwimmer)
-					swimmerKeys.add(key)
-				'''
-				'''
-				key = str(season) + team + gender + conference + division
-				if not relay and not key in teamKeys:
-					newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
-						gender, 'division': division}
-					newTeams.append(newTeam)
-					teamKeys.add(key)
-				'''
-				'''
-				key = str(season) + meet + gender + str(swimDate)
-				if not relay and not key in meetKeys:
-					newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
-					meets.append(newMeet)
-					meetKeys.add(key)
-				'''
-				'''
-				key = str(season) + meet + gender + team
+				if loadMeets:
+					key = str(season) + meet + gender + str(swimDate)
+					if not relay and not key in meetKeys:
+						meetKeys.add(key)  # try each meet once
+						try:  # don't double add for meets not loaded yet
+							Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender, Meet.date==swimDate)
+						except Meet.DoesNotExist:
+							newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
+							meets.append(newMeet)
 
-				if not relay and not key in teamMeetKeys:
-					newTeamMeet = {'season': season, 'gender': gender, 'meet': meet, 'team': team}
-					teamMeets.append(newTeamMeet)
-					teamMeetKeys.add(key)
-				'''
+				if loadTeamMeets:
+					key = str(season) + meet + gender + team
+					if not relay and not key in teamMeetKeys:
+						teamMeetKeys.add(key)
+						newTeamMeet = {'season': season, 'gender': gender, 'meet': meet, 'team': team}
+						teamMeets.append(newTeamMeet)
 
-	#print len(teamMeets)
-	#for meet in teamMeets:
-	#	print meet
-
-	#db.connect()
-	#Meet.insert_many(meets).execute()
 	db.connect()
-	#print len(swims)
-	#print Swim.insert_many(swims).execute()
+	if loadTeams and len(newTeams) > 0:
+		print 'Teams:', len(newTeams)
+		TeamSeason.insert_many(newTeams).execute()
+
+	if loadMeets and len(meets) > 0:
+		print 'Meets:', len(meets)
+		Meet.insert_many(meets).execute()
+
+	if loadSwimmers and len(swimmers) > 0:
+		print 'Swimmers:', len(swimmers)
+		Swimmer.insert_many(swimmers).execute()
+
+	if loadTeamMeets and len(teamMeets) > 0:
+		print 'Team Meets:', len(teamMeets)
+		teamMeetIDs = []
+		for meet in teamMeets:
+			try:
+				meetID = Meet.get(Meet.gender==meet['gender'], Meet.meet==meet['meet'], Meet.season==meet['season']).id
+				teamID = TeamSeason.get(TeamSeason.gender==meet['gender'], TeamSeason.team==meet['team'],
+							 TeamSeason.season==meet['season']).id
+				try:
+					TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID)
+				except TeamMeet.DoesNotExist:
+					teamMeetIDs.append({'team': teamID, 'meet': meetID})
+
+			except:
+				pass
+		if len(teamMeetIDs) > 0:
+			TeamMeet.insert_many(teamMeetIDs).execute()
+
+	if loadSwims and len(swims) > 0:
+		print len(swims)
+		Swim.insert_many(swims).execute()
 	'''
 	for i in range(len(newSwims) / 100):
 		print i
@@ -325,12 +410,17 @@ def load():
 
 
 if __name__ == '__main__':
+	'''
+	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
+		print teamMeet.meet.meet, teamMeet.team.team, teamMeet.team.season, teamMeet.team.gender, \
+			teamMeet.team.conference
+	'''
 	#db.get_indexes(Swim)
 	#swims = {}
 
 	#db.drop_tables([TeamSeason])
-	#db.create_tables([TeamMeet])
+	#db.create_tables([Swimmer, TeamSeason, Meet, TeamMeet])
 	start = time.time()
-	load()
+	load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
 	stop = time.time()
 	print stop - start

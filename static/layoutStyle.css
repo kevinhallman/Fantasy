@@ -55,7 +55,9 @@
     	text-decoration: none;
     	width:50%;
     	background-color:#333;
+    	cursor:pointer;
 	}
+
 	div.sidebar li:hover {
 		background-color: #111;
 	}
