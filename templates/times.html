@@ -4,7 +4,7 @@ $def with(conferences,events,scores)
 Top Times
 </h1>
 
-<form name=confForm method="GET">
+<form name=confForm method="GET" class="ajax">
 	<p>
 		<label>Conference:</label>
 		<select name="conference">
@@ -43,7 +43,9 @@ Top Times
 	<input type="submit" value="Get Top Times">
 </form>
 
-<div id="scoreTable">
-$if scores:
-	$:scores
+<div id="results">
+	<div id="scoreTable">
+	$if scores:
+		$:scores
+	</div>
 </div>

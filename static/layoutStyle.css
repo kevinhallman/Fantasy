@@ -77,7 +77,6 @@
 	#scoreTable {max-width: 63%; float:left;}
 	#report {padding-left:1%; width:20%; float:left;}
 	#finalScores {padding-left:1%; width:15%; float:left;}
-	.hidden { display:none}
 	body {
 		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 		margin: auto;
@@ -114,4 +113,11 @@
 	form p     { display: table-row;  }
 	form label { display: table-cell; }
 	form input { display: table-cell; }
-	thead th:hover{ background-color:darkred}
+	thead th:hover{ background-color:darkred;}
+	#loading {
+		background: transparent url("/static/ajax-loader.gif");
+		height: 16px;
+		width: 16px;
+		display: none;
+		float: left;
+	}

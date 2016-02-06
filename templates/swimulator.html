@@ -116,11 +116,10 @@ $def with (divTeams,scores,teamScores,finalScores)
 			});
 		});
 	}
-
 </script>
 
 $ teams = divTeams[context.division]
-<form id="teamForm" method="GET">
+<form id="teamForm" method="GET" action="swimulate" class="ajax">
 	<button type="button" onclick="add(this.form);">Add New Team</button>
 	<p>
 	Team: <select name="division1" onchange="getTeams(this)">
@@ -160,9 +159,11 @@ $ teams = divTeams[context.division]
 	<select name="meet2">	</select>
 	</p>
 
-	<input id="swim" type="submit" value="Swimulate">
+ 	<input id="swim" type="submit" value="Swimulate">
+	<div id="loading"></div>
 </form>
 
+<div id="results">
 <div id="scoreTable">
 $if scores:
 	$:scores
@@ -176,4 +177,5 @@ $if teamScores:
 <div id="finalScores">
 $if finalScores:
 	$:finalScores
+</div>
 </div>

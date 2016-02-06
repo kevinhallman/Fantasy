@@ -23,7 +23,7 @@ input[type=text] {
 }
 </style>
 
-<form method="get">
+<form method="get" class="ajax">
 	<select name="event1">
 	$for event in events:
 		<option> $event </option>
@@ -39,4 +39,6 @@ input[type=text] {
 
 <br>
 
+<div id="results">
 $:conferences
+</div>

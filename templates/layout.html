@@ -20,49 +20,50 @@ $def with (content)
 		<style>
 		</style>
 		<script type="text/javascript">
-			function sumType (form) {
-				var select = document.getElementById("summaryType");
+			function sumType (form) {  //handles switching the summary type
+				var select = $$("#summaryType");
 				var type = select.options[select.selectedIndex].text;
-				var event = document.getElementById("event");
-				var year = document.getElementById("year");
-				var swimmer = document.getElementById("swimmer");
 				if (type == "swimmer") {
-					swimmer.setAttribute("class","visible");
-					event.setAttribute("class","hidden");
-					year.setAttribute("class","hidden");
+					$$("#swimmer").show();
+					$$("#event").hide();
+					$$("#year").hide();
 				}
 				if (type == "event") {
-					event.setAttribute("class","visible");
-					swimmer.setAttribute("class","hidden");
-					year.setAttribute("class","hidden");
+					$$("#event").show();
+					$$("#swimmer").hide();
+					$$("#year").hide();
 				}
 				if (type == "year") {
-					year.setAttribute("class","visible");
-					event.setAttribute("class","hidden");
-					swimmer.setAttribute("class","hidden");
+					$$("#year").show();
+					$$("#event").hide();
+					$$("#swimmer").hide();
 				}
 			}
 		</script>
 		<script type="text/javascript">
 			\$(document).ready(function() {
-				var url = \$(location).attr('href');
-    			\$('input[type=radio]').change(function() {
 
-    				if (this.name == 'gender') {
-    					json = {gender: this.value}
-            		}
-            		else if (this.name == 'division') {
-            			json = {division: this.value}
-            		}
-					jQuery.ajax({
-        				type: "POST",
-        				async: true,
-        				url: 'home',
-        				data:  json,
-        				success: reload,
-        				error: reload
-    				});
-    			});
+				//handles the form submissions and does a partial ajax page reload
+				$$('form.ajax').submit(function(form) {  // catch any form submission event
+					newURL = location.pathname + '?' + $$(this).serialize();
+					$$("#loading").show();
+					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
+						$$("#loading").hide();
+					}); //load just #results
+					
+					history.pushState('', 'New URL: '+newURL, newURL);
+					form.preventDefault(); // cancel original event to prevent form submitting
+				});
+
+				// make forward/back buttons work
+				window.onpopstate = function(event) {
+					console.log("pathname: "+location.pathname + location.search);
+					$$("#loading").show();
+					$$("#results").load( location.pathname + location.search + " #results", function() {
+						$$("#loading").hide();
+					});
+				};
+
 
 				$$("#gender li").click(function() {
 					jQuery.ajax({
@@ -73,8 +74,6 @@ $def with (content)
         				success: reload,
         				error: reload
     				});
-    				$$('#gender li').removeClass('active');
-    				this.addClass('active');
 				});
 
 				$$("#division li").click(function() {
@@ -86,10 +85,7 @@ $def with (content)
         				success: reload,
         				error: reload
     				});
-    				$$('#division li').removeClass('active');
-    				this.addClass('active');
 				});
-
 
     			$if context.gender=="Women":
     				$$("#Women").addClass('active');
@@ -143,7 +139,7 @@ $def with (content)
 				<li value=1 ><a href="/">Home</a></li>
 				<li value=2 ><a href="/conference">Conference</a> </li>
 				<li value=3 ><a href="/swimulate">Head to Head</a></li>
-				<!--<li value=4 ><a href="/times">Top Times</a></li>-->
+				<li value=4 ><a href="/times">Top Times</a></li>
 				<li value=5 ><a href="/placing">Placing</a></li>
 				<!--<li value=6 ><a class="banner" href="/improvement">Improvement</a></li>-->
 				<li value=7 ><a class="banner" href="/rankings">Rankings</a></li>

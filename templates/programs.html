@@ -38,7 +38,7 @@ Programs are ranked on their overall team strength, attrition rate, and swimmer 
 </p>
 
 
-<form name=confForm method="GET">
+<form name=confForm method="GET" class="ajax">
 	Conference: <select name="conference">
 		<option>All</option>
 		$for name in conferences:
@@ -46,9 +46,10 @@ Programs are ranked on their overall team strength, attrition rate, and swimmer 
 	</select>
 	<br>
 	<input type="submit" value="Rate Programs">
+	<div id="loading"></div>
 </form>
 
-<div id="rankingTable">
+<div id="results">
 $if rankings:
 	$:rankings
 </div>

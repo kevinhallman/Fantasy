@@ -4,6 +4,7 @@ import re
 from datetime import date as Date
 import time
 import urlparse
+from playhouse.migrate import *
 
 
 urlparse.uses_netloc.append("postgres")
@@ -88,20 +89,13 @@ class HSSwim(Model):
 	class Meta:
 		database = db
 
-class Improvement(Model):
-	name = CharField()
-	event = CharField()
-	improvement = FloatField()
-	fromTime = FloatField()
-	toTime = FloatField()
-	fromSeason = IntegerField()
-	toSeason = IntegerField()
+class TeamSeason(Model):
+	#name = CharField()
+	season = IntegerField()
 	team = CharField()
 	gender = CharField()
-	conference = CharField()
+	conference = CharField(null=True)
 	division = CharField()
-	fromYear = CharField()
-	toYear = CharField()
 
 	class Meta:
 		database = db
@@ -112,17 +106,26 @@ class Swimmer(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
+	#teamID = ForeignKeyField(TeamSeason, null=True)
 
 	class Meta:
 		database = db
 
-class TeamSeason(Model):
-	#name = CharField()
-	season = IntegerField()
+class Improvement(Model):
+	swimmer = ForeignKeyField(Swimmer, null=True)
+	name = CharField()
+	event = CharField()
+	improvement = FloatField()
+	fromtime = FloatField()
+	totime = FloatField()
+	fromseason = IntegerField()
+	toseason = IntegerField()
 	team = CharField()
 	gender = CharField()
-	conference = CharField(null=True)
+	conference = CharField()
 	division = CharField()
+	fromyear = CharField()
+	toyear = CharField()
 
 	class Meta:
 		database = db
@@ -142,7 +145,6 @@ class TeamMeet(Model):
 
 	class Meta:
 		database = db
-
 
 def seasonString(dateString):
 	dateParts = re.split('/', dateString)
@@ -407,6 +409,23 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
     '''
 	#return divisions
 
+def migrateImprovement():
+	'''
+	migrator = PostgresqlMigrator(db)
+	with db.transaction():
+		migrate(
+			migrator.add_column('improvement', 'swimmer', Improvement.swimmer)
+		)
+	'''
+	for imp in Improvement.select(Improvement.name, Improvement.toseason, Improvement.team):
+		try:
+
+			swimmer = Swimmer.select().where(Swimmer.team==imp.team, Swimmer.name==imp.name,
+													Swimmer.season==imp.toseason).get()
+			print swimmer.id
+			#Improvement.update(id = imp.id, swimmer=id, columns=['id'])
+		except Swimmer.DoesNotExist:
+			pass
 
 
 if __name__ == '__main__':
@@ -421,6 +440,7 @@ if __name__ == '__main__':
 	#db.drop_tables([TeamSeason])
 	#db.create_tables([Swimmer, TeamSeason, Meet, TeamMeet])
 	start = time.time()
-	load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
+	#load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
+	migrateImprovement()
 	stop = time.time()
 	print stop - start

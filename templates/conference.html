@@ -7,21 +7,7 @@ Simulate a conference or national swim meet using either a swimmer's top times o
 </p>
 
 <script type="text/javascript">
-	/*this will reload just the data part of the page with ajax leaving the form intact
-	function swimulateConf(form){
-		var baseurl = $$(location).attr('href');
-		var getURL = baseurl + "?" + $$.param({
-			conference: $$("select[name=conference]").find(":selected").text(),
-			season: $$("select[name=season]").find(":selected").text(),
-			taper: $$("select[name=taper]").find(":selected").text(),
-			date: $$("select[name=date]").find(":selected").text()
-		});
-		$$('#swimdata').load(getURL + " #swimdata", function(response, status) {alert(status, response);});
-		document.location = getURL;
-	};*/
-</script>
-
-<script type="text/javascript">
+	/* This loads up the cool chart with google's API into the 'chart' div
 	google.load("visualization", "1", {packages:["treemap"]});
     google.setOnLoadCallback(drawChart);
 
@@ -48,9 +34,10 @@ Simulate a conference or national swim meet using either a swimmer's top times o
     		return '<div>' + 'Score: ' + data.getValue(row, 2) + ' </div>';
   		};
     }
+    */
 </script>
 
-<form id="confForm" name=confForm>
+<form id="confForm" name=confForm class="ajax">
 	<p>
 		<label>Conference:</label>
 		<select name="conference">
@@ -90,9 +77,10 @@ Simulate a conference or national swim meet using either a swimmer's top times o
 	</p>
 
 	<input type="submit" value="Swimulate">
+	<div id="loading"></div>
 </form>
 
-<div id="swimdata">
+<div id="results">
 $if scores and False:
 	<div id="chart" style="width: 1000px; height: 400px; float:none; margin-left: auto; margin-right: auto;"></div>
 
