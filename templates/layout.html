@@ -48,6 +48,7 @@ $def with (content)
 					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
 						$$("#loading").hide();
 						sumType();
+						$$("#programs").tablesorter(); //also needs to be done on re-load
 					}); //load just #results
 
 					history.pushState('', 'New URL: '+newURL, newURL);
@@ -61,6 +62,7 @@ $def with (content)
 					$$("#results").load( location.pathname + location.search + " #results", function() {
 						$$("#loading").hide();
 						sumType();
+						$$("#programs").tablesorter(); //also needs to be done on re-load
 					});
 					sumtype();
 				};
