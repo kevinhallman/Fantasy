@@ -20,9 +20,8 @@ $def with (content)
 		<style>
 		</style>
 		<script type="text/javascript">
-			function sumType (form) {  //handles switching the summary type
-				var select = $$("#summaryType");
-				var type = select.options[select.selectedIndex].text;
+			function sumType () {  //handles switching the summary type
+				var type = $$("#summaryType").val();
 				if (type == "swimmer") {
 					$$("#swimmer").show();
 					$$("#event").hide();
@@ -41,16 +40,16 @@ $def with (content)
 			}
 		</script>
 		<script type="text/javascript">
-			\$(document).ready(function() {
-
+			function prepAjaxForms() {
 				//handles the form submissions and does a partial ajax page reload
 				$$('form.ajax').submit(function(form) {  // catch any form submission event
 					newURL = location.pathname + '?' + $$(this).serialize();
 					$$("#loading").show();
 					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
 						$$("#loading").hide();
+						sumType();
 					}); //load just #results
-					
+
 					history.pushState('', 'New URL: '+newURL, newURL);
 					form.preventDefault(); // cancel original event to prevent form submitting
 				});
@@ -61,11 +60,19 @@ $def with (content)
 					$$("#loading").show();
 					$$("#results").load( location.pathname + location.search + " #results", function() {
 						$$("#loading").hide();
+						sumType();
 					});
+					sumtype();
 				};
+			};
+
+			\$(document).ready(function() {
+				prepAjaxForms();
 
 
 				$$("#gender li").click(function() {
+					$$("#gender li").removeClass('active');
+					$$(this).addClass('active');
 					jQuery.ajax({
         				type: "POST",
         				async: true,
@@ -77,6 +84,8 @@ $def with (content)
 				});
 
 				$$("#division li").click(function() {
+					$$("#division li").removeClass('active');
+					$$(this).addClass('active');
 					jQuery.ajax({
         				type: "POST",
         				async: true,
@@ -104,11 +113,14 @@ $def with (content)
     				$$("#D3").addClass('active');
     				$$("#D2").removeClass('active');
     				$$("#D1").removeClass('active');
+
 			});
 
 			function reload() {
 				var url = \$(location).attr('href');
-            	\$('body').load(url.split("?")[0]);
+            	\$('.content').load(location.pathname + ' .innerContent', function() {  //just reload content
+            		prepAjaxForms();  //add ajax loads to forms
+            	});
 			}
 		</script>
 
@@ -148,7 +160,9 @@ $def with (content)
 		</div>
 
 		<div class="content">
-			$:content
+			<div class="innerContent">
+				$:content
+			</div>
 		</div>
 	</div>
 
