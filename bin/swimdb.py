@@ -35,13 +35,13 @@ class Swimmer(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
-	teamid = ForeignKeyField(TeamSeason, null=True)
+	#teamid = ForeignKeyField(TeamSeason, null=True)
 
 	class Meta:
 		database = db
 
 class Swim(Model):
-	swimmer = ForeignKeyField(Swimmer, null=True)
+	#swimmer = ForeignKeyField(Swimmer, null=True)
 	name = CharField()
 	event = CharField()
 	date = DateField()
