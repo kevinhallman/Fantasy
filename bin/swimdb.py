@@ -18,7 +18,30 @@ if "DATABASE_URL" in os.environ:  # production
 else:
 	db = PostgresqlDatabase('swimdb', user='hallmank')
 
+class TeamSeason(Model):
+	#name = CharField()
+	season = IntegerField()
+	team = CharField()
+	gender = CharField()
+	conference = CharField(null=True)
+	division = CharField()
+
+	class Meta:
+		database = db
+
+class Swimmer(Model):
+	name = CharField()
+	season = IntegerField()
+	team = CharField()
+	gender = CharField()
+	year = CharField()
+	teamid = ForeignKeyField(TeamSeason, null=True)
+
+	class Meta:
+		database = db
+
 class Swim(Model):
+	swimmer = ForeignKeyField(Swimmer, null=True)
 	name = CharField()
 	event = CharField()
 	date = DateField()
@@ -85,28 +108,6 @@ class HSSwim(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
-
-	class Meta:
-		database = db
-
-class TeamSeason(Model):
-	#name = CharField()
-	season = IntegerField()
-	team = CharField()
-	gender = CharField()
-	conference = CharField(null=True)
-	division = CharField()
-
-	class Meta:
-		database = db
-
-class Swimmer(Model):
-	name = CharField()
-	season = IntegerField()
-	team = CharField()
-	gender = CharField()
-	year = CharField()
-	#teamID = ForeignKeyField(TeamSeason, null=True)
 
 	class Meta:
 		database = db
@@ -410,23 +411,43 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	#return divisions
 
 def migrateImprovement():
-	'''
+
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
-			migrator.add_column('improvement', 'swimmer', Improvement.swimmer)
+			#migrator.add_column('improvement', 'swimmer_id', Improvement.swimmer)
+			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
+	count = 0
 	'''
-	for imp in Improvement.select(Improvement.name, Improvement.toseason, Improvement.team):
+	for swimmer in Swimmer.select(Swimmer.name, Swimmer.season, Swimmer.team):
 		try:
 
-			swimmer = Swimmer.select().where(Swimmer.team==imp.team, Swimmer.name==imp.name,
-													Swimmer.season==imp.toseason).get()
-			print swimmer.id
-			#Improvement.update(id = imp.id, swimmer=id, columns=['id'])
+			team = TeamSeason.select().where(TeamSeason.team==swimmer.team, TeamSeason.season==swimmer.season).get()
+			#print team.id, swimmer.name
+			Swimmer.update(teamid=team.id).where(Swimmer.name==swimmer.name,
+								Swimmer.season==swimmer.season).execute()
+			count += 1
+			if count %100==0:
+				print count
 		except Swimmer.DoesNotExist:
 			pass
+	'''
+	for swim in Swim.select(Swim.name, Swim.season, Swim.team, Swim.relay, Swim.id).where(Swim.swimmer >> None):
 
+		try:
+			#print swim.team
+			if swim.relay: continue
+			swimmer = Swimmer.select().where(Swimmer.team==swim.team, Swimmer.season==swim.season,
+										  Swimmer.name==swim.name).get()
+			#print swimmer.id, swimmer.name, swim.id
+			Swim.update(swimmer=swimmer.id).where(Swim.id==swim.id).execute()
+			count += 1
+			if count %100==0:
+				print count
+		except Swimmer.DoesNotExist:
+			pass
 
 if __name__ == '__main__':
 	'''
@@ -440,7 +461,8 @@ if __name__ == '__main__':
 	#db.drop_tables([TeamSeason])
 	#db.create_tables([Swimmer, TeamSeason, Meet, TeamMeet])
 	start = time.time()
-	#load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
-	migrateImprovement()
+	load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
+	#migrateImprovement()
+
 	stop = time.time()
 	print stop - start
