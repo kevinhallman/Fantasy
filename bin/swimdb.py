@@ -2,7 +2,7 @@ from peewee import *
 import os
 import re
 from datetime import date as Date
-import time
+import time as Time
 import urlparse
 from playhouse.migrate import *
 
@@ -35,13 +35,13 @@ class Swimmer(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
-	#teamid = ForeignKeyField(TeamSeason, null=True)
+	teamid = ForeignKeyField(TeamSeason, null=True)
 
 	class Meta:
 		database = db
 
 class Swim(Model):
-	#swimmer = ForeignKeyField(Swimmer, null=True)
+	swimmer = ForeignKeyField(Swimmer, null=True)
 	name = CharField()
 	event = CharField()
 	date = DateField()
@@ -266,8 +266,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		div, year, gender = match.groups()
 
-		if not (int(year) == 16):  #and gender=='m'):
-			continue
+		#if not (int(year) == 16):  #and gender=='m'):
+		#	continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
 				division = 'D1'
@@ -310,55 +310,73 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				if relay:
 					name = team + ' Relay'
 
-				if loadSwims:
-					try:
-						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-							Swim.date==swimDate)  # floats in SQL and python evidently different precision
-					except Swim.DoesNotExist:
-						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
-					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
-							division, 'relay': relay}
-						swims.append(newSwim)
-
-				if loadSwimmers:
-					key = str(season) + name + year + team + gender
-					if not relay and not key in swimmerKeys:
-						swimmerKeys.add(key)
-						try:
-							Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team)
-						except Swimmer.DoesNotExist:
-							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender': gender}
-							swimmers.append(newSwimmer)
-
+				#clear old values
+				teamID = None
+				meetID = None
+				swimmerID = None
 
 				if loadTeams:
 					key = str(season) + team + gender + conference + division
 					if not relay and not key in teamKeys:  # try each team once
 						teamKeys.add(key)
-						try:  # don't double add for meets not loaded yet
-							TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference)
+						try:  # don't double add for teams not loaded yet
+							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
 						except TeamSeason.DoesNotExist:
 							newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
 								gender, 'division': division}
 							newTeams.append(newTeam)
 
 				if loadMeets:
-					key = str(season) + meet + gender + str(swimDate)
+					key = str(season) + meet + gender
 					if not relay and not key in meetKeys:
 						meetKeys.add(key)  # try each meet once
 						try:  # don't double add for meets not loaded yet
-							Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender, Meet.date==swimDate)
+							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
 						except Meet.DoesNotExist:
 							newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
 							meets.append(newMeet)
+
+				if loadSwimmers:
+					key = str(season) + name + year + team + gender
+					if not relay and not key in swimmerKeys:
+						swimmerKeys.add(key)
+						try:
+							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
+						except Swimmer.DoesNotExist:
+							if not teamID:
+								teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
+							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
+								gender, 'teamid': teamID}
+							swimmers.append(newSwimmer)
 
 				if loadTeamMeets:
 					key = str(season) + meet + gender + team
 					if not relay and not key in teamMeetKeys:
 						teamMeetKeys.add(key)
-						newTeamMeet = {'season': season, 'gender': gender, 'meet': meet, 'team': team}
-						teamMeets.append(newTeamMeet)
+						if not meetID:
+							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
+						if not teamID:
+							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
+						try:
+							teamMeetID = TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID).id
+						except TeamMeet.DoesNotExist:
+							newTeamMeet = {'meet': meetID, 'team': teamID}
+							teamMeets.append(newTeamMeet)
+
+				if loadSwims:
+					try:
+						Swim.get(Swim.name==event, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+							Swim.date==swimDate)  # floats in SQL and python evidently different precision
+					except Swim.DoesNotExist:
+						if not swimmerID and not relay:
+							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
+						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
+					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
+							division, 'relay': relay, 'swimmer': swimmerID}
+						swims.append(newSwim)
 
 	db.connect()
 	if loadTeams and len(newTeams) > 0:
@@ -375,24 +393,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 	if loadTeamMeets and len(teamMeets) > 0:
 		print 'Team Meets:', len(teamMeets)
-		teamMeetIDs = []
-		for meet in teamMeets:
-			try:
-				meetID = Meet.get(Meet.gender==meet['gender'], Meet.meet==meet['meet'], Meet.season==meet['season']).id
-				teamID = TeamSeason.get(TeamSeason.gender==meet['gender'], TeamSeason.team==meet['team'],
-							 TeamSeason.season==meet['season']).id
-				try:
-					TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID)
-				except TeamMeet.DoesNotExist:
-					teamMeetIDs.append({'team': teamID, 'meet': meetID})
-
-			except:
-				pass
-		if len(teamMeetIDs) > 0:
-			TeamMeet.insert_many(teamMeetIDs).execute()
+		TeamMeet.insert_many(teamMeets).execute()
 
 	if loadSwims and len(swims) > 0:
-		print len(swims)
+		print 'Swims: ', len(swims)
 		Swim.insert_many(swims).execute()
 	'''
 	for i in range(len(newSwims) / 100):
@@ -402,7 +406,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			Swim.insert_many(newSwims[i*100:(i+1)*100]).execute()
 	'''
 
-	'''
+	''' cleanup for duplicate swims
 	Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY meet, name, event, time ORDER BY id) AS rnum '
         'FROM Swim) t '
@@ -449,6 +453,53 @@ def migrateImprovement():
 		except Swimmer.DoesNotExist:
 			pass
 
+def safeLoad():
+	print 'loading teams...'
+	load(loadTeams=True)
+	print 'loading meets and swimmers...'
+	load(loadMeets=True, loadSwimmers=True)
+	print 'loading teamMeets and swims...'
+	load(loadTeamMeets=True, loadSwims=True)
+
+def addRelaySwimmers():
+	'''
+	relaySwimmers = []
+	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender).distinct().where(Swim.relay==True):
+		try:
+			teamID = TeamSeason.get(TeamSeason.season==swim.season, TeamSeason.team==swim.team,
+										   TeamSeason.gender==swim.gender, TeamSeason.conference==swim.conference).id
+		except TeamSeason.DoesNotExist:
+			print swim.team
+		relayName = swim.team + ' Relay'
+		newSwim = {'season': swim.season, 'name': relayName, 'year': None, 'team': swim.team, 'gender': swim.gender,
+				   'teamid': teamID}
+		relaySwimmers.append(newSwim)
+	print 'Swimmers: ' + str(len(relaySwimmers))
+	Swimmer.insert_many(relaySwimmers).execute()
+	'''
+	#print relaySwimmers
+	swimmers = {}
+	i=0
+	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender, Swim.id).where(Swim.relay==True):
+		i+=1
+		if i%1000==0:
+			print i
+		key = swim.team + str(swim.season) + swim.gender
+		if not key in swimmers:
+			try:
+				swimmerID = Swimmer.get(Swimmer.team==swim.team, Swimmer.season==swim.season,
+									Swimmer.gender==swim.gender).id
+				swimmers[key] = swimmerID
+			except Swimmer.DoesNotExist:
+				print swim.team, swim.season, swim.conference
+				continue
+		else:
+			swimmerID = swimmers[key]
+
+		Swim.update(swimmer=swimmerID).where(Swim.id==swim.id).execute()
+
+
+
 if __name__ == '__main__':
 	'''
 	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
@@ -458,11 +509,12 @@ if __name__ == '__main__':
 	#db.get_indexes(Swim)
 	#swims = {}
 
-	#db.drop_tables([TeamSeason])
-	#db.create_tables([Swimmer, TeamSeason, Meet, TeamMeet])
-	start = time.time()
-	load(loadTeamMeets=True, loadSwimmers=True, loadSwims=True, loadTeams=True, loadMeets=True)
+	#db.drop_tables([TeamSeason, Swimmer])
+	#db.create_tables([TeamSeason, Swimmer])
+	start = Time.time()
+	#load(loadTeams)
+	#safeLoad()
 	#migrateImprovement()
-
-	stop = time.time()
+	addRelaySwimmers()
+	stop = Time.time()
 	print stop - start

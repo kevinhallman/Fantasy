@@ -101,6 +101,7 @@ class Home():
 
 class Swim(object):
 	def GET(self):
+		monteCarlo = False
 		gender = session.gender
 		divTeams = allTeams[gender]
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False)
@@ -149,8 +150,12 @@ class Swim(object):
 			teamScores = newMeet.scoreReport(printout=False)
 			newMeet.reset(True, True)
 
-			return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
-				teamScores), finalScores=showScores(scores))
+			if monteCarlo:
+				winProb = newMeet.scoreMonteCarlo()
+				return winTable(winProb)
+			else:
+				return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
+					teamScores), finalScores=showScores(scores))
 
 class Fantasy(object):
 	def GET(self):
@@ -351,7 +356,7 @@ class Rankings():
 			recruits = True
 			bar = True
 		else:
-			seasons = {2015, 2014, 2013, 2012}
+			seasons = {2016, 2015, 2014, 2013, 2012}
 			bar = False
 		scores = {}
 		if form.conference in confList:
@@ -525,7 +530,6 @@ def showConf(scores, newSwims):
 
 	return html
 
-
 def showPrograms(teamRank):
 	html = ''
 	html += '<table id="programs">'
@@ -557,7 +561,6 @@ def showPrograms(teamRank):
 	html += '</table>'
 
 	return html
-
 
 def googleTable(teamScores, scores):
 	table = ["['Name','Parent','Score'],"]
@@ -641,6 +644,24 @@ def googleJSON(teams):
 		for team in teams:
 			line[team] = teams[team][season]
 		data.append(line)
+
+def winTable(winProb):
+	html = ''
+	for team in winProb:
+		html += '<div id="winProbs">'
+		html += '<table>'
+		html += '<tr><th>'
+		html += team
+		html += '</th></tr>'
+		for prob in winProb[team]:
+			event = swim[0]
+			html += '<td>'
+			html += event + ': ' + '<b>' + str(scores[conference][event]) + '<b>'
+			html += '</td>'
+		html += '</table>'
+		html += '</div>'
+
+	return html
 
 
 

@@ -4,6 +4,7 @@ import os, urlparse
 import numpy
 from peewee import *
 from operator import itemgetter
+from swimdb import TeamSeason
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
@@ -41,18 +42,21 @@ def connection_processor(handler):
 		if not db.is_closed():
 			db.close()
 
-def getConfs(confFile):
-	with open(confFile, 'r') as file:
-		confs = {'D1': {}, 'D2': {}, 'D3': {}}
-		for line in file:
-			parts = re.split('\t', line.strip())
-			division = parts[0]
-			conf = parts[1]
-			team = parts[2]
-			if not conf in confs[division]:
-				confs[division][conf] = set()
-			confs[division][conf].add(team)
-	return confs
+def getConfs():
+	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
+	allTeams = {'Men': {'D1': [], 'D2': [], 'D3': []}, 'Women': {'D1': [], 'D2': [], 'D3': []}}
+	for newTeam in TeamSeason.select(TeamSeason.team, TeamSeason.conference, TeamSeason.division,
+									 TeamSeason.gender).distinct(TeamSeason.team):
+		if newTeam.conference not in confs[newTeam.division][newTeam.gender]:
+			confs[newTeam.division][newTeam.gender][newTeam.conference] = set()
+
+		confs[newTeam.division][newTeam.gender][newTeam.conference].add(newTeam.team)
+		allTeams[newTeam.gender][newTeam.division].append(newTeam.team)
+
+		for division in ['D1', 'D2', 'D3']:
+			allTeams['Men'][division].sort()
+			allTeams['Women'][division].sort()
+	return confs, allTeams
 
 class Team(Model):
 	name = CharField()
@@ -71,35 +75,35 @@ class Team(Model):
 #db.create_tables([Team])
 
 
-
-conferences = getConfs('data/conferences.txt')
+(conferences, allTeams) = getConfs()
 database = sqlmeets.SwimDatabase(database=db)
 
 teams = []
 teamRecruits = {}
 teamImprovement = {}
 teamAttrition = {}
-for gender in ['Men', 'Women']:
-	for division in conferences:
-		for conf in conferences[division]:
-			for team in conferences[division][conf]:
-				if team != 'Richmond' and team!= 'Connecticut': continue
 
-				#get recruit scores
+for division in conferences:
+	for gender in conferences[division]:
+		for conf in conferences[division][gender]:
+			for team in conferences[division][gender][conf]:
+				#if team != 'Richmond' and team!= 'Connecticut': continue
+
+				# get team score
 				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
 									 dual=False)
 				dualScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
 											 dual=True)
 
-				#get attrition rate
+				# get attrition rate
 				attrition = database.attrition([team], gender=gender)
 				if attrition == {}:
 					attrition = 0
 				else:
 					attrition = -attrition
 
-				#get improvement
-				drops = database.improvement2(teams=[team], gender=gender, season1=2015, season2=2012)
+				# get improvement
+				drops = database.improvement2(teams=[team], gender=gender, season1=2015, season2=2011)
 				if drops != {}:
 					improvement = numpy.mean(drops)
 				else:
@@ -118,12 +122,12 @@ for gender in ['Men', 'Women']:
 						'division': division,
 						'gender': gender}
 					teams.append(newTeam)
-				print team
+				print team, attrition, improvement, invScore
 print teams
 
 
-Team.delete().where(Team.name=='Richmond')
-Team.delete().where(Team.name=='Connecticut')
+#Team.delete().where(Team.name=='Richmond')
+#Team.delete().where(Team.name=='Connecticut')
 
 db.connect()
 with db.transaction():
