@@ -147,7 +147,7 @@ class Swim(object):
 			else:
 				showNum = 6	
 			scores = newMeet.scoreString(showNum=showNum)
-			teamScores = newMeet.scoreReport(printout=False)
+			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)
 
 			if monteCarlo:
@@ -170,7 +170,7 @@ class Conf(object):
 
 		if form.conference is None:
 			return render.conference(conferences=sorted(confList.keys()), scores=None, teamScores=None,
-									 finalScores=None, table='')
+									 finalScores=None, table='', winTable=None)
 
 		season = int(form.season)
 		if form.date and form.date != 'Whole Season':
@@ -182,7 +182,7 @@ class Conf(object):
 			swimdate = year + '-' + month + '-' + day
 		else:
 			swimdate = None
-		print swimdate
+
 		if form.conference:
 			if form.taper == 'Top Time':
 				topTimes = True
@@ -192,21 +192,25 @@ class Conf(object):
 				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division)
 				scores = confMeet.scoreString(25)
-				teamScores = confMeet.scoreReport(printout=False, repressSwim=True, repressTeam=True)
+				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
 				scores = confMeet.scoreString()
-				teamScores = confMeet.scoreReport(printout=False)
+				teamScores = confMeet.scoreReport()
+			winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
+			winProb = None
 		if teamScores:
 			table = googleTable(teamScores, scores['scores'])
 		else:
 			table = ''
+		#print showWinTable(winProb)
 		return render.conference(conferences=sorted(confList.keys()), scores=showMeet(scores),
-								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores), table=table)
+								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
+								 table=table, winTable=showWinTable(winProb))
 
 class Times(object):
 	def GET(self):
@@ -645,21 +649,36 @@ def googleJSON(teams):
 			line[team] = teams[team][season]
 		data.append(line)
 
-def winTable(winProb):
-	html = ''
+# generate html for winProb table
+def showWinTable(winProb):
+	# average placing for sorting
+	avgTeamPlace = {}
 	for team in winProb:
-		html += '<div id="winProbs">'
-		html += '<table>'
-		html += '<tr><th>'
-		html += team
-		html += '</th></tr>'
+		avgPlace = 0
+		for (i, prob) in enumerate(winProb[team]):
+			avgPlace += (i+1)*prob
+		avgTeamPlace[team] = avgPlace
+
+	html = '<h3>Placing Probabilities</h3>'
+	html += '<div id="winProbs">'
+	html += '<table><tr>'
+	html += '<th></th>'
+	# placing header
+	for i in range(1,len(winProb)+1):
+		html += '<th>'
+		html += str(i)
+		html += '</th>'
+	html += '</tr>'
+	for (team, place) in sorted(avgTeamPlace.items(), key=itemgetter(1)):  # sort by average place
+		html += '<tr>'
+		html += '<td>' + team + '</td>'
 		for prob in winProb[team]:
-			event = swim[0]
 			html += '<td>'
-			html += event + ': ' + '<b>' + str(scores[conference][event]) + '<b>'
+			html += str(prob*100) + '%'
 			html += '</td>'
-		html += '</table>'
-		html += '</div>'
+		html += '</tr>'
+	html += '</table>'
+	html += '</div>'
 
 	return html
 

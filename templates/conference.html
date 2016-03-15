@@ -1,4 +1,4 @@
-$def with (conferences,scores,teamScores,finalScores,table)
+$def with (conferences,scores,teamScores,finalScores,table,winTable)
 <h1>
 Taper Meet
 </h1>
@@ -80,22 +80,34 @@ Simulate a conference or national swim meet using either a swimmer's top times o
 	<div id="loading"></div>
 </form>
 
+<div id="exactProb">
+	<ul>
+		<li id="exact">Exact Scores</li>
+		<li id="prob">Estimated Scores</li>
+	</ul>
+
+</div>
+
 <div id="results">
 $if scores and False:
 	<div id="chart" style="width: 1000px; height: 400px; float:none; margin-left: auto; margin-right: auto;"></div>
 
-<div id="scoreTable">
+<div id="scoreTable" class="scores">
 $if scores:
 	$:scores
 </div>
 
-<div id="report">
+<div id="report" class="scores">
 $if teamScores:
 	$:teamScores
 </div>
 
-<div id="finalScores">
+<div id="finalScores" class="scores">
 $if finalScores:
 	$:finalScores
+</div>
+
+<div id="estResults">
+	$:winTable
 </div>
 </div>
