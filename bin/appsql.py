@@ -14,7 +14,7 @@ eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","
 
 urls = ('/', 'Home',
 	'/home', 'Home',
-	'/swimulate', 'Swim',
+	'/swimulate', 'Swimulate',
 	'/fantasy', 'Fantasy',
 	'/conference', 'Conf',
 	'/times', 'Times',
@@ -99,7 +99,7 @@ class Home():
 		web.header("Content-Type", "application/json")
 		return 'an error'
 
-class Swim(object):
+class Swimulate(object):
 	def GET(self):
 		monteCarlo = False
 		gender = session.gender
@@ -135,27 +135,25 @@ class Swim(object):
 		#print optimizeTeams
 
 		if len(formMeets) + len(optimizeTeams) < 1:
-			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None)
+			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 		
 		else:
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
 				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
-			if len(formMeets) > 2:
+			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
-				showNum = 6	
+				showNum = 6
 			scores = newMeet.scoreString(showNum=showNum)
 			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)
 
-			if monteCarlo:
-				winProb = newMeet.scoreMonteCarlo()
-				return winTable(winProb)
-			else:
-				return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
-					teamScores), finalScores=showScores(scores))
+			winProb = newMeet.scoreMonteCarlo()
+			winTable = showWinTable(winProb)
+			return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
+				teamScores), finalScores=showScores(scores), winTable=winTable)
 
 class Fantasy(object):
 	def GET(self):
@@ -207,7 +205,6 @@ class Conf(object):
 			table = googleTable(teamScores, scores['scores'])
 		else:
 			table = ''
-		#print showWinTable(winProb)
 		return render.conference(conferences=sorted(confList.keys()), scores=showMeet(scores),
 								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
 								 table=table, winTable=showWinTable(winProb))
@@ -656,15 +653,13 @@ def showWinTable(winProb):
 	for team in winProb:
 		avgPlace = 0
 		for (i, prob) in enumerate(winProb[team]):
-			avgPlace += (i+1)*prob
+			avgPlace += (i+1) * prob
 		avgTeamPlace[team] = avgPlace
-
-	html = '<h3>Placing Probabilities</h3>'
-	html += '<div id="winProbs">'
+	html = '<div id="winProbs">'
 	html += '<table><tr>'
 	html += '<th></th>'
 	# placing header
-	for i in range(1,len(winProb)+1):
+	for i in range(1, len(winProb)+1):
 		html += '<th>'
 		html += str(i)
 		html += '</th>'

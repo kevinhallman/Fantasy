@@ -1,4 +1,4 @@
-$def with (divTeams,scores,teamScores,finalScores)
+$def with (divTeams,scores,teamScores,finalScores,winTable)
 
 <h1>Head to Head Competition</h1>
 
@@ -163,19 +163,34 @@ $ teams = divTeams[context.division]
 	<div id="loading"></div>
 </form>
 
+<div id="exactProb">
+	<ul>
+		<li id="exact">Exact Scores</li>
+		<li id="prob">Estimated Scores</li>
+	</ul>
+
+</div>
+
 <div id="results">
-<div id="scoreTable">
+<div id="scoreTable" class="scores">
 $if scores:
 	$:scores
 </div>
 
-<div id="report">
+<div id="report" class="scores">
 $if teamScores:
 	$:teamScores
 </div>
 
-<div id="finalScores">
+<div id="finalScores" class="scores">
 $if finalScores:
 	$:finalScores
+</div>
+<div id="estResults" class="scores">
+	<h3>Placing Probabilities</h3>
+	We estimate the probabilities that each team will finish in a certain spot by simulating the meet 100 times and
+	giving each swim a 2% variation. A 10% chance of first place means that the team finished first in 10% of the
+	simulated meets.
+	$:winTable
 </div>
 </div>
