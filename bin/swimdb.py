@@ -179,6 +179,10 @@ def swimTime(time):
 
 #turn time into seconds, round to two digits
 def toTime(time):
+	if not time:
+		return 0
+	if type(time)==float:
+		return time
 	if time[0]=="X" or time[0]=="x":
 		time=time[1:]
 	if re.match(".*:.*",time) == None:
@@ -266,8 +270,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		div, year, gender = match.groups()
 
-		#if not (int(year) == 16):  #and gender=='m'):
-		#	continue
+		if not (int(year) == 16):  #and gender=='m'):
+			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
 				division = 'D1'
@@ -515,6 +519,7 @@ if __name__ == '__main__':
 	#load(loadTeams)
 	#safeLoad()
 	#migrateImprovement()
-	addRelaySwimmers()
+	#addRelaySwimmers()
+	safeLoad()
 	stop = Time.time()
 	print stop - start
