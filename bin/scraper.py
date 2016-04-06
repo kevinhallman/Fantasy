@@ -73,7 +73,9 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 		ED=split[2]+'-'+split[0]+'-'+split[1]
 		SDValid=SD+'-00-00-00'
 		EDValid=ED+'-00-00-00'
-	DateDict={'15 DIII':'35','14 DIII':'31','13 DIII':'27','12 DIII':'22','11 DIII':'8','15 DI':'33','14 DI':'30','13 DI':'25','12 DI':'20','11 DI':'7','10 DI':'4','09 DI':'5','08 DI':'6','15 DII':'34','14 DII':'29','13 DII':'26','12 DII':'21','11 DII':'9'}
+	DateDict={'16 DI':'37','16 DII':'38','16 DIII':'39','15 DIII':'35','14 DIII':'31','13 DIII':'27',\
+																								  '12 DIII':'22','11 DIII':'8','15 DI':'33','14 DI':'30',\
+																											  '13 DI':'25','12 DI':'20','11 DI':'7','10 DI':'4','09 DI':'5','08 DI':'6','15 DII':'34','14 DII':'29','13 DII':'26','12 DII':'21','11 DII':'9'}
 	Date=DateDict[Date]
 	revd=dict([reversed(i) for i in DateDict.items()])
 	DateDict.update(revd)
@@ -165,55 +167,72 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 	}
 	r = requests.post(URL, data=payload)
 	r = r.text
-	place = r.find('ctl82_dgSearchResults')
+	place = r.find('ctl82_dgSearchResults',100000)
 	if RelInd == 'rbRelay':
-		place = r.find('ctl82_trSearchResults')
-	end = r.find('</table>', place)
-	count = 0
+		place = r.find('ctl82_trSearchResults', 90000)
+	responseEnd = r.find('</table>', place)
 	event = str(Distance) + ' Yard ' + strokeOut
 	num = 0
+	#place = 100000  #speed up start of search
+	#print r
 	if RelInd=='rbIndividual':
-		while place>0:
-			place=r.find('</td>',place+1,end)
-			count=(count+1) % 12
-			if count==1:
-				time=r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count==4:
-				swimmer=r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count==6:
-				team=r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count==7:
-				year=r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count==8:
-				meet=r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count==9:
-				date=r[r.find('>',place+5)+1:r.find('<',place+9)]
-				if time=='Time' or '&nbsp' in team:
-					continue
-				num += 1
-				File.write(meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(time))+'\n')
+		while place > 0:
+			place = r.find('ctl82_dgSearchResults_lblSwimTimeFormatted', place+1, responseEnd)  # find time
+			if place == -1:  # reached end
+				break
+			time = r[r.find('>', place) + 1: r.find('<', place+4)]
+			for tagNum in range(1, 9):
+				place = r.find('<td>', place+4)
+				start = place + 4
+				end = r.find('<', place+4)
+				if tagNum == 3:
+					swimmer = r[start: end]
+				elif tagNum == 5:
+					team = r[start: end]
+				elif tagNum == 6:
+					year = r[start: end]
+				elif tagNum == 7:
+					meet = r[start: end]
+				elif tagNum == 8:
+					date = r[start: end]
+			if time=='Time' or '&nbsp' in team or toTime(time) < 15:
+				continue
+			num += 1
+			#print meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time
+			File.write(meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n')
 	elif RelInd=='rbRelay':
 		while place>0:
-			place=r.find('</td>', place+1, end)
-			count=(count+1) % 8
-			if count==2:
-				time=r[r.find('>', place+5) + 1: r.find('<', place+9)]
-			if count==4:
-				swimmer=r[r.find('<br>', place+9): r.find('</', place+9)]
-			if count==4:
-				team=r[r.find('>', place+5)+1: r.find('<', place+9)]
-			if count==5:
-				meet=r[r.find('>', place+5)+1:r.find('<', place+9)]
-			if count==6:
-				date=r[r.find('>', place+5)+1:r.find('<', place+9)]
-				if time == 'Time' or '&nbsp' in team:
-					continue
-				swimmer = swimmer.replace('<br>', '')
-				num += 1
-				File.write(meet+'\t'+date+'\t'+swimmer+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(time))+'\n')
+			place = r.find('ctl82_dgRelaySearchResults_lblSwimTimeFormatted', place+1, responseEnd)  # find time
+			#print 'loop', place
+			if place == -1:  # reached end
+				break
+			time = r[r.find('>', place) + 1: r.find('<', place+4)]
+			for tagNum in range(1, 6):
+				place = r.find('<td', place + 3)
+				#print place
+				start = r.find('>', place + 3) + 1
+				end = r.find('<', place + 3)
+				#print tagNum, r[start: end]
+				if tagNum == 1:
+					time = r[start: end]
+				elif tagNum == 2:
+					team = r[start: end]
+					nameEnd = r.find('</td>', place)
+					#print r[start: ]
+					name = r[start: nameEnd]
+					name = name.replace('<br>', ' ')
+				elif tagNum == 3:
+					meet = r[start: end]
+				elif tagNum == 4:
+					date = r[start: end]
+			if time=='Time' or '&nbsp' in team or toTime(time) < 15:
+				continue
+			num += 1
+			#print meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time
+			File.write(meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n')
 	return num
 
-confFile = './bin/conferences.txt'
+confFile = './data/conferences.txt'
 confDiv = {}
 with open(confFile,'r') as confs:
 	for line in confs:
@@ -225,8 +244,8 @@ with open(confFile,'r') as confs:
 			confDiv[conf] = division
 
 
-genders = ['f', 'm']
-divisions = ['DIII']
+genders = ['m', 'f']
+divisions = ['DIII', 'DII', 'DI']
 distances = {}
 distances['FL'] = [100, 200]
 distances['BK'] = [100, 200]
@@ -235,11 +254,11 @@ distances['IM'] = [200, 400]
 distances['MED-R'] = [200, 400]
 distances['FR-R'] = [200, 400, 800]
 distances['FR'] = [50, 100, 200, 500, 1000, 1650]
-strokes = ['FR', 'FL', 'BR', 'BK', 'IM','FR-R','MED-R']
+strokes = ['FR', 'FL', 'BR', 'BK', 'IM', 'FR-R', 'MED-R']
 conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
-years = ['15']  # ['15','14','13','12','11']
+years = ['16']  # ['15','14','13','12','11']
 
-directory = 'swimData'
+directory = 'data'
 for year in years:
 	for division in divisions:
 		if division == 'DI':
@@ -252,7 +271,7 @@ for year in years:
 			filePath = directory+'/'+division+year+gender
 			#if os.path.exists(filePath):
 			#	os.remove(filePath)
-			with open(filePath, 'w') as meetFile:
+			with open(filePath, 'w+') as meetFile:
 				for conference in ['']:
 					if conference == '':
 						confName = 'all'
