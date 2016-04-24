@@ -8,6 +8,7 @@ import numpy
 from peewee import *
 from swimdb import Swim, TeamSeason, Meet, TeamMeet
 from operator import itemgetter
+import time as Time
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
@@ -161,6 +162,7 @@ class Fantasy(object):
 		
 class Conf(object):
 	def GET(self):
+		start = Time.time()
 		division = session.division
 		gender = session.gender
 		confList = conferences[division][gender]
@@ -647,7 +649,7 @@ def googleJSON(teams):
 		data.append(line)
 
 # generate html for winProb table
-def showWinTable(winProb):
+def showWinTable(winProb, top=20):
 	# average placing for sorting
 	avgTeamPlace = {}
 	for team in winProb:
@@ -660,14 +662,17 @@ def showWinTable(winProb):
 	html += '<th></th>'
 	# placing header
 	for i in range(1, len(winProb)+1):
+		if i > top: break
 		html += '<th>'
 		html += str(i)
 		html += '</th>'
 	html += '</tr>'
 	for (team, place) in sorted(avgTeamPlace.items(), key=itemgetter(1)):  # sort by average place
+		if place > top: break  # only top so many teams
 		html += '<tr>'
 		html += '<td>' + team + '</td>'
-		for prob in winProb[team]:
+		for (idx, prob) in enumerate(winProb[team]):
+			if idx > top: break
 			html += '<td>'
 			html += str(prob*100) + '%'
 			html += '</td>'
