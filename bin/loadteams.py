@@ -1,27 +1,11 @@
 import sqlmeets
-import re
 import os, urlparse
 import numpy
 from peewee import *
-from operator import itemgetter
 from swimdb import TeamSeason
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
-
-urls = ('/', 'Home',
-	'/home', 'Home',
-	'/swimulate', 'Swim',
-	'/fantasy', 'Fantasy',
-	'/conference', 'Conf',
-	'/times', 'Times',
-	'/duals', 'Duals',
-	'/placing', 'Placing',
-	'/improvement', 'Improvement',
-	'/rankings', 'Rankings',
-	'/teamMeets', 'teamMeets',
-	'/programs', 'Programs'
-)
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -90,9 +74,9 @@ for division in conferences:
 				#if team != 'Richmond' and team!= 'Connecticut': continue
 
 				# get team score
-				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
+				invScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2016,
 									 dual=False)
-				dualScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2015,
+				dualScore = database.topTeamScore(team, gender=gender, recruits=False, division=division, season=2016,
 											 dual=True)
 
 				# get attrition rate
@@ -103,7 +87,7 @@ for division in conferences:
 					attrition = -attrition
 
 				# get improvement
-				drops = database.improvement2(teams=[team], gender=gender, season1=2015, season2=2011)
+				drops = database.improvement2(teams=[team], gender=gender, season1=2016, season2=2011)
 				if drops != {}:
 					improvement = numpy.mean(drops)
 				else:
@@ -121,7 +105,11 @@ for division in conferences:
 						'conference': conf,
 						'division': division,
 						'gender': gender}
-					teams.append(newTeam)
+
+					if not Team.update(attrition=attrition, strengthdual=dualScore, strengthinvite=invScore,
+							improvement=improvement).where(Team.name==team, Team.gender==gender, Team.conference==conf,
+														   Team.division==division):
+						teams.append(newTeam)
 				print team, attrition, improvement, invScore
 print teams
 

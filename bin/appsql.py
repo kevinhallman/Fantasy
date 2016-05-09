@@ -159,7 +159,11 @@ class Swimulate(object):
 class Fantasy(object):
 	def GET(self):
 		return render.fantasy()
-		
+
+meetCache = {}
+mcScoreCache = {}
+teamScoreCache = {}
+scoreCache = {}
 class Conf(object):
 	def GET(self):
 		start = Time.time()
@@ -173,6 +177,7 @@ class Conf(object):
 									 finalScores=None, table='', winTable=None)
 
 		season = int(form.season)
+
 		if form.date and form.date != 'Whole Season':
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
@@ -183,22 +188,38 @@ class Conf(object):
 		else:
 			swimdate = None
 
+
 		if form.conference:
-			if form.taper == 'Top Time':
-				topTimes = True
+			sentinelString = form.taper + form.conference + str(swimdate) + gender + division + str(season)
+			if sentinelString in meetCache:  # check cache first
+				print 'cached'
+				confMeet = meetCache[sentinelString]
+				scores = scoreCache[sentinelString]
+				winProb = mcScoreCache[sentinelString]
+				teamScores = teamScoreCache[sentinelString]
 			else:
-				topTimes = False
-			if form.conference == 'Nationals':
-				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
-											   season=season, divisions=division)
-				scores = confMeet.scoreString(25)
-				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
-			else:
-				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
+				if form.taper == 'Top Time':
+					topTimes = True
+				else:
+					topTimes = False
+				if form.conference == 'Nationals':
+					confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
-				scores = confMeet.scoreString()
-				teamScores = confMeet.scoreReport()
-			winProb = confMeet.scoreMonteCarlo(runs=100)
+					scores = confMeet.scoreString(25)
+					teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
+				else:
+					confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
+											   season=season, divisions=division, date=swimdate)
+					scores = confMeet.scoreString()
+					teamScores = confMeet.scoreReport()
+				print Time.time() - start
+				winProb = confMeet.scoreMonteCarlo(runs=100)
+
+				#add to cache
+				meetCache[sentinelString] = confMeet
+				scoreCache[sentinelString] = scores
+				mcScoreCache[sentinelString] = winProb
+				teamScoreCache[sentinelString] = teamScores
 		else:
 			scores = None
 			teamScores = None
@@ -207,6 +228,8 @@ class Conf(object):
 			table = googleTable(teamScores, scores['scores'])
 		else:
 			table = ''
+
+		print Time.time() - start
 		return render.conference(conferences=sorted(confList.keys()), scores=showMeet(scores),
 								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
 								 table=table, winTable=showWinTable(winProb))
@@ -662,7 +685,7 @@ def showWinTable(winProb, top=20):
 	html += '<th></th>'
 	# placing header
 	for i in range(1, len(winProb)+1):
-		if i > top: break
+		if i > top + 1: break  # one for name column
 		html += '<th>'
 		html += str(i)
 		html += '</th>'

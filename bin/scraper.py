@@ -11,32 +11,33 @@ def toTime(time):
 		return float(time)
 	return float(re.split(":",time)[0])*60 +float(re.split(":",time)[1])
 	
-conferenceMap={59:'Allegheny Mountain',81:'American Southwest',346:'Appalachian (ASC)',125:'Bluegrass Mountain',82:'Capital Athletic',83:'Centennial',84:'City Univ. of New York',85:'College of Illinois/Wisc',86:'Colonial States Athletic',87:'Commonwealth Coast',88:'Empire 8',90:'Great Northeast Athletic',89:'Great South Athletic',91:'Heartland Collegiate',338:'Independent',92:'Iowa Intercollegiate',93:'Landmark',124:'Liberal Arts',94:'Liberty League',95:'Little East',96:'Massachusetts State',130:'Metropolitan Swim',97:'Michigan Intercollegiate',98:'Middle Atlantic',99:'Midwest',100:'MIAC',101:'New England Intercoll.',102:'NESCAC',103:'New England',104:'New Jersey Athletic',105:'North Atlantic',106:'North Coast Athletic',107:'North Eastern Athletic',108:'Northern Athletics',109:'Northwest Conference',110:'Ohio Athletic',111:'Old Dominion Athletic',129:'Pacific Collegiate',112:'Presidents',114:'Skyline',343:'Southern Athletic Associa',115:'Southern California',116:'Southern Collegiate',113:'St. Louis Intercollegiate',117:'State Univ of New York',119:'University Athletic',120:'Upper Midwest Athletic',118:'USA South Athletic',121:'Wisconsin Intercollegiate',25:'ACC (Atlantic Coast)',29:'America East',345:'American Athletic Conf',30:'Atlantic 10',27:'Big 12',31:'Big East',1:'Big Ten',49:'Coastal College (CCSA)',33:'Colonial Athletic Assoc',34:'Conference USA',35:'Horizon League',36:'Independent',37:'Ivy League',38:'Metro Atlantic Athl. Conf',340:'Metropolitan Swimming Con',39:'Mid',41:'Missouri Valley',336:'Mountain Pacific Sports',42:'Mountain West',43:'Northeast Conf',28:'Pac 12',26:'SEC',45:'Sun Belt',46:'The Patriot League',47:'The Summit League',48:'Western Athletic Conf',339:'Appalachian (ASC)',123:'Bluegrass Mountain',341:'California Collegiate',61:'Central Atlantic',64:'East Coast',66:'Great Lakes Intercoll',344:'Great Lakes Valley',337:'Independent',128:'Metropolitan Swimming',71:'Mid',127:'New South Intercollegiate',73:'Northeast Ten',72:'Northern Sun Intercoll',131:'Pacific Collegiate',122:'Pennsylvania State (PSAC)',76:'Rocky Mountain Athletic',79:'Sunshine State'}
+conferenceMap = {59:'Allegheny Mountain',81:'American Southwest',346:'Appalachian (ASC)',125:'Bluegrass Mountain',82:'Capital Athletic',83:'Centennial',84:'City Univ. of New York',85:'College of Illinois/Wisc',86:'Colonial States Athletic',87:'Commonwealth Coast',88:'Empire 8',90:'Great Northeast Athletic',89:'Great South Athletic',91:'Heartland Collegiate',338:'Independent',92:'Iowa Intercollegiate',93:'Landmark',124:'Liberal Arts',94:'Liberty League',95:'Little East',96:'Massachusetts State',130:'Metropolitan Swim',97:'Michigan Intercollegiate',98:'Middle Atlantic',99:'Midwest',100:'MIAC',101:'New England Intercoll.',102:'NESCAC',103:'New England',104:'New Jersey Athletic',105:'North Atlantic',106:'North Coast Athletic',107:'North Eastern Athletic',108:'Northern Athletics',109:'Northwest Conference',110:'Ohio Athletic',111:'Old Dominion Athletic',129:'Pacific Collegiate',112:'Presidents',114:'Skyline',343:'Southern Athletic Associa',115:'Southern California',116:'Southern Collegiate',113:'St. Louis Intercollegiate',117:'State Univ of New York',119:'University Athletic',120:'Upper Midwest Athletic',118:'USA South Athletic',121:'Wisconsin Intercollegiate',25:'ACC (Atlantic Coast)',29:'America East',345:'American Athletic Conf',30:'Atlantic 10',27:'Big 12',31:'Big East',1:'Big Ten',49:'Coastal College (CCSA)',33:'Colonial Athletic Assoc',34:'Conference USA',35:'Horizon League',36:'Independent',37:'Ivy League',38:'Metro Atlantic Athl. Conf',340:'Metropolitan Swimming Con',39:'Mid',41:'Missouri Valley',336:'Mountain Pacific Sports',42:'Mountain West',43:'Northeast Conf',28:'Pac 12',26:'SEC',45:'Sun Belt',46:'The Patriot League',47:'The Summit League',48:'Western Athletic Conf',339:'Appalachian (ASC)',123:'Bluegrass Mountain',341:'California Collegiate',61:'Central Atlantic',64:'East Coast',66:'Great Lakes Intercoll',344:'Great Lakes Valley',337:'Independent',128:'Metropolitan Swimming',71:'Mid',127:'New South Intercollegiate',73:'Northeast Ten',72:'Northern Sun Intercoll',131:'Pacific Collegiate',122:'Pennsylvania State (PSAC)',76:'Rocky Mountain Athletic',79:'Sunshine State'}
 
-def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Stroke='1',Gender='rbGenderMale',BestAll='radBestTimeOnly',Number='100',StartDate='',EndDate=''):
+def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50', Stroke='1', Gender='rbGenderMale',
+				BestAll='radBestTimeOnly', Number=100, StartDate='', EndDate='', oldTimes=set()):
 	URL = 'http://usaswimming.org/DesktopDefault.aspx?TabId=1969&Alias=Rainbow&Lang=en'
-	Cut='1'
-	Division=1
+	Cut = '1'
+	Division = 1
 	if Date.find('DIII')>-1:
-		URL='http://usaswimming.org/DesktopDefault.aspx?TabId=1989&Alias=Rainbow&Lang=en'
-		Cut='9'
-		Division=3
+		URL = 'http://usaswimming.org/DesktopDefault.aspx?TabId=1989&Alias=Rainbow&Lang=en'
+		Cut = '9'
+		Division = 3
 	elif Date.find('DII')>-1:
-		URL='http://usaswimming.org/DesktopDefault.aspx?TabId=1984&Alias=Rainbow&Lang=en'
-		Cut='6'
-		Division=2
-	RelInd='rbIndividual'
-	EventType='radEventIndividual'
+		URL = 'http://usaswimming.org/DesktopDefault.aspx?TabId=1984&Alias=Rainbow&Lang=en'
+		Cut = '6'
+		Division = 2
+	RelInd = 'rbIndividual'
+	EventType = 'radEventIndividual'
 	if Stroke.find('-R')>0:
-		RelInd='rbRelay'
-		EventType='radEventRelay'
+		RelInd = 'rbRelay'
+		EventType = 'radEventRelay'
 	session = requests.session()
 	if StartDate=='' and EndDate=='':
 		r = requests.post(URL)
-		place=r.text.find('<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="')+64
-		ViewState=r.text[place:r.text.find('"',place)]
+		place = r.text.find('<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="')+64
+		ViewState = r.text[place:r.text.find('"',place)]
 		place=r.text.find('<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="')+76
-		EventValidation=r.text[place:r.text.find('"',place)]
+		EventValidation = r.text[place:r.text.find('"',place)]
 	elif not (StartDate=='' and EndDate==''):
 		if Division==1:
 			ViewState='/wEPDwUENTM4MQ8WBB4LVXJsUmVmZXJyZXIFNS9EZXNrdG9wRGVmYXVsdC5hc3B4P1RhYklkPTE5NjUmQWxpYXM9UmFpbmJvdyZMYW5nPWVuHhNWYWxpZGF0ZVJlcXVlc3RNb2RlAgEWAmYPZBYCAgMPZBYCAgEPZBYEAgkPZBYCAggPDxYEHgRUZXh0BQxNeSBEZWNrIFBhc3MeC05hdmlnYXRlVXJsBR8vRGVza3RvcERlZmF1bHQuYXNweD9UYWJJZD0yMTQzZGQCFQ9kFgICAQ9kFgoCAQ9kFgJmD2QWAmYPZBYCAgEPDxYCHwJlZGQCAw9kFgICAQ9kFg5mD2QWAmYPZBYCAgEPDxYCHwIFCk5DQUEgRGl2IElkZAIED2QWBGYPZBYCAgEPDxYCHwIFC0NvbmZlcmVuY2U6ZGQCAQ9kFgICAQ8QDxYGHg1EYXRhVGV4dEZpZWxkBRFsZXZlbF9kZXNjcmlwdGlvbh4ORGF0YVZhbHVlRmllbGQFH3NlY29uZGFyeV9vcmdhbml6YXRpb25fbGV2ZWxfaWQeC18hRGF0YUJvdW5kZ2QQFRsJLS0gQWxsIC0tFEFDQyAoQXRsYW50aWMgQ29hc3QpDEFtZXJpY2EgRWFzdBZBbWVyaWNhbiBBdGhsZXRpYyBDb25mC0F0bGFudGljIDEwBkJpZyAxMghCaWcgRWFzdAdCaWcgVGVuFkNvYXN0YWwgQ29sbGVnZSAoQ0NTQSkXQ29sb25pYWwgQXRobGV0aWMgQXNzb2MOQ29uZmVyZW5jZSBVU0EOSG9yaXpvbiBMZWFndWULSW5kZXBlbmRlbnQKSXZ5IExlYWd1ZRlNZXRybyBBdGxhbnRpYyBBdGhsLiBDb25mGU1ldHJvcG9saXRhbiBTd2ltbWluZyBDb24RTWlkLUFtZXJpY2FuIENvbmYPTWlzc291cmkgVmFsbGV5F01vdW50YWluIFBhY2lmaWMgU3BvcnRzDU1vdW50YWluIFdlc3QOTm9ydGhlYXN0IENvbmYKUGFjaWZpYyAxMhJTRUMgKFNvdXRoZWFzdGVybikIU3VuIEJlbHQSVGhlIFBhdHJpb3QgTGVhZ3VlEVRoZSBTdW1taXQgTGVhZ3VlFVdlc3Rlcm4gQXRobGV0aWMgQ29uZhUbAAIyNQIyOQMzNDUCMzACMjcCMzEBMQI0OQIzMwIzNAIzNQIzNgIzNwIzOAMzNDACMzkCNDEDMzM2AjQyAjQzAjI4AjI2AjQ1AjQ2AjQ3AjQ4FCsDG2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2RkAgYPZBYCAgEPZBYCAgUPD2QWBB4IcmVhZG9ubHkFCHJlYWRvbmx5HgVzdHlsZQUNZGlzcGxheTpub25lO2QCCA9kFgICAQ9kFgYCAw8QDxYGHwQFFW5hbWVkX2RhdGVfcmFuZ2VfZGVzYx8FBSFzZWNvbmRhcnlfb3JnX25hbWVkX2RhdGVfcmFuZ2VfaWQfBmdkEBUHFigxKSAyMDEzLTE0IE5DQUEgRGl2IEkWKDIpIDIwMTItMTMgTkNBQSBEaXYgSRYoMykgMjAxMS0xMiBOQ0FBIERpdiBJFig0KSAyMDEwLTExIE5DQUEgRGl2IEkWKDUpIDIwMDktMTAgTkNBQSBEaXYgSRYoNikgMjAwOC0wOSBOQ0FBIERpdiBJFig3KSAyMDA3LTA4IE5DQUEgRGl2IEkVBwIzMAIyNQIyMAE3ATQBNQE2FCsDB2dnZ2dnZ2dkZAIHD2QWBGYPDxYGHhBTaG93UG9wdXBPbkZvY3VzaB4HTWF4RGF0ZQYA8M1FbcgxjR4MU2VsZWN0ZWREYXRlZGQWBGYPFCsACA8WCh4RRW5hYmxlQXJpYVN1cHBvcnRoHwoGAPDNRW3IMY0fAmQeBFNraW4FB0RlZmF1bHQeDUxhYmVsQ3NzQ2xhc3MFB3JpTGFiZWxkFgYeBVdpZHRoGwAAAAAAAFlABwAAAB4IQ3NzQ2xhc3MFEXJpVGV4dEJveCByaUhvdmVyHgRfIVNCAoICFgYfDxsAAAAAAABZQAcAAAAfEAURcmlUZXh0Qm94IHJpRXJyb3IfEQKCAhYGHw8bAAAAAAAAWUAHAAAAHxAFE3JpVGV4dEJveCByaUZvY3VzZWQfEQKCAhYGHw8bAAAAAAAAWUAHAAAAHxAFE3JpVGV4dEJveCByaUVuYWJsZWQfEQKCAhYGHw8bAAAAAAAAWUAHAAAAHxAFFHJpVGV4dEJveCByaURpc2FibGVkHxECggIWBh8PGwAAAAAAAFlABwAAAB8QBRFyaVRleHRCb3ggcmlFbXB0eR8RAoICFgYfDxsAAAAAAABZQAcAAAAfEAUQcmlUZXh0Qm94IHJpUmVhZB8RAoICZAICDxQrAA0PFhAFA0VSU2gFDVNlbGVjdGVkRGF0ZXMPBY8BVGVsZXJpay5XZWIuVUkuQ2FsZW5kYXIuQ29sbGVjdGlvbnMuRGF0ZVRpbWVDb2xsZWN0aW9uLCBUZWxlcmlrLldlYi5VSSwgVmVyc2lvbj0yMDEzLjEuMjIwLjQ1LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTEyMWZhZTc4MTY1YmEzZDQUKwAABRFFbmFibGVNdWx0aVNlbGVjdGgFD1JlbmRlckludmlzaWJsZWcFC1NwZWNpYWxEYXlzDwWSAVRlbGVyaWsuV2ViLlVJLkNhbGVuZGFyLkNvbGxlY3Rpb25zLkNhbGVuZGFyRGF5Q29sbGVjdGlvbiwgVGVsZXJpay5XZWIuVUksIFZlcnNpb249MjAxMy4xLjIyMC40NSwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj0xMjFmYWU3ODE2NWJhM2Q0FCsAAAUETWluRAYAQFcgUwVRCAUETWF4RAYA8M1FbcgxjQUQVmlld1NlbGVjdG9yVGV4dAUBeA8WBB8MaB8NBQdEZWZhdWx0ZGQWBB8QBQtyY01haW5UYWJsZR8RAgIWBB8QBQxyY090aGVyTW9udGgfEQICZBYEHxAFCnJjU2VsZWN0ZWQfEQICZBYEHxAFCnJjRGlzYWJsZWQfEQICFgQfEAUMcmNPdXRPZlJhbmdlHxECAhYEHxAFCXJjV2Vla2VuZB8RAgIWBB8QBQdyY0hvdmVyHxECAhYEHxAFMVJhZENhbGVuZGFyTW9udGhWaWV3IFJhZENhbGVuZGFyTW9udGhWaWV3X0RlZmF1bHQfEQICFgQfEAUJcmNWaWV3U2VsHxECAmQCAg8PFgQeEkVuYWJsZUNsaWVudFNjcmlwdGgeB0VuYWJsZWRoZGQCCQ9kFgRmDw8WBh8JaB8KBgDwzUVtyDGNHwtkZBYEZg8UKwAIDxYKHwxoHwoGAPDNRW3IMY0fAmQfDQUHRGVmYXVsdB8OBQdyaUxhYmVsZBYGHw8bAAAAAAAAWUAHAAAAHxAFEXJpVGV4dEJveCByaUhvdmVyHxECggIWBh8PGwAAAAAAAFlABwAAAB8QBRFyaVRleHRCb3ggcmlFcnJvch8RAoICFgYfDxsAAAAAAABZQAcAAAAfEAUTcmlUZXh0Qm94IHJpRm9jdXNlZB8RAoICFgYfDxsAAAAAAABZQAcAAAAfEAUTcmlUZXh0Qm94IHJpRW5hYmxlZB8RAoICFgYfDxsAAAAAAABZQAcAAAAfEAUUcmlUZXh0Qm94IHJpRGlzYWJsZWQfEQKCAhYGHw8bAAAAAAAAWUAHAAAAHxAFEXJpVGV4dEJveCByaUVtcHR5HxECggIWBh8PGwAAAAAAAFlABwAAAB8QBRByaVRleHRCb3ggcmlSZWFkHxECggJkAgIPFCsADQ8WEAUDRVJTaAUNU2VsZWN0ZWREYXRlcw8FjwFUZWxlcmlrLldlYi5VSS5DYWxlbmRhci5Db2xsZWN0aW9ucy5EYXRlVGltZUNvbGxlY3Rpb24sIFRlbGVyaWsuV2ViLlVJLCBWZXJzaW9uPTIwMTMuMS4yMjAuNDUsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49MTIxZmFlNzgxNjViYTNkNBQrAAAFEUVuYWJsZU11bHRpU2VsZWN0aAUPUmVuZGVySW52aXNpYmxlZwULU3BlY2lhbERheXMPBZIBVGVsZXJpay5XZWIuVUkuQ2FsZW5kYXIuQ29sbGVjdGlvbnMuQ2FsZW5kYXJEYXlDb2xsZWN0aW9uLCBUZWxlcmlrLldlYi5VSSwgVmVyc2lvbj0yMDEzLjEuMjIwLjQ1LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTEyMWZhZTc4MTY1YmEzZDQUKwAABQRNaW5EBgBAVyBTBVEIBQRNYXhEBgDwzUVtyDGNBRBWaWV3U2VsZWN0b3JUZXh0BQF4DxYEHwxoHw0FB0RlZmF1bHRkZBYEHxAFC3JjTWFpblRhYmxlHxECAhYEHxAFDHJjT3RoZXJNb250aB8RAgJkFgQfEAUKcmNTZWxlY3RlZB8RAgJkFgQfEAUKcmNEaXNhYmxlZB8RAgIWBB8QBQxyY091dE9mUmFuZ2UfEQICFgQfEAUJcmNXZWVrZW5kHxECAhYEHxAFB3JjSG92ZXIfEQICFgQfEAUxUmFkQ2FsZW5kYXJNb250aFZpZXcgUmFkQ2FsZW5kYXJNb250aFZpZXdfRGVmYXVsdB8RAgIWBB8QBQlyY1ZpZXdTZWwfEQICZAICDw8WBB8SaB8TaGRkAgoPZBYCAgEPZBYCAgMPZBYGAgEPEA8WBh8FBQhkaXN0YW5jZR8EBQhkaXN0YW5jZR8GZ2QQFQ0CNTADMTAwAzIwMAM0MDADNTAwAzgwMAQxMDAwBDE1MDAEMTY1MAQyMDAwBDMwMDAENDAwMAQ1MDAwFQ0CNTADMTAwAzIwMAM0MDADNTAwAzgwMAQxMDAwBDE1MDAEMTY1MAQyMDAwBDMwMDAENDAwMAQ1MDAwFCsDDWdnZ2dnZ2dnZ2dnZ2dkZAIEDxAPFgYfBQUJc3Ryb2tlX2lkHwQFC3N0cm9rZV9jb2RlHwZnZBAVBQJGUgJCSwJCUgJGTAJJTRUFATEBMgEzATQBNRQrAwVnZ2dnZ2RkAgcPEA8WBh8FBQljb3Vyc2VfaWQfBAULY291cnNlX2NvZGUfBmdkEBUDA1NDWQNTQ00DTENNFQMBMQEyATMUKwMDZ2dnZGQCCw9kFgICAQ9kFgICAw9kFgYCAQ8QDxYGHwUFCGRpc3RhbmNlHwQFCGRpc3RhbmNlHwZnZBAVAwMyMDADNDAwAzgwMBUDAzIwMAM0MDADODAwFCsDA2dnZ2RkAgQPEA8WBh8FBQlzdHJva2VfaWQfBAULc3Ryb2tlX2NvZGUfBmdkEBUCBEZSLVIFTUVELVIVAgE2ATcUKwMCZ2dkZAIHDxAPFgYfBQUJY291cnNlX2lkHwQFC2NvdXJzZV9jb2RlHwZnZBAVAwNTQ1kDU0NNA0xDTRUDATEBMgEzFCsDA2dnZ2RkAg8PZBYCAgEPZBYCAgEPEA8WBh8EBQ1zdGFuZGFyZF9uYW1lHwUFGXNlY29uZGFyeV9vcmdfc3RhbmRhcmRfaWQfBmdkEBUFAUEBQgJRUwJQUwJOUxUFATIBMwIxNAIxNQExFCsDBWdnZ2dnZGQCBQ9kFgICAQ9kFggCAQ8PFgIfAgULQ29uZmVyZW5jZTpkZAIDDxAPFgYfBAURbGV2ZWxfZGVzY3JpcHRpb24fBQUfc2Vjb25kYXJ5X29yZ2FuaXphdGlvbl9sZXZlbF9pZB8GZ2QQFRsJLS0gQWxsIC0tFEFDQyAoQXRsYW50aWMgQ29hc3QpDEFtZXJpY2EgRWFzdBZBbWVyaWNhbiBBdGhsZXRpYyBDb25mC0F0bGFudGljIDEwBkJpZyAxMghCaWcgRWFzdAdCaWcgVGVuFkNvYXN0YWwgQ29sbGVnZSAoQ0NTQSkXQ29sb25pYWwgQXRobGV0aWMgQXNzb2MOQ29uZmVyZW5jZSBVU0EOSG9yaXpvbiBMZWFndWULSW5kZXBlbmRlbnQKSXZ5IExlYWd1ZRlNZXRybyBBdGxhbnRpYyBBdGhsLiBDb25mGU1ldHJvcG9saXRhbiBTd2ltbWluZyBDb24RTWlkLUFtZXJpY2FuIENvbmYPTWlzc291cmkgVmFsbGV5F01vdW50YWluIFBhY2lmaWMgU3BvcnRzDU1vdW50YWluIFdlc3QOTm9ydGhlYXN0IENvbmYKUGFjaWZpYyAxMhJTRUMgKFNvdXRoZWFzdGVybikIU3VuIEJlbHQSVGhlIFBhdHJpb3QgTGVhZ3VlEVRoZSBTdW1taXQgTGVhZ3VlFVdlc3Rlcm4gQXRobGV0aWMgQ29uZhUbAAIyNQIyOQMzNDUCMzACMjcCMzEBMQI0OQIzMwIzNAIzNQIzNgIzNwIzOAMzNDACMzkCNDEDMzM2AjQyAjQzAjI4AjI2AjQ1AjQ2AjQ3AjQ4FCsDG2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZxYBZmQCBw8QDxYGHwQFCGxzY19uYW1lHwUFBmxzY19pZB8GZ2QQFT0JLS0gQWxsIC0tE0FESVJPTkRBQ0sgU1dJTU1JTkcPQUxBU0tBIFNXSU1NSU5HG0FMTEVHSEVOWSBNT1VOVEFJTiBTV0lNTUlORxBBUklaT05BIFNXSU1NSU5HEUFSS0FOU0FTIFNXSU1NSU5HD0JPUkRFUiBTV0lNTUlORxtDRU5UUkFMIENBTElGT1JOSUEgU1dJTU1JTkcRQ09MT1JBRE8gU1dJTU1JTkcUQ09OTkVDVElDVVQgU1dJTU1JTkcbRkxPUklEQSBHT0xEIENPQVNUIFNXSU1NSU5HEEZMT1JJREEgU1dJTU1JTkcQR0VPUkdJQSBTV0lNTUlORw1HVUxGIFNXSU1NSU5HEUhBV0FJSUFOIFNXSU1NSU5HEUlMTElOT0lTIFNXSU1NSU5HEElORElBTkEgU1dJTU1JTkcWSU5MQU5EIEVNUElSRSBTV0lNTUlORw1JT1dBIFNXSU1NSU5HEUtFTlRVQ0tZIFNXSU1NSU5HEkxBS0UgRVJJRSBTV0lNTUlORxJMT1VJU0lBTkEgU1dJTU1JTkcOTUFJTkUgU1dJTU1JTkcRTUFSWUxBTkQgU1dJTU1JTkcVTUVUUk9QT0xJVEFOIFNXSU1NSU5HEU1JQ0hJR0FOIFNXSU1NSU5HGE1JRERMRSBBVExBTlRJQyBTV0lNTUlORxNNSURXRVNURVJOIFNXSU1NSU5HEk1JTk5FU09UQSBTV0lNTUlORxRNSVNTSVNTSVBQSSBTV0lNTUlORxhNSVNTT1VSSSBWQUxMRVkgU1dJTU1JTkcQTU9OVEFOQSBTV0lNTUlORxRORVcgRU5HTEFORCBTV0lNTUlORxNORVcgSkVSU0VZIFNXSU1NSU5HE05FVyBNRVhJQ08gU1dJTU1JTkcQTklBR0FSQSBTV0lNTUlORxdOT1JUSCBDQVJPTElOQSBTV0lNTUlORxVOT1JUSCBEQUtPVEEgU1dJTU1JTkcUTk9SVEggVEVYQVMgU1dJTU1JTkcNT0hJTyBTV0lNTUlORxFPS0xBSE9NQSBTV0lNTUlORw9PUkVHT04gU1dJTU1JTkcOT1pBUksgU1dJTU1JTkcaUEFDSUZJQyBOT1JUSFdFU1QgU1dJTU1JTkcQUEFDSUZJQyBTV0lNTUlORxdQT1RPTUFDIFZBTExFWSBTV0lNTUlORxtTQU4gRElFR08tSU1QRVJJQUwgU1dJTU1JTkcWU0lFUlJBIE5FVkFEQSBTV0lNTUlORxRTTkFLRSBSSVZFUiBTV0lNTUlORxdTT1VUSCBDQVJPTElOQSBTV0lNTUlORxVTT1VUSCBEQUtPVEEgU1dJTU1JTkcUU09VVEggVEVYQVMgU1dJTU1JTkcVU09VVEhFQVNURVJOIFNXSU1NSU5HHFNPVVRIRVJOIENBTElGT1JOSUEgU1dJTU1JTkcMVVNBIFNXSU1NSU5HDVVUQUggU1dJTU1JTkcRVklSR0lOSUEgU1dJTU1JTkcTV0VTVCBURVhBUyBTV0lNTUlORxZXRVNUIFZJUkdJTklBIFNXSU1NSU5HEldJU0NPTlNJTiBTV0lNTUlORxBXWU9NSU5HIFNXSU1NSU5HFT0AAkFEAkFLAkFNAkFaAkFSAkJEAkNDAkNPAkNUAkZHAkZMAkdBAkdVAkhJAklMAklOAklFAklBAktZAkxFAkxBAk1FAk1EAk1SAk1JAk1BAk1XAk1OAk1TAk1WAk1UAk5FAk5KAk5NAk5JAk5DAk5EAk5UAk9IAk9LAk9SAk9aAlBOAlBDAlBWAlNJAlNOAlNSAlNDAlNEAlNUAlNFAkNBAlVTAlVUAlZBAldUAldWAldJAldZFCsDPWdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2cWAWZkAg8PZBYCAgEPZBYCZg9kFgJmD2QWAgIBDzwrAAsAZAIHDw8WAh4HVmlzaWJsZWhkFgICAQ9kFgZmDxYCHxRoZAIBD2QWAmYPFgIfFGhkAgIPZBYCZg9kFgQCAQ88KwALAGQCAw88KwALAGQCCQ8PFgIfFGhkFgICBQ9kFgICAg8QZBAVBAlBZG9iZSBQREYORm9ybWF0dGVkIEhUTUwIUmF3IEhUTUwPRXhwb3J0IHRvIEV4Y2VsFQQJQWRvYmUgUERGDkZvcm1hdHRlZCBIVE1MCFJhdyBIVE1MD0V4cG9ydCB0byBFeGNlbBQrAwRnZ2dnFgFmZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WJAUaY3RsMDAkSGVhZGVyMSRybVBvcnRhbFRhYnMFJmN0bDAwJEhlYWRlcjEkcm1Qb3J0YWxUYWJzJGkwJGkwJGN0bDAwBSZjdGwwMCRIZWFkZXIxJHJtUG9ydGFsVGFicyRpMSRpMCRjdGwwMAUmY3RsMDAkSGVhZGVyMSRybVBvcnRhbFRhYnMkaTIkaTAkY3RsMDMFJmN0bDAwJEhlYWRlcjEkcm1Qb3J0YWxUYWJzJGkyJGkwJGN0bDA3BSZjdGwwMCRIZWFkZXIxJHJtUG9ydGFsVGFicyRpMyRpMCRjdGwwMAUmY3RsMDAkSGVhZGVyMSRybVBvcnRhbFRhYnMkaTQkaTAkY3RsMDAFJmN0bDAwJEhlYWRlcjEkcm1Qb3J0YWxUYWJzJGk1JGkwJGN0bDAwBSZjdGwwMCRIZWFkZXIxJHJtUG9ydGFsVGFicyRpNiRpMCRjdGwwMAUmY3RsMDAkSGVhZGVyMSRybVBvcnRhbFRhYnMkaTckaTAkY3RsMDAFJmN0bDAwJEhlYWRlcjEkcm1Qb3J0YWxUYWJzJGk4JGkwJGN0bDAwBSZjdGwwMCRIZWFkZXIxJHJtUG9ydGFsVGFicyRpOSRpMCRjdGwwMAUYY3RsMDAkY3RsODIkcmJJbmRpdmlkdWFsBRNjdGwwMCRjdGw4MiRyYlJlbGF5BRNjdGwwMCRjdGw4MiRyYlJlbGF5BRZjdGwwMCRjdGw4MiRyYWRBbGxUZWFtBRtjdGwwMCRjdGw4MiRyYWRTcGVjaWZpY1RlYW0FG2N0bDAwJGN0bDgyJHJhZFNwZWNpZmljVGVhbQUcY3RsMDAkY3RsODIkcmJOYW1lZERhdGVSYW5nZQUXY3RsMDAkY3RsODIkcmJEYXRlUmFuZ2UFF2N0bDAwJGN0bDgyJHJiRGF0ZVJhbmdlBSJjdGwwMCRjdGw4MiR1Y1N0YXJ0RGF0ZSRyYWRUaGVEYXRlBStjdGwwMCRjdGw4MiR1Y1N0YXJ0RGF0ZSRyYWRUaGVEYXRlJGNhbGVuZGFyBStjdGwwMCRjdGw4MiR1Y1N0YXJ0RGF0ZSRyYWRUaGVEYXRlJGNhbGVuZGFyBSBjdGwwMCRjdGw4MiR1Y0VuZERhdGUkcmFkVGhlRGF0ZQUpY3RsMDAkY3RsODIkdWNFbmREYXRlJHJhZFRoZURhdGUkY2FsZW5kYXIFKWN0bDAwJGN0bDgyJHVjRW5kRGF0ZSRyYWRUaGVEYXRlJGNhbGVuZGFyBR5jdGwwMCRjdGw4MiRyYWRFdmVudEluZGl2aWR1YWwFGWN0bDAwJGN0bDgyJHJhZEV2ZW50UmVsYXkFGWN0bDAwJGN0bDgyJHJhZEV2ZW50UmVsYXkFGGN0bDAwJGN0bDgyJHJiR2VuZGVyTWFsZQUaY3RsMDAkY3RsODIkcmJHZW5kZXJGZW1hbGUFGmN0bDAwJGN0bDgyJHJiR2VuZGVyRmVtYWxlBRtjdGwwMCRjdGw4MiRyYWRCZXN0VGltZU9ubHkFIWN0bDAwJGN0bDgyJHJhZEFsbFRpbWVzRm9yU3dpbW1lcgUhY3RsMDAkY3RsODIkcmFkQWxsVGltZXNGb3JTd2ltbWVycavPNByTczeeIyjSI+inMlHRYOS+tVHkUW/FS+5JOO0='
@@ -49,31 +50,31 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 			EventValidation='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'
 	RStroke='6'
 	if RelInd=='rbRelay':
-		RDistance=Distance
+		RDistance = Distance
 	else:
-		RDistance='200'
-	DateType='rbNamedDateRange'
-	SD=''
-	ED=''
-	SDValid=''
-	EDValid=''
-	if StartDate!='' and EndDate !='':
-		DateType='rbDateRange'
-		split=StartDate.split('/')
-		if int(split[1])<10:
-			split[1]='0'+split[1]
-		if int(split[0])<10:
-			split[0]='0'+split[0]
-		SD=split[2]+'-'+split[0]+'-'+split[1]
-		split=EndDate.split('/')
-		if int(split[1])<10:
-			split[1]='0'+split[1]
-		if int(split[0])<10:
-			split[0]='0'+split[0]
-		ED=split[2]+'-'+split[0]+'-'+split[1]
-		SDValid=SD+'-00-00-00'
-		EDValid=ED+'-00-00-00'
-	DateDict={'16 DI':'37','16 DII':'38','16 DIII':'39','15 DIII':'35','14 DIII':'31','13 DIII':'27',\
+		RDistance = '200'
+	DateType = 'rbNamedDateRange'
+	SD = ''
+	ED = ''
+	SDValid = ''
+	EDValid = ''
+	if StartDate != '' and EndDate != '':
+		DateType = 'rbDateRange'
+		split = StartDate.split('/')
+		if int(split[1]) < 10:
+			split[1]='0' + split[1]
+		if int(split[0]) < 10:
+			split[0] = '0'+split[0]
+		SD = split[2]+'-'+split[0]+'-'+split[1]
+		split = EndDate.split('/')
+		if int(split[1]) < 10:
+			split[1] = '0'+split[1]
+		if int(split[0]) < 10:
+			split[0] = '0'+split[0]
+		ED = split[2]+'-'+split[0]+'-'+split[1]
+		SDValid = SD+'-00-00-00'
+		EDValid = ED+'-00-00-00'
+	DateDict = {'16 DI':'37','16 DII':'38','16 DIII':'39','15 DIII':'35','14 DIII':'31','13 DIII':'27',\
 																								  '12 DIII':'22','11 DIII':'8','15 DI':'33','14 DI':'30',\
 																											  '13 DI':'25','12 DI':'20','11 DI':'7','10 DI':'4','09 DI':'5','08 DI':'6','15 DII':'34','14 DII':'29','13 DII':'26','12 DII':'21','11 DII':'9'}
 	Date=DateDict[Date]
@@ -198,8 +199,10 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 			if time=='Time' or '&nbsp' in team or toTime(time) < 15:
 				continue
 			num += 1
-			#print meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time
-			File.write(meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n')
+			timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
+
+			if timeString not in oldTimes:
+				File.write(timeString)
 	elif RelInd=='rbRelay':
 		while place>0:
 			place = r.find('ctl82_dgRelaySearchResults_lblSwimTimeFormatted', place+1, responseEnd)  # find time
@@ -228,62 +231,74 @@ def getTopTimes(File,Conference="",Team='radAllTeam',Date='30',Distance='50',Str
 			if time=='Time' or '&nbsp' in team or toTime(time) < 15:
 				continue
 			num += 1
-			#print meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time
-			File.write(meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n')
+			timeString = meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
+			if timeString not in oldTimes:
+				File.write(timeString)
 	return num
 
-confFile = './data/conferences.txt'
-confDiv = {}
-with open(confFile,'r') as confs:
-	for line in confs:
-		parts = re.split('\t', line.strip())
-		division = parts[0]
-		conf = parts[1]
-		team = parts[2]
-		if not conf in confDiv:
-			confDiv[conf] = division
+def getConfs(confFile='./data/conferences.txt'):
+	confDiv = {}
+	with open(confFile,'r') as confs:
+		for line in confs:
+			parts = re.split('\t', line.strip())
+			division = parts[0]
+			conf = parts[1]
+			team = parts[2]
+			if not conf in confDiv:
+				confDiv[conf] = division
+	return confDiv
 
+def topTimesLoop():
+	confDiv = getConfs()
+	genders = ['m', 'f']
+	divisions = ['DII'] # ['DIII', 'DII', 'DI']
+	distances = {}
+	distances['FL'] = [100, 200]
+	distances['BK'] = [100, 200]
+	distances['BR'] = [100, 200]
+	distances['IM'] = [200, 400]
+	distances['MED-R'] = [200, 400]
+	distances['FR-R'] = [200, 400, 800]
+	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
+	strokes = ['FR', 'FL', 'BR', 'BK', 'IM', 'FR-R', 'MED-R']
+	conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
+	years = ['16']  # ['15','14','13','12','11']
 
-genders = ['m', 'f']
-divisions = ['DIII', 'DII', 'DI']
-distances = {}
-distances['FL'] = [100, 200]
-distances['BK'] = [100, 200]
-distances['BR'] = [100, 200]
-distances['IM'] = [200, 400]
-distances['MED-R'] = [200, 400]
-distances['FR-R'] = [200, 400, 800]
-distances['FR'] = [50, 100, 200, 500, 1000, 1650]
-strokes = ['FR', 'FL', 'BR', 'BK', 'IM', 'FR-R', 'MED-R']
-conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
-years = ['16']  # ['15','14','13','12','11']
+	directory = 'data'
+	for year in years:
+		for division in divisions:
+			if division == 'DI':
+				divNum = 'D1'
+			elif division == 'DII':
+				divNum = 'D2'
+			else:
+				divNum = 'D3'
+			for gender in genders:
+				filePath = directory + '/' + division + year + gender + 'new'
+				oldFilePath = directory + '/' + division + year + gender
+				#if os.path.exists(filePath):
+				#	os.remove(filePath)
+				oldTimes = set()
+				with open(oldFilePath, 'r') as oldMeetFile:
+					for line in oldMeetFile:
+						oldTimes.add(line)
 
-directory = 'data'
-for year in years:
-	for division in divisions:
-		if division == 'DI':
-			divNum = 'D1'
-		elif division == 'DII':
-			divNum = 'D2'
-		else:
-			divNum = 'D3'
-		for gender in genders:
-			filePath = directory+'/'+division+year+gender
-			#if os.path.exists(filePath):
-			#	os.remove(filePath)
-			with open(filePath, 'w+') as meetFile:
-				for conference in ['']:
-					if conference == '':
-						confName = 'all'
-					else:
-						confName = conferenceMap[conference]
-					if confName in confDiv and confDiv[confName] != divNum:
-						continue
-					for stroke in strokes:
-						for distance in distances[stroke]:
-							print year, division, gender, distance, stroke
-							print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
-										Stroke=stroke, Gender=gender, Conference=conference, BestAll='all', Number=7000)
+				with open(filePath, 'w+') as meetFile:
+					for conference in ['']:
+						if conference == '':
+							confName = 'all'
+						else:
+							confName = conferenceMap[conference]
+						if confName in confDiv and confDiv[confName] != divNum:
+							continue
+						for stroke in strokes:
+							for distance in distances[stroke]:
+								print year, division, gender, distance, stroke
+								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
+											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
+												  Number=7000, oldTimes=oldTimes)
+if __name__ == "__main__":
+	topTimesLoop()  # get all new times
 
 #getTopTimes(Date='12 DIII',Distance=100,Stroke='FL',Gender='f',Conference=100)
 
