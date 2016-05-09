@@ -14,3 +14,4 @@ virtualenv==1.11.6
 web.py==0.37
 wsgiref==0.1.2
 sympy==0.7.6.1
+scipy==0.14.0
