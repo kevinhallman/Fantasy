@@ -19,12 +19,13 @@ else:
 	db = PostgresqlDatabase('swimdb', user='hallmank')
 
 class TeamSeason(Model):
-	#name = CharField()
 	season = IntegerField()
 	team = CharField()
 	gender = CharField()
 	conference = CharField(null=True)
 	division = CharField()
+	winnats = FloatField(null=True)
+	winconf = FloatField(null=True)
 
 	class Meta:
 		database = db
@@ -36,6 +37,9 @@ class Swimmer(Model):
 	gender = CharField()
 	year = CharField()
 	teamid = ForeignKeyField(TeamSeason, null=True)
+	#taper1 = ForeignKeyField(Swim, null=True)
+	#taper2 = ForeignKeyField(Swim, null=True)
+	#taper3 = ForeignKeyField(Swim, null=True)
 
 	class Meta:
 		database = db
@@ -54,11 +58,13 @@ class Swim(Model):
 	division = CharField()
 	relay = BooleanField()
 	year = CharField()
+	powerpoints = None
 	place = None
 	score = None
 	scoreTeam = None
 	scoreTime = None
 	split = False
+	pastTimes = []
 
 	def getScoreTeam(self):
 		if self.scoreTeam:
@@ -67,10 +73,13 @@ class Swim(Model):
 			return self.team
 		return ''
 
-	def getScoreTime(self):
+	def getScoreTime(self):  # can temporarily set a new time, i.e. taper time
 		if self.scoreTime:
 			return	self.scoreTime
 		return self.time
+
+	def generateTime(self):
+		pass
 
 	def getScore(self):
 		if self.score:
@@ -128,6 +137,9 @@ class Improvement(Model):
 	fromyear = CharField()
 	toyear = CharField()
 
+	def percentImp(self):
+		return (self.fromtime - self.totime) / ((self.fromtime + self.totime) / 2)
+
 	class Meta:
 		database = db
 
@@ -143,6 +155,33 @@ class Meet(Model):
 class TeamMeet(Model):
 	team = ForeignKeyField(TeamSeason)
 	meet = ForeignKeyField(Meet)
+
+	class Meta:
+		database = db
+
+class Team(Model):
+	name = CharField()
+	improvement = FloatField()
+	attrition = FloatField()
+	strengthdual = FloatField()
+	strengthinvite = FloatField()
+	conference = CharField()
+	division = CharField()
+	gender = CharField()
+
+	class Meta:
+		database = db
+
+'''
+store time distribution data
+'''
+class Timedist(Model):
+	event = CharField()
+	gender = CharField()
+	division = CharField()
+	mu = FloatField()
+	sigma = FloatField()
+	percent = IntegerField(null=True)
 
 	class Meta:
 		database = db
@@ -423,7 +462,7 @@ def migrateImprovement():
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
-			#migrator.add_column('improvement', 'swimmer_id', Improvement.swimmer)
+			migrator.add_column('improvement', 'swimmer_id', Improvement.swimmer)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
@@ -502,8 +541,6 @@ def addRelaySwimmers():
 
 		Swim.update(swimmer=swimmerID).where(Swim.id==swim.id).execute()
 
-
-
 if __name__ == '__main__':
 	'''
 	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
@@ -512,7 +549,6 @@ if __name__ == '__main__':
 	'''
 	#db.get_indexes(Swim)
 	#swims = {}
-
 	#db.drop_tables([TeamSeason, Swimmer])
 	#db.create_tables([TeamSeason, Swimmer])
 	start = Time.time()
@@ -520,6 +556,16 @@ if __name__ == '__main__':
 	#safeLoad()
 	#migrateImprovement()
 	#addRelaySwimmers()
-	safeLoad()
+	#safeLoad()
+
+	migrator = PostgresqlMigrator(db)
+	with db.transaction():
+		migrate(
+			#migrator.add_column('teamseason', 'winnats', TeamSeason.winnats)
+			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
+		)
+	db.drop_tables([Timedist])
+	db.create_tables([Timedist])
 	stop = Time.time()
 	print stop - start

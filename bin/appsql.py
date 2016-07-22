@@ -6,7 +6,7 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
-from swimdb import Swim, TeamSeason, Meet, TeamMeet
+from swimdb import Swim, TeamSeason, Meet, TeamMeet, Team
 from operator import itemgetter
 import time as Time
 
@@ -178,7 +178,7 @@ class Conf(object):
 
 		season = int(form.season)
 
-		if form.date and form.date != 'Whole Season':
+		if form.date and form.date != 'Whole Season':  # parse the date string
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
 				year = str(season - 1)
@@ -193,7 +193,6 @@ class Conf(object):
 			sentinelString = form.taper + form.conference + str(swimdate) + gender + division + str(season)
 			if sentinelString in meetCache:  # check cache first
 				print 'cached'
-				confMeet = meetCache[sentinelString]
 				scores = scoreCache[sentinelString]
 				winProb = mcScoreCache[sentinelString]
 				teamScores = teamScoreCache[sentinelString]
@@ -321,7 +320,7 @@ class Placing(object):
 				time *= 0.975
 			newSwims.add((event, time))
 			if len(newSwims) > 0:
-				confPlaces = database.conferencePlace(division=division, gender=gender, newSwims=newSwims)
+				confPlaces = database.conferencePlace(division=division, gender=gender, newSwims=newSwims, year=2014)
 				confTable = showConf(confPlaces, newSwims)
 			else:
 				confTable = ''
@@ -430,7 +429,6 @@ class Programs():
 		teamImprovement = {}
 		teamAttrition = {}
 
-
 		if form.conference != 'All':
 			confs = [form.conference]
 		else:
@@ -439,8 +437,7 @@ class Programs():
 		for conference in confs:
 			for team in conferences[division][gender][conference]:
 				for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
-																					 Team.gender==gender,
-																					 Team.division==division):
+															Team.gender==gender, Team.division==division):
 
 					teamRecruits[team] = stats.strengthinvite
 					teamAttrition[team] = stats.attrition
@@ -458,6 +455,11 @@ class Programs():
 
 		html = showPrograms(teamRank)
 		return render.programs(conferences=sorted(allConfs.keys()), rankings=html)
+
+class PowerRankings():
+	def GET(self):
+		database.top25(division=session.division, gender=session.gender)
+		return render.powerRankings()
 
 class teamMeets():
 	def POST(self):

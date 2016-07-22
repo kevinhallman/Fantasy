@@ -107,7 +107,6 @@ D3	NESCAC	Bates
 D3	NESCAC	Middlebury
 D3	NESCAC	Wesleyan
 D3	NESCAC	Trinity C.
-D3	NESCAC	Richmond
 D3	NESCAC	Bowdoin
 D3	NESCAC	Connecticut
 D3	NESCAC	Hamilton

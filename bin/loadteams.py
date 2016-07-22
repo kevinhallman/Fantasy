@@ -2,7 +2,7 @@ import sqlmeets
 import os, urlparse
 import numpy
 from peewee import *
-from swimdb import TeamSeason
+from swimdb import TeamSeason, Team
 
 eventOrder = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley","200 Yard Medley Relay","400 Yard Medley Relay","200 Yard Freestyle Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay"]
 eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","500 Yard Freestyle","1000 Yard Freestyle","1650 Yard Freestyle","100 Yard Butterfly","200 Yard Butterfly","100 Yard Backstroke","200 Yard Backstroke","100 Yard Breastroke","200 Yard Breastroke","200 Yard Individual Medley","400 Yard Individual Medley"]
@@ -41,19 +41,6 @@ def getConfs():
 			allTeams['Men'][division].sort()
 			allTeams['Women'][division].sort()
 	return confs, allTeams
-
-class Team(Model):
-	name = CharField()
-	improvement = FloatField()
-	attrition = FloatField()
-	strengthdual = FloatField()
-	strengthinvite = FloatField()
-	conference = CharField()
-	division = CharField()
-	gender = CharField()
-
-	class Meta:
-		database = db
 
 #db.drop_tables([Team])
 #db.create_tables([Team])
