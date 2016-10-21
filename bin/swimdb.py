@@ -401,12 +401,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teams = getConfs('data/conferences.txt')
 	divisions = {}
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])', swimFileName)
+		match = re.search('(\D+)(\d+)([mf]).*', swimFileName)
 		if not match:
 			continue
 		div, year, gender = match.groups()
 
-		if not (int(year) == 16):  #and gender=='m'):
+		if not (int(year) == 17):  #and gender=='m'):
 			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
@@ -519,6 +519,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						swims.append(newSwim)
 
 	db.connect()
+
 	if loadTeams and len(newTeams) > 0:
 		print 'Teams:', len(newTeams)
 		TeamSeason.insert_many(newTeams).execute()
@@ -652,11 +653,11 @@ if __name__ == '__main__':
 	#db.create_tables([TeamStats, MeetStats])
 	start = Time.time()
 	#load(loadTeams)
-	#safeLoad()
+	safeLoad()
 	#migrateImprovement()
 	#addRelaySwimmers()
 	#safeLoad()
-
+	'''
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
@@ -665,6 +666,7 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
+	'''
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
 	stop = Time.time()
