@@ -24,7 +24,10 @@ urls = ('/', 'Home',
 	'/improvement', 'Improvement',
 	'/rankings', 'Rankings',
 	'/teamMeets', 'teamMeets',
-	'/programs', 'Programs'
+	'/programs', 'Programs',
+	'/power', 'PowerRankings',
+	'/preseason', 'PreseasonRankings',
+	'/impcalc', 'ImprovementCalculator'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -458,8 +461,26 @@ class Programs():
 
 class PowerRankings():
 	def GET(self):
-		database.top25(division=session.division, gender=session.gender)
-		return render.powerRankings()
+		topTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
+		rank = showTopRanking(topTeams)
+		return render.powerRank(rank)
+
+class PreseasonRankings():
+	def GET(self):
+
+		#database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
+		#database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
+
+		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
+
+		#print oldTopTeams
+
+		rank = showPreseason(oldTopTeams)
+		return render.powerRank(rank)
+
+class ImprovementCaclulator():
+	def GET(self):
+		return render.impCalc()
 
 class teamMeets():
 	def POST(self):
@@ -583,6 +604,70 @@ def showPrograms(teamRank):
 		for (idx, part) in enumerate(rank[1:]):
 			html += '<td>' + str(part[0]) + '</td>'
 			html += '<td>' + str(round(part[1], 3)) + '</td>'
+		html += '<tr>'
+
+	html += '</tbody>'
+	html += '</table>'
+
+	return html
+
+def showTopRanking(topTeams):
+	html = ''
+	html += '<table id="topteams">'
+	html += '<thead><tr>'
+	html += '<th>Rank</th>'
+	html += '<th>Team</th>'
+	html += '<th>National Win %</th>'
+	html += '<th>Conference</th>'
+	html += '<th>Conference Win %</th>'
+	html += '<th>Power Invite</th>'
+	html += '<th>Power Dual</th>'
+	html += '</tr></thead>'
+	html += '<tbody>'
+	for idx, team in enumerate(topTeams):
+		html += '<tr>'
+		html += '<td>' + str(idx+1) + '</td>'
+		html += '<td>' + team.team + '</td>'
+		html += '<td class=percent>' + str(team.winnats * 100) + '</td>'
+		html += '<td>' + team.conference + '</td>'
+		html += '<td class=percent>' + str(team.winconf * 100) + '</td>'
+		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
+		html += '<td class=dualpow>' + str(team.strengthdual) + '</td>'
+		html += '<tr>'
+
+	html += '</tbody>'
+	html += '</table>'
+
+	return html
+
+def showPreseason(topTeams):
+	html = ''
+	html += '<table id="topteams">'
+	html += '<thead><tr>'
+	html += '<th>2016 Rank</th>'
+	html += '<th>Team</th>'
+	html += '<th>Predicted National Win %</th>'
+	html += '<th>Conference</th>'
+	html += '<th>Predicted Conference Win %</th>'
+	html += '<th>Power Invite 2016</th>'
+	html += '<th>Power Dual 2016</th>'
+	html += '</tr></thead>'
+	html += '<tbody>'
+	for idx, team in enumerate(topTeams):
+		html += '<tr>'
+		html += '<td>' + str(idx+1) + '</td>'
+		html += '<td>' + team.team + '</td>'
+		try:
+			newTeam = TeamSeason.get(TeamSeason.team==team.team, TeamSeason.gender==team.gender,
+					   TeamSeason.division==team.division, TeamSeason.season==team.season+1)
+			#print newTeam
+			html += '<td class=percent>' + str(newTeam.getWinnats() * 100) + '</td>'
+			html += '<td>' + team.conference + '</td>'
+			html += '<td class=percent>' + str(newTeam.getWinconf() * 100) + '</td>'
+		except TeamSeason.DoesNotExist:
+			pass
+		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
+		html += '<td class=dualpow>' + str(team.strengthdual) + '</td>'
 		html += '<tr>'
 
 	html += '</tbody>'

@@ -25,7 +25,8 @@ def toTime(time):
 		return time
 	return float(re.split(":",time)[0])*60 +float(re.split(":",time)[1])
 
-def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes="6000",year="2016",File='',minAge='All',maxAge='All'):
+def lookup(driver, gender="M", event="50 Free", courseStr="LCM", bestAll="Best", nTimes="6000", year="2016", File='',
+		   minAge='All', maxAge='All', zone=None):
 	driver.get('http://www.usaswimming.org/DesktopDefault.aspx?TabId=1482')
 	if(gender=="M"):
 		sex="radMale"
@@ -38,7 +39,7 @@ def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes=
 	strokeDict = {"Free":1,"Back":2,"Breast":3,"Fly":4,"IM":5}
 	stroke = strokeDict[strke]
 	courseDict = {"SCY":1,"SCM":2,"LCM":3}
-	course = courseDict[course]
+	course = courseDict[courseStr]
 	bestAllDict = {"All":"radAllTimesForSwimmer","Best":"radBestTimeOnly"}
 	bestAll = bestAllDict[bestAll]
 	yearDict = {"1996":"1","1997":"2","1998":"3","1999":"4","2000":"5","2001":"6","2002":"7","2003":"8","2004":"9",
@@ -52,11 +53,13 @@ def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes=
 				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddDistance']/option[@value="+distance+"]").click()
 				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddStroke']/option[@value="+str(stroke)+"]").click()
 				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddCourse']/option[@value="+str(course)+"]").click()
-				driver.find_element_by_xpath("//input[@id='ctl68_"+sex+"']").click()
+				driver.find_element_by_xpath("//input[@id='ctl68_" + sex + "']").click()
 				driver.find_element_by_xpath("//input[@id='ctl68_radlStandard_14']").click()
-				driver.find_element_by_xpath("//input[@id='ctl68_"+bestAll+"']").click()
+				driver.find_element_by_xpath("//input[@id='ctl68_" + bestAll + "']").click()
 				driver.find_element_by_id("ctl68_txtMaxResults").clear()
 				driver.find_element_by_id("ctl68_txtMaxResults").send_keys(nTimes)
+				if zone:
+					driver.find_element_by_xpath("//select[@id='ctl68_ddZone']/option[@value=" + zone + "]").click()
 				if minAge!="All":
 					driver.find_element_by_xpath("//select[@id='ctl68_ddAgeStart']/option[@value="+minAge+"]").click()
 				if maxAge!="All":
@@ -85,10 +88,10 @@ def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes=
 			print("Error")
 		with open('testhtml'+'.txt','w') as ile:
 			ile.write(r.encode('utf-8'))
-		place=r.find('<td>Meet Results</td>')+25
-		end=r.find('</table>',place+1000)
-		count=0
-		previousResult=""
+		place = r.find('<td>Meet Results</td>') + 25
+		end = r.find('</table>', place + 1000)
+		count = 0
+		previousResult = ""
 		#there are vastly more efficient ways to loop through this, but this code is done and works, so I don't care
 		while place>0:
 			place=r.find('</td>',place+1,end)
@@ -119,7 +122,7 @@ def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes=
 					continue
 				previousResult = swimmer+age+timeMMSS+date
 				outputstring = meet+'\t'+swimmer+'\t'+age+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(
-					timeMMSS))+'\t'+timeMMSS+'\t'+date+'\t'+'\n'
+					timeMMSS))+'\t'+timeMMSS+'\t'+date+'\t'+courseStr+'\t'+'\n'
 				outputstring = unidecode(outputstring)
 				outputstring = str(outputstring).translate(None,"#")
 				#print outputstring
@@ -129,19 +132,23 @@ def lookup(driver, gender="M",event="50 Free",course="LCM",bestAll="All",nTimes=
 
 if __name__ == "__main__":
 	driver = init_driver()
-	years = ['2011']  # ['2013', '2012']
+	years = ['2016', '2015']  # ['2013', '2012']
 	genders = ['M', 'F']
-	events = ['1500 Free', '400 Free', '200 Free', '100 Free', '50 Free', '100 Fly', '200 Fly', '100 Back', '200 Back',
-			'100 Breast', '200 Breast', '200 IM', '400 IM']
-	#events = ['200 Back']
+	#events = ['1650 Free', '500 Free', '200 Free', '100 Free', '50 Free', '100 Fly', '200 Fly', '100 Back', '200 Back',
+	#		'100 Breast', '200 Breast', '200 IM', '400 IM']
+	events = ['50 Free']
+	#zones = ['1', '2', '3', '4']
+	ages = range(8,20)
 
 	for gender in genders:
 		for event in events:
 			for year in years:
-				course = 'LCM'
-				filename = 'Club_' + year + course + gender + event
-				print filename
-				with open(filename, 'w') as meetFile:
-					lookup(driver, event=event, course="LCM", gender=gender, year=year, File=meetFile)
+				for age in ages:
+					course = 'SCY'
+					filename = 'Club_' + year + course + gender + event + '_Age_' + str(age) + '_Central'
+					print filename
+					with open(filename, 'w') as meetFile:
+						lookup(driver, event=event, courseStr=course, gender=gender, year=year, File=meetFile,
+							   minAge=str(age), maxAge=str(age), zone='1')
 	time.sleep(5)
 	driver.quit()

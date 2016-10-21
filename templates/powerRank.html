@@ -1,0 +1,61 @@
+$def with(rankings)
+
+<style>
+input[type=text] {
+	width:24px;
+	border-radius: none;
+	border: solid 1px #dcdcdc;
+	margin: 0;
+}
+
+#container {
+	margin-bottom: 10px;
+	margin-right: 10px:
+	float: left;
+	border: 1px;
+	width: 20%
+}
+
+#rankingTable {
+	width: 100%
+}
+</style>
+<script>
+	\$(document).ready(function() {
+        \$("#topteams").tablesorter();
+
+		function morph(start, stop, point, scale) {
+			return Math.round((stop - start) * point / scale + start);
+		}
+
+		\$('#topteams td.percent').each(function(){
+			var scale = 100;
+			var value = parseInt(\$(this).text());
+			var color = morph(255,0,value,scale) + ',' + morph(255,100,value,scale) + ',' + morph(255,0,value,scale);
+			\$(this).css('background-color', 'rgb(' + color + ')');
+		});
+
+		\$('#topteams td.invpow').each(function(){
+			var scale = 1000;
+			var value = parseInt(\$(this).text());
+			var color = morph(255,0,value,scale) + ',' + morph(255,100,value,scale) + ',' + morph(255,0,value,scale);
+			\$(this).css('background-color', 'rgb(' + color + ')');
+		});
+
+		\$('#topteams td.dualpow').each(function(){
+			var scale = 200;
+			var value = parseInt(\$(this).text());
+			var color = morph(255,0,value,scale) + ',' + morph(255,100,value,scale) + ',' + morph(255,0,value,scale);
+			\$(this).css('background-color', 'rgb(' + color + ')');
+		});
+    }
+);
+</script>
+<h1>
+Team Power Rankings
+</h1>
+
+<div id="results">
+$if rankings:
+	$:rankings
+</div>

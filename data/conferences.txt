@@ -289,6 +289,7 @@ D1	Metro Atlantic Athl. Conf	Fairfield
 D1	Metro Atlantic Athl. Conf	Niagara
 D1	Metro Atlantic Athl. Conf	Siena
 D1	Metro Atlantic Athl. Conf	Rider
+D1	Metro Atlantic Athl. Conf	Monmouth
 D1	Horizon League	Illinois-Chicago
 D1	Horizon League	Wis.- Green Bay
 D1	Horizon League	Wright State

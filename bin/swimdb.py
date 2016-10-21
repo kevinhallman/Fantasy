@@ -26,7 +26,53 @@ class TeamSeason(Model):
 	division = CharField()
 	winnats = FloatField(null=True)
 	winconf = FloatField(null=True)
+	strengthdual = FloatField(null=True)
+	strengthinvite = FloatField(null=True)
 
+	def getTaperStats(self, weeks=12):
+		for stats in TeamStats.select().where(TeamStats.team==self.name, TeamStats.gender==self.gender,
+			TeamStats.season==self.season - 1, TeamStats.week >= weeks).top(1).order_by(TeamStats.week):
+			return stats.mediantaper, stats.mediantaperstd
+
+	def getWinnats(self):
+		if self.winnats:
+			return self.winnats
+		return 0
+
+	def getWinconf(self):
+		if not self.conference:
+			return ''
+		for stats in TeamStats.select(fn.MAX(TeamStats.week), TeamStats.winconf).where(
+				TeamStats.teamseasonid==self.id).group_by(TeamStats.winconf):
+			print stats.winconf, self.team
+			return stats.winconf
+		if self.winconf:
+			return self.winconf
+		return 0
+
+	class Meta:
+		database = db
+
+class TeamStats(Model):
+	teamseasonid = ForeignKeyField(TeamSeason)
+	winnats = FloatField(null=True)
+	winconf = FloatField(null=True)
+	date = DateField()  # will be the date the stats were current as of
+	week = IntegerField(null=True)
+	toptaper = FloatField(null=True)
+	toptaperstd = FloatField(null=True)
+	mediantaper = FloatField(null=True)
+	mediantaperstd = FloatField(null=True)
+	strengthdual = FloatField(null=True)
+	strengthinvite = FloatField(null=True)
+	class Meta:
+		database = db
+
+class MeetStats(Model):
+	percent = FloatField()
+	place = IntegerField()
+	conference = CharField()
+	numWeeks = IntegerField()
 	class Meta:
 		database = db
 
@@ -37,9 +83,6 @@ class Swimmer(Model):
 	gender = CharField()
 	year = CharField()
 	teamid = ForeignKeyField(TeamSeason, null=True)
-	#taper1 = ForeignKeyField(Swim, null=True)
-	#taper2 = ForeignKeyField(Swim, null=True)
-	#taper3 = ForeignKeyField(Swim, null=True)
 
 	class Meta:
 		database = db
@@ -65,6 +108,7 @@ class Swim(Model):
 	scoreTime = None
 	split = False
 	pastTimes = []
+	taperTime = None
 
 	def getScoreTeam(self):
 		if self.scoreTeam:
@@ -101,6 +145,57 @@ class Swim(Model):
 		else:
 			meet = ''
 		return name+br+self.getScoreTeam()+genderStr+br+self.event+br+time+br+meet
+
+	def taper(self, weeks, noise=0):
+		#print self.name, self.id, self.swimmer, self.swimmer.team, self.swimmer.id
+		taper, taperStd = self.getTaperStats(weeks=weeks)
+		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
+		self.scoreTime = self.time - self.time * taper / 100.0 + self.time * noise
+
+	def improve(self, database):
+		if self.division:
+			division=self.division
+		else:
+			division='D3'
+
+		if '1000' in self.event or 'Relay' in self.event:
+			self.scoreTime = self.time
+			return self
+		try:
+			f = database.getExtrapEvent(gender=self.gender, division=division, year=self.year, event=self.event)
+			newTime = self.time + f(self.time)
+			# cap improvement, regression for really slow and fast times at 2%
+			if newTime > 1.02 * self.time:
+				self.scoreTime = self.time * 1.02
+			elif newTime < .98 * self.time:
+				self.scoreTime = .98 * self.time
+			else:
+				self.scoreTime = newTime
+		except:
+			print self.time, self. event
+			self.scoreTime = self.time
+
+		return self
+
+	def getTaperTime(self):
+		if self.taperTime:
+			return self.taperTime
+		return self.time
+
+	def getTaperStats(self, weeks=12):
+		try:
+			teamid = TeamSeason.get(TeamSeason.team==self.team, TeamSeason.gender==self.gender,
+				TeamSeason.season==self.season - 1).id
+			for stats in TeamStats.select().where(TeamStats.teamseasonid==teamid, TeamStats.week >= weeks).limit(1)\
+				.order_by(TeamStats.week):
+				#print stats
+				if not stats.toptaper or stats.toptaper==0:
+					#print teamid, stats.week
+					return 3, 3
+				return stats.toptaper, stats.toptaperstd
+		except:
+			return 3, 3
+		return 3, 3
 
 	def __str__(self):
 		return self.name+self.team+self.event+str(toTime(self.time))
@@ -218,6 +313,8 @@ def swimTime(time):
 
 #turn time into seconds, round to two digits
 def toTime(time):
+	if time[-1]=='r':
+		time = time[:-1]
 	if not time:
 		return 0
 	if type(time)==float:
@@ -546,11 +643,13 @@ if __name__ == '__main__':
 	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
 		print teamMeet.meet.meet, teamMeet.team.team, teamMeet.team.season, teamMeet.team.gender, \
 			teamMeet.team.conference
+
+	select teamstats.winconf,teamseason.team,teamstats.week, teamseason.id from teamstats, teamseason where teamstats.teamseasonid_id=teamseason.id and teamseason.season=2017 and week=-1;
 	'''
 	#db.get_indexes(Swim)
 	#swims = {}
-	#db.drop_tables([TeamSeason, Swimmer])
-	#db.create_tables([TeamSeason, Swimmer])
+	#db.drop_tables([TeamStats, MeetStats])
+	#db.create_tables([TeamStats, MeetStats])
 	start = Time.time()
 	#load(loadTeams)
 	#safeLoad()
@@ -561,11 +660,14 @@ if __name__ == '__main__':
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
-			#migrator.add_column('teamseason', 'winnats', TeamSeason.winnats)
+			migrator.add_column('teamstats', 'toptaperstd', TeamStats.toptaperstd),
+			migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
-	db.drop_tables([Timedist])
-	db.create_tables([Timedist])
+	#db.drop_tables([Timedist])
+	#db.create_tables([Timedist])
 	stop = Time.time()
 	print stop - start
+
+
