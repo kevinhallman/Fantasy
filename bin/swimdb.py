@@ -406,7 +406,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		div, year, gender = match.groups()
 
-		if not (int(year) == 17) and div=='DIII' and gender=='m':  #and gender=='m'):
+		if not (int(year) == 17) or (not div=='DIII') or (not gender=='m'):  #and gender=='m'):
 			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
