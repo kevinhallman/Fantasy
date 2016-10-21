@@ -44,7 +44,7 @@ class TeamSeason(Model):
 			return ''
 		for stats in TeamStats.select(fn.MAX(TeamStats.week), TeamStats.winconf).where(
 				TeamStats.teamseasonid==self.id).group_by(TeamStats.winconf):
-			print stats.winconf, self.team
+			#print stats.winconf, self.team
 			return stats.winconf
 		if self.winconf:
 			return self.winconf

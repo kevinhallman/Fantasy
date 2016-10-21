@@ -467,6 +467,11 @@ class PowerRankings():
 
 class PreseasonRankings():
 	def GET(self):
+		#form = web.input(gender=None, division=False)
+		#if form.gender!session.gender or not form.division):
+		#	print 'redirect'
+		#	raise web.seeother('preseason?gender={gender}&division={div}'.format(gender=session.gender,
+		# div=session.division))
 
 		#database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
 		#database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
@@ -476,7 +481,7 @@ class PreseasonRankings():
 		#print oldTopTeams
 
 		rank = showPreseason(oldTopTeams)
-		return render.powerRank(rank)
+		return render.preseason(rank)
 
 class ImprovementCaclulator():
 	def GET(self):
@@ -646,11 +651,11 @@ def showPreseason(topTeams):
 	html += '<thead><tr>'
 	html += '<th>2016 Rank</th>'
 	html += '<th>Team</th>'
-	html += '<th>Predicted National Win %</th>'
+	html += '<th>National Win % 2017</th>'
 	html += '<th>Conference</th>'
-	html += '<th>Predicted Conference Win %</th>'
-	html += '<th>Power Invite 2016</th>'
-	html += '<th>Power Dual 2016</th>'
+	html += '<th>Conference Win % 2017</th>'
+	html += '<th>Invite Strength 2016</th>'
+	html += '<th>Dual Strength 2016</th>'
 	html += '</tr></thead>'
 	html += '<tbody>'
 	for idx, team in enumerate(topTeams):
