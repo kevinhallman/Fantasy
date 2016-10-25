@@ -42,9 +42,10 @@ $def with (content)
 			}
 		</script>
 		<script type="text/javascript">
-			function prepAjaxForms() {
+			function prepAjaxForms(gendiv) {
 				//handles the form submissions and does a partial ajax page reload
 				$$('form.ajax').submit(function(form) {  // catch any form submission event
+
 					newURL = location.pathname + '?' + $$(this).serialize();
 					$$("#loading").show();
 					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
@@ -59,7 +60,7 @@ $def with (content)
 
 				// make forward/back buttons work
 				window.onpopstate = function(event) {
-					console.log("pathname: "+location.pathname + location.search);
+					console.log("pathname: " + location.pathname + location.search);
 					$$("#loading").show();
 					$$("#results").load( location.pathname + location.search + " #results", function() {
 						$$("#loading").hide();
@@ -127,10 +128,13 @@ $def with (content)
 
 			function reload() {
 				var url = \$(location).attr('href');
-            	\$('.content').load(location.pathname + ' .innerContent', function() {  //just reload content
-            		prepAjaxForms();  //add ajax loads to forms
-            		        \$("#topteams").tablesorter();
 
+            	\$('.content').load(location.pathname + ' .innerContent', function() {  //just reload content
+            		prepAjaxForms(true);  //add ajax loads to forms
+
+					\$("#topteams").tablesorter();
+
+					// preseason table prep on re-load
 					function morph(start, stop, point, scale) {
 						return Math.round((stop - start) * point / scale + start);
 					}
@@ -155,18 +159,19 @@ $def with (content)
 						var color = morph(255,0,value,scale) + ',' + morph(255,100,value,scale) + ',' + morph(255,0,value,scale);
 						\$(this).css('background-color', 'rgb(' + color + ')');
 					});
-							});
-						}
-					function toggleProb() {
-						$$("#exact").click(function() {
-							$$("div.scores").show();
-							$$("#estResults").hide();
-						});
-						$$("#prob").click(function() {
-							$$("div.scores").hide();
-							$$("#estResults").show();
-						});
-					};
+				});
+			}
+
+			function toggleProb() {
+				$$("#exact").click(function() {
+					$$("div.scores").show();
+					$$("#estResults").hide();
+				});
+				$$("#prob").click(function() {
+					$$("div.scores").hide();
+					$$("#estResults").show();
+				});
+			};
 		</script>
 
 		<script type="text/javascript">

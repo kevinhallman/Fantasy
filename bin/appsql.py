@@ -66,22 +66,23 @@ def getConfs():
 	return confs, allTeams
 
 def getMeetList():
-	newList = {'Men': {}, 'Women': {}}
+	newList = {'Men': {'D1': {}, 'D2': {}, 'D3': {}}, 'Women': {'D1': {}, 'D2': {}, 'D3': {}}}
 	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
 		newTeam = teamMeet.team.team
 		gender = teamMeet.team.gender
 		newSeason = teamMeet.team.season
 		newMeet = teamMeet.meet.meet
-		if newTeam not in newList[gender]:
-			newList[gender][newTeam] = {}
-		if newSeason not in newList[gender][newTeam]:
-			newList[gender][newTeam][newSeason] = []
-		newList[gender][newTeam][newSeason].append(re.sub('\"', '\\\\\"', newMeet))
+		newDiv = teamMeet.team.division
+		if newTeam not in newList[gender][newDiv]:
+			newList[gender][newDiv][newTeam] = {}
+		if newSeason not in newList[gender][newDiv][newTeam]:
+			newList[gender][newDiv][newTeam][newSeason] = []
+		newList[gender][newDiv][newTeam][newSeason].append(re.sub('\"', '\\\\\"', newMeet))
 	return newList
 
 web.config.debug = False
 app = web.application(urls, globals())
-session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Men', 'division': 'D3'})
+session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division': 'D1'})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
 app.add_processor(connection_processor)
@@ -467,18 +468,16 @@ class PowerRankings():
 
 class PreseasonRankings():
 	def GET(self):
-		#form = web.input(gender=None, division=False)
-		#if form.gender!session.gender or not form.division):
-		#	print 'redirect'
-		#	raise web.seeother('preseason?gender={gender}&division={div}'.format(gender=session.gender,
-		# div=session.division))
+		form = web.input(gender=None, division=False)
+		if not form.gender or not form.division:
+			print 'redirect'
+			raise web.seeother('preseason?gender={gender}&division={div}'.format(gender=session.gender,
+		 div=session.division))
 
-		#database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
-		#database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
+		# database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
+		# database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
 
 		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
-
-		#print oldTopTeams
 
 		rank = showPreseason(oldTopTeams)
 		return render.preseason(rank)
@@ -491,8 +490,8 @@ class teamMeets():
 	def POST(self):
 		form = web.input(team=None, division=None, season=None)
 		web.header("Content-Type", "application/json")
-		if form.team in meetList[session.gender]:
-			seasonMeets = meetList[session.gender][form.team]
+		if form.team in meetList[session.gender][session.division]:
+			seasonMeets = meetList[session.gender][session.division][form.team]
 			if form.season and int(form.season) in seasonMeets:
 				meets = seasonMeets[int(form.season)]
 				'''
@@ -508,13 +507,13 @@ class teamMeets():
 				'''
 				return json.dumps(meets)
 
-			#on first load, default season
+			# on first load, default season
 			return json.dumps(seasonMeets)
 		else:
 			return
 
 
-#HTML generators
+# HTML generators
 
 def showMeet(scores):
 	if scores == None: return None
