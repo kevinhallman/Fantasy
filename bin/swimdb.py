@@ -406,7 +406,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		div, year, gender = match.groups()
 
-		if not (int(year) == 17) or (not div=='DIII') or (not gender=='m'):  #and gender=='m'):
+		if not (int(year) == 17):  # or (not div=='DIII') or (not gender=='m'):  #and gender=='m'):
 			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
@@ -547,13 +547,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			Swim.insert_many(newSwims[i*100:(i+1)*100]).execute()
 	'''
 
-	''' cleanup for duplicate swims
+def deleteDups():
+	# cleanup for duplicate swims
 	Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY meet, name, event, time ORDER BY id) AS rnum '
         'FROM Swim) t '
-        'WHERE t.rnum > 1)')
-    '''
-	#return divisions
+        'WHERE t.rnum > 1) and season=2017')
 
 def migrateImprovement():
 
@@ -654,6 +653,7 @@ if __name__ == '__main__':
 	start = Time.time()
 	#load(loadTeams)
 	safeLoad()
+	deleteDups()
 	#migrateImprovement()
 	#addRelaySwimmers()
 	#safeLoad()
