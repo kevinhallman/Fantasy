@@ -91,6 +91,12 @@ database = sqlmeets.SwimDatabase(database=db)
 meetList = getMeetList()
 (conferences, allTeams) = getConfs()
 
+def setGenDiv(gender, division):
+	if gender in ['Men', 'Women']:
+		session.gender = gender
+	if division in ['D1', 'D2', 'D3']:
+		session.division = division
+
 class Home():
 	def GET(self):
 		return render.home()
@@ -146,7 +152,7 @@ class Swimulate(object):
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
-				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
+				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender, debug=True)
 			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
@@ -170,11 +176,14 @@ teamScoreCache = {}
 scoreCache = {}
 class Conf(object):
 	def GET(self):
+		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
+						 gender=None)
+		setGenDiv(form.gender, form.division)
+
 		start = Time.time()
 		division = session.division
 		gender = session.gender
 		confList = conferences[division][gender]
-		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False)
 
 		if form.conference is None:
 			return render.conference(conferences=sorted(confList.keys()), scores=None, teamScores=None,
@@ -333,11 +342,12 @@ class Placing(object):
 
 class Improvement():
 	def GET(self):
+		form = web.input(conference=None, season=None, gender=None, division=None)
+		setGenDiv(form.gender, form.division)
 		division = session.division
 		gender = session.gender
 		season = 2015
 		confList = conferences[division][gender]
-		form = web.input(conference=None, season=None)
 
 		if form.conference in confList:
 			teams=confList[form.conference]
@@ -422,9 +432,11 @@ class Rankings():
 
 class Programs():
 	def GET(self):
+		form = web.input(conference=None, tableOnly=False, gender=None, division=None)
+		setGenDiv(form.gender, form.division)
+
 		division = session.division
 		gender = session.gender
-		form = web.input(conference=None, tableOnly=False)
 		allConfs = conferences[division][gender]
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
@@ -468,7 +480,9 @@ class PowerRankings():
 
 class PreseasonRankings():
 	def GET(self):
-		form = web.input(gender=None, division=False)
+		form = web.input(gender=None, division=None)
+		setGenDiv(form.gender, form.division)
+
 		if not form.gender or not form.division:
 			print 'redirect'
 			raise web.seeother('preseason?gender={gender}&division={div}'.format(gender=session.gender,
