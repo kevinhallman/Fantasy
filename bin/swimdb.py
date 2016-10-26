@@ -457,7 +457,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if loadTeams:
 					key = str(season) + team + gender + conference + division
-					if not relay and not key in teamKeys:  # try each team once
+					if not key in teamKeys:  # try each team once
 						teamKeys.add(key)
 						try:  # don't double add for teams not loaded yet
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
@@ -469,7 +469,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if loadMeets:
 					key = str(season) + meet + gender
-					if not relay and not key in meetKeys:
+					if not key in meetKeys:
 						meetKeys.add(key)  # try each meet once
 						try:  # don't double add for meets not loaded yet
 							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
@@ -479,7 +479,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if loadSwimmers:
 					key = str(season) + name + year + team + gender
-					if not relay and not key in swimmerKeys:
+					if not key in swimmerKeys:
 						swimmerKeys.add(key)
 						try:
 							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
@@ -493,7 +493,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if loadTeamMeets:
 					key = str(season) + meet + gender + team
-					if not relay and not key in teamMeetKeys:
+					if not key in teamMeetKeys:
 						teamMeetKeys.add(key)
 						if not meetID:
 							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
@@ -508,7 +508,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if loadSwims:
 					try:
-						Swim.get(Swim.name==event, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
 							Swim.date==swimDate)  # floats in SQL and python evidently different precision
 					except Swim.DoesNotExist:
 						if not swimmerID and not relay:
@@ -539,6 +539,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	if loadSwims and len(swims) > 0:
 		print 'Swims: ', len(swims)
 		Swim.insert_many(swims).execute()
+
 	'''
 	for i in range(len(newSwims) / 100):
 		print i
@@ -620,7 +621,8 @@ def addRelaySwimmers():
 	#print relaySwimmers
 	swimmers = {}
 	i=0
-	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender, Swim.id).where(Swim.relay==True):
+	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender, Swim.id).where(Swim.relay==True,
+																		Swim.swimmer==None):
 		i+=1
 		if i%1000==0:
 			print i
@@ -655,7 +657,7 @@ if __name__ == '__main__':
 	safeLoad()
 	deleteDups()
 	#migrateImprovement()
-	#addRelaySwimmers()
+	addRelaySwimmers()
 	#safeLoad()
 	'''
 	migrator = PostgresqlMigrator(db)
