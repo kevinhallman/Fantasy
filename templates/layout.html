@@ -46,7 +46,8 @@ $def with (content)
 				//handles the form submissions and does a partial ajax page reload
 				$$('form.ajax').submit(function(form) {  // catch any form submission event
 
-					newURL = location.pathname + '?' + $$(this).serialize();
+					newURL = location.pathname + '?' + $$(this).serialize() + '&gender=' + '$ (context.gender)'+
+					'&division=' + '$ (context.division)';
 					$$("#loading").show();
 					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
 						$$("#loading").hide();
@@ -79,7 +80,7 @@ $def with (content)
 			\$(document).ready(function() {
 				prepAjaxForms();
 
-
+				// gender or division modified
 				$$("#gender li").click(function() {
 					$$("#gender li").removeClass('active');
 					$$(this).addClass('active');
@@ -128,8 +129,10 @@ $def with (content)
 
 			function reload() {
 				var url = \$(location).attr('href');
+				var newURL = location.pathname
+				history.pushState('', 'New URL: '+newURL, newURL);
 
-            	\$('.content').load(location.pathname + ' .innerContent', function() {  //just reload content
+            	\$('.content').load(newURL + ' .innerContent', function() {  //just reload content
             		prepAjaxForms(true);  //add ajax loads to forms
 
 					\$("#topteams").tablesorter();

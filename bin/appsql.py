@@ -91,7 +91,13 @@ database = sqlmeets.SwimDatabase(database=db)
 meetList = getMeetList()
 (conferences, allTeams) = getConfs()
 
+# appends the gender and division to the URL and allows them to be changed via there as well
 def setGenDiv(gender, division):
+	# modifies the URL if different
+	if gender is None or division is None:
+		print gender, division, session.gender, session.division, web.http.changequery(gender=session.gender, division=session.division)
+		raise web.seeother(web.http.changequery(gender=session.gender, division=session.division))
+
 	if gender in ['Men', 'Women']:
 		session.gender = gender
 	if division in ['D1', 'D2', 'D3']:
@@ -99,27 +105,35 @@ def setGenDiv(gender, division):
 
 class Home():
 	def GET(self):
+		form = web.input(gender=session.gender, division=session.division)
+		setGenDiv(form.gender, form.division)
 		return render.home()
 
 	def POST(self):
 		form = web.input(gender=session.gender, division=session.division, _unicode=False)
 		session.gender = form.gender
 		session.division = form.division
-		print session.gender, session.division
 
 		web.header("Content-Type", "application/json")
 		return 'an error'
 
+
 class Swimulate(object):
 	def GET(self):
-		monteCarlo = False
+		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False, gender=None, division=None)
+		setGenDiv(form.gender, form.division)
+
 		gender = session.gender
 		divTeams = allTeams[gender]
-		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False)
+
+		if not form.team1:
+			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
+
 		keys = form.keys()
 		
 		formMeets = {}
 		for key in keys:
+			if key in ['gender', 'division']: continue
 			num = int(key[-1])
 			if not num in formMeets:
 				formMeets[num] = [None, None, None, None]
@@ -433,6 +447,7 @@ class Rankings():
 class Programs():
 	def GET(self):
 		form = web.input(conference=None, tableOnly=False, gender=None, division=None)
+
 		setGenDiv(form.gender, form.division)
 
 		division = session.division
@@ -482,11 +497,6 @@ class PreseasonRankings():
 	def GET(self):
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
-
-		if not form.gender or not form.division:
-			print 'redirect'
-			raise web.seeother('preseason?gender={gender}&division={div}'.format(gender=session.gender,
-		 div=session.division))
 
 		# database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
 		# database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
