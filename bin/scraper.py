@@ -190,7 +190,7 @@ def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50',
 	r = requests.post(URL, data=payload, headers=headers)
 	r = r.text
 
-	place = r.find('ctl82_dgSearchResults',100000)
+	place = r.find('ctl82_dgSearchResults', 10000)
 	if RelInd == 'rbRelay':
 		place = r.find('ctl82_dgRelaySearchResults', 9000)
 	responseEnd = r.find('</table>', place)
