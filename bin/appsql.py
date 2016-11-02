@@ -27,7 +27,8 @@ urls = ('/', 'Home',
 	'/programs', 'Programs',
 	'/power', 'PowerRankings',
 	'/preseason', 'PreseasonRankings',
-	'/impcalc', 'ImprovementCalculator'
+	'/impcalc', 'ImprovementCalculator',
+	'/teamstats', 'TeamStats'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -94,14 +95,16 @@ meetList = getMeetList()
 # appends the gender and division to the URL and allows them to be changed via there as well
 def setGenDiv(gender, division):
 	# modifies the URL if different
-	if gender is None or division is None:
-		print gender, division, session.gender, session.division, web.http.changequery(gender=session.gender, division=session.division)
-		raise web.seeother(web.http.changequery(gender=session.gender, division=session.division))
-
 	if gender in ['Men', 'Women']:
 		session.gender = gender
 	if division in ['D1', 'D2', 'D3']:
 		session.division = division
+
+	if gender is None:
+		print gender, division, session.gender, session.division, web.http.changequery(gender=session.gender, division=session.division)
+		raise web.seeother(web.http.changequery(gender=session.gender))
+	if division is None:
+		raise web.seeother(web.http.changequery(division=session.division))
 
 class Home():
 	def GET(self):
@@ -505,6 +508,39 @@ class PreseasonRankings():
 
 		rank = showPreseason(oldTopTeams)
 		return render.preseason(rank)
+
+class TeamStats():
+	def GET(self):
+		form = web.input(name=None)
+		if not form.name:
+			return render.teamstats()
+
+		try:
+			team = TeamSeason.get(TeamSeason.name==form.name, TeamSeason.division==session.division)
+		except TeamSeason.doesNotExist:
+			return render.teamstats()
+
+		# team speed
+		# dual strength, invite strength, nats%, conf%
+		team.getWinnats()
+		team.getWinconf()
+
+		# team development
+		teamRecruits = {}
+		teamAttrition = {}
+		teamImprovement = {}
+		for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
+															Team.gender==gender, Team.division==division):
+			teamRecruits[team] = stats.strengthinvite
+			teamAttrition[team] = stats.attrition
+			teamImprovement[team] = stats.improvement
+
+		# top swimmers
+		database.teamSwimmerRank()
+
+		(medtaper, stdtaper) = team.getTaperStats()
+
+		# top lineup?
 
 class ImprovementCaclulator():
 	def GET(self):

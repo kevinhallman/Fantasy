@@ -46,8 +46,8 @@ $def with (content)
 				//handles the form submissions and does a partial ajax page reload
 				$$('form.ajax').submit(function(form) {  // catch any form submission event
 
-					newURL = location.pathname + '?' + $$(this).serialize() + '&gender=' + '$ (context.gender)'+
-					'&division=' + '$ (context.division)';
+					newURL = location.pathname + '?' + $$(this).serialize() + '&gender=' + $$('ul#gender li.active')[0]
+					.id + '&division=' + $$('ul#division li.active')[0].id;
 					$$("#loading").show();
 					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
 						$$("#loading").hide();
@@ -84,27 +84,13 @@ $def with (content)
 				$$("#gender li").click(function() {
 					$$("#gender li").removeClass('active');
 					$$(this).addClass('active');
-					jQuery.ajax({
-        				type: "POST",
-        				async: true,
-        				url: 'home',
-        				data:  {gender: this.id},
-        				success: reload,
-        				error: reload
-    				});
+					reload(this.id, $$('ul#division li.active')[0].id);
 				});
 
 				$$("#division li").click(function() {
 					$$("#division li").removeClass('active');
 					$$(this).addClass('active');
-					jQuery.ajax({
-        				type: "POST",
-        				async: true,
-        				url: 'home',
-        				data:  {division: this.id},
-        				success: reload,
-        				error: reload
-    				});
+					reload($$('ul#gender li.active')[0].id, this.id);
 				});
 
     			$if context.gender=="Women":
@@ -127,9 +113,9 @@ $def with (content)
 
 			});
 
-			function reload() {
+			function reload(gen='$ (context.gender)', div='$ (context.division)') {
 				var url = \$(location).attr('href');
-				var newURL = location.pathname
+				var newURL = location.pathname + '?gender=' + gen + '&division=' + div
 				history.pushState('', 'New URL: '+newURL, newURL);
 
             	\$('.content').load(newURL + ' .innerContent', function() {  //just reload content
