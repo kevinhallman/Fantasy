@@ -169,7 +169,7 @@ class Swimulate(object):
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
-				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender, debug=True)
+				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
 			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
@@ -187,10 +187,10 @@ class Fantasy(object):
 	def GET(self):
 		return render.fantasy()
 
-meetCache = {}
-mcScoreCache = {}
-teamScoreCache = {}
-scoreCache = {}
+#meetCache = {}
+#mcScoreCache = {}
+#teamScoreCache = {}
+#scoreCache = {}
 class Conf(object):
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
@@ -245,10 +245,10 @@ class Conf(object):
 				winProb = confMeet.scoreMonteCarlo(runs=100)
 
 				#add to cache
-				meetCache[sentinelString] = confMeet
-				scoreCache[sentinelString] = scores
-				mcScoreCache[sentinelString] = winProb
-				teamScoreCache[sentinelString] = teamScores
+				#meetCache[sentinelString] = confMeet
+				#scoreCache[sentinelString] = scores
+				#mcScoreCache[sentinelString] = winProb
+				#teamScoreCache[sentinelString] = teamScores
 		else:
 			scores = None
 			teamScores = None
@@ -549,9 +549,16 @@ class ImprovementCaclulator():
 class teamMeets():
 	def POST(self):
 		form = web.input(team=None, division=None, season=None)
+		#print form.team, form.division.strip(), form.season
+		#print session.gender, session.division
 		web.header("Content-Type", "application/json")
-		if form.team in meetList[session.gender][session.division]:
-			seasonMeets = meetList[session.gender][session.division][form.team]
+
+		if form.division:
+			division = form.division.strip()
+		else:
+			return
+		if form.team in meetList[session.gender][division]:
+			seasonMeets = meetList[session.gender][division][form.team]
 			if form.season and int(form.season) in seasonMeets:
 				meets = seasonMeets[int(form.season)]
 				'''

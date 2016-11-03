@@ -65,9 +65,10 @@ $def with (divTeams,scores,teamScores,finalScores,winTable)
 	}
 
 	function getSeasons(select) {
-		team = select.value;
-		num = select.name.slice(-1);
-		$$.post('teamMeets', {'team': team}, function(seasonMeets) {
+		var team = select.value;
+		var num = select.name.slice(-1);
+		var div = $$('select[name=division' + num + '] option:selected').html();
+		$$.post('teamMeets', {'team': team, 'division': div}, function(seasonMeets) {
 			$$("select[name=season" + num + "]").html('');
 
 			$$.each(seasonMeets, function (season, meets) {
@@ -99,11 +100,12 @@ $def with (divTeams,scores,teamScores,finalScores,winTable)
 
 	function meets(select) {
 		// when the season is changed
-		season = select.value
-		num = select.name.slice(-1)
-		team = $$("select[name=team" + num + "] option:selected").text()
+		var season = select.value;
+		var num = select.name.slice(-1);
+		var team = $$("select[name=team" + num + "] option:selected").text()
+		var div = $$('select[name=division' + num + '] option:selected').html();
 
-		$$.post('teamMeets', {'team': team, 'season': season}, function(meets) {
+		$$.post('teamMeets', {'team': team, 'season': season, 'division': div}, function(meets) {
 			$$("select[name=meet" + num + "]").html('');
 			$$("select[name=meet" + num + "]")
 				.append($$('<option>')
