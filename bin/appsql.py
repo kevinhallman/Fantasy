@@ -6,7 +6,9 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
-from swimdb import Swim, TeamSeason, Meet, TeamMeet, Team
+
+from swimdb import Meet, TeamMeet, Team, TeamSeason
+
 from operator import itemgetter
 import time as Time
 
@@ -28,7 +30,7 @@ urls = ('/', 'Home',
 	'/power', 'PowerRankings',
 	'/preseason', 'PreseasonRankings',
 	'/impcalc', 'ImprovementCalculator',
-	'/teamstats', 'TeamStats'
+	'/teamstats/(.+)', 'TeamStats'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -187,10 +189,10 @@ class Fantasy(object):
 	def GET(self):
 		return render.fantasy()
 
-#meetCache = {}
-#mcScoreCache = {}
-#teamScoreCache = {}
-#scoreCache = {}
+meetCache = {}
+mcScoreCache = {}
+teamScoreCache = {}
+scoreCache = {}
 class Conf(object):
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
@@ -510,37 +512,43 @@ class PreseasonRankings():
 		return render.preseason(rank)
 
 class TeamStats():
-	def GET(self):
-		form = web.input(name=None)
-		if not form.name:
-			return render.teamstats()
+	def GET(self, team=None):
+		if not team:
+			return render.teamstats(None, None, None, None, None, None)
 
 		try:
-			team = TeamSeason.get(TeamSeason.name==form.name, TeamSeason.division==session.division)
-		except TeamSeason.doesNotExist:
-			return render.teamstats()
+			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
+										TeamSeason.season==2016)
+		except TeamSeason.DoesNotExist:
+			return render.teamstats(None, None, None, None, None, None)
 
 		# team speed
 		# dual strength, invite strength, nats%, conf%
-		team.getWinnats()
-		team.getWinconf()
+		print teamseason.season
+		winNats = teamseason.getWinnats()
+		winConf = teamseason.getWinconf()
 
 		# team development
-		teamRecruits = {}
-		teamAttrition = {}
-		teamImprovement = {}
-		for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
-															Team.gender==gender, Team.division==division):
-			teamRecruits[team] = stats.strengthinvite
-			teamAttrition[team] = stats.attrition
-			teamImprovement[team] = stats.improvement
+		print team, session.gender, session.division
+		try:
+			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
+			inviteStr = stats.strengthinvite
+			attrition = stats.attrition
+			imp = stats.improvement
+		except Team.DoesNotExist:
+			inviteStr = None
+			attrition = None
+			imp = None
 
 		# top swimmers
-		database.teamSwimmerRank()
+		print teamseason.getTopSwimmers(10)
+		#print database.teamSwimmerRank(team=team, gender=session.gender, conference=teamseason.conference, season=2016)
 
-		(medtaper, stdtaper) = team.getTaperStats()
+		(medtaper, stdtaper) = teamseason.getTaperStats()
+		print medtaper, stdtaper
 
 		# top lineup?
+		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats)
 
 class ImprovementCaclulator():
 	def GET(self):
@@ -727,14 +735,13 @@ def showPreseason(topTeams):
 	for idx, team in enumerate(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
-		html += '<td>' + team.team + '</td>'
+		html += '<td> <a href=/teamstats/' + team.team + '>' + team.team + '</a></td>'
 		try:
-			newTeam = TeamSeason.get(TeamSeason.team==team.team, TeamSeason.gender==team.gender,
-					   TeamSeason.division==team.division, TeamSeason.season==team.season+1)
-			#print newTeam
-			html += '<td class=percent>' + str(newTeam.getWinnats() * 100) + '</td>'
+			newSeason = team.getPrevious(-1)
+			print newSeason.id
+			html += '<td class=percent>' + str(newSeason.getWinnats() * 100) + '</td>'
 			html += '<td>' + team.conference + '</td>'
-			html += '<td class=percent>' + str(newTeam.getWinconf() * 100) + '</td>'
+			html += '<td class=percent>' + str(newSeason.getWinconf() * 100) + '</td>'
 		except TeamSeason.DoesNotExist:
 			pass
 		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
@@ -745,6 +752,10 @@ def showPreseason(topTeams):
 	html += '</table>'
 
 	return html
+
+def showTopSwimmers(swimmers):
+	html = ''
+
 
 def googleTable(teamScores, scores):
 	table = ["['Name','Parent','Score'],"]
