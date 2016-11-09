@@ -5,7 +5,10 @@ from datetime import date as Date
 import time as Time
 import urlparse
 from playhouse.migrate import *
-
+from math import log
+from scipy.stats import norm, truncnorm
+import numpy as np
+import heapq
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -18,6 +21,68 @@ if "DATABASE_URL" in os.environ:  # production
 else:
 	db = PostgresqlDatabase('swimdb', user='hallmank')
 
+'''kills outliers from list greater than rsigma or less than lsigma'''
+def rejectOutliers(dataX, dataY=None, l=5, r=6):
+	u = np.mean(dataX)
+	s = np.std(dataX)
+
+	if dataY:
+		data = zip(dataX, dataY)
+		newList = [i for i in data if (u - l*s < i[0] < u + r*s)]
+		newX, newY = zip(*newList)
+		return list(newX), list(newY)
+	else:
+		newList = [i for i in dataX if (u - l*s < i < u + r*s)]
+	#print swimTime(max(newList)), swimTime(min(newList))
+	#print "Num rejected: " + str(len(dataX)-len(newList))
+	return newList
+
+'''
+used to find the the full distribution of times in a single event and a divsion, gender
+'''
+def getTimeCDF(gender, division, event, numsigma=-1):
+	# creates a frozen truncated normal distribution
+	def makeCDF(mu, sigma, clip):  # returns a frozen truncated normal CDF
+			a = -100  # arbitrarily fast times
+			b = (clip - mu) / sigma
+			def defaultCDF(x):
+				return truncnorm.cdf(x, a, b, mu, sigma)
+			return defaultCDF
+
+	# first check db
+	try:
+		dist = Timedist.get(Timedist.gender==gender, Timedist.division==division, Timedist.event==event,
+					 Timedist.percent==numsigma)
+		clipR = dist.mu + dist.sigma * dist.percent
+		#print dist.mu, dist.sigma, clipR, dist.event
+		ecdf = makeCDF(dist.mu, dist.sigma, clipR)
+		return ecdf
+
+	except Timedist.DoesNotExist:
+		times = []
+		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event):
+			if swim.time > 15:
+				times.append(swim.time)
+		if len(times) == 0:
+			return
+		times = rejectOutliers(times, l=5, r=5)
+
+		# best fit of data
+		(mu, sigma) = norm.fit(times)
+
+		'''top 10,1 percent'''
+		clipR = mu + sigma * numsigma  # slowest time to allow
+		fastTimes = [i for i in times if i< clipR]
+
+		#ecdfold = ECDF(fastTimes)
+		ecdf = makeCDF(mu, sigma, clipR)
+
+		newDist = Timedist(gender=gender, division=division, event=event, percent=numsigma, mu=mu, sigma=sigma)
+		newDist.save()
+
+	return ecdf
+
+
 class TeamSeason(Model):
 	season = IntegerField()
 	team = CharField()
@@ -28,11 +93,20 @@ class TeamSeason(Model):
 	winconf = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
+	topSwimmers = {}
+
+	def getPrevious(self, yearsBack=1):
+		try:
+			return TeamSeason.get(TeamSeason.team==self.team, TeamSeason.gender==self.gender,
+						   TeamSeason.division==self.division, TeamSeason.season==self.season-yearsBack)
+		except TeamSeason.DoesNotExist:
+			return
 
 	def getTaperStats(self, weeks=12):
-		for stats in TeamStats.select().where(TeamStats.team==self.name, TeamStats.gender==self.gender,
-			TeamStats.season==self.season - 1, TeamStats.week >= weeks).top(1).order_by(TeamStats.week):
-			return stats.mediantaper, stats.mediantaperstd
+		lastSeason = self.getPrevious()
+		for stats in TeamStats.select().where(TeamStats.teamseasonid==lastSeason.id, TeamStats.week >= weeks)\
+				.limit(1).order_by(TeamStats.week):
+			return stats.toptaper, stats.toptaperstd
 
 	def getWinnats(self):
 		if self.winnats:
@@ -44,14 +118,23 @@ class TeamSeason(Model):
 			return ''
 		for stats in TeamStats.select(fn.MAX(TeamStats.week), TeamStats.winconf).where(
 				TeamStats.teamseasonid==self.id).group_by(TeamStats.winconf):
-			#print stats.winconf, self.team
-			return stats.winconf
+			if stats.winconf:
+				return stats.winconf
 		if self.winconf:
 			return self.winconf
 		return 0
 
+	def getTopSwimmers(self, num=10):
+		swimmers = []
+		for swimmer in Swimmer.select().where(Swimmer.teamid==self.id):
+			if 'Relay' in swimmer.name: continue
+			heapq.heappush(swimmers, (swimmer.getPPTs(), swimmer))
+
+		return heapq.nlargest(num, swimmers)
+
 	class Meta:
 		database = db
+
 
 class TeamStats(Model):
 	teamseasonid = ForeignKeyField(TeamSeason)
@@ -68,6 +151,7 @@ class TeamStats(Model):
 	class Meta:
 		database = db
 
+
 class MeetStats(Model):
 	percent = FloatField()
 	place = IntegerField()
@@ -76,6 +160,7 @@ class MeetStats(Model):
 	class Meta:
 		database = db
 
+
 class Swimmer(Model):
 	name = CharField()
 	season = IntegerField()
@@ -83,9 +168,39 @@ class Swimmer(Model):
 	gender = CharField()
 	year = CharField()
 	teamid = ForeignKeyField(TeamSeason, null=True)
+	taperSwims = {}
 
 	class Meta:
 		database = db
+
+	def getTaperSwims(self, num=3):
+		taperSwims = {}
+		times = []
+
+		for swim in Swim.raw("WITH topTimes as "
+			"(SELECT name, gender, meet, event, time, year, division, swimmer_id, row_number() OVER "
+			"(PARTITION BY event, name ORDER BY time) as rnum "
+			"FROM Swim WHERE swimmer_id=%s) "
+			"SELECT name, event, meet, time, gender, division, year, swimmer_id FROM topTimes WHERE rnum=1",
+			self.id):
+			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
+				continue
+			points = swim.getPPTs()
+			heapq.heappush(times, (points, swim))
+
+		for (points, swim) in heapq.nlargest(num, times):  # take three best times
+			taperSwims[swim.event] = swim
+
+		return taperSwims
+
+	def getPPTs(self):
+		totalPPts = 0
+		taperSwims = self.getTaperSwims()
+		for event in taperSwims:
+			totalPPts += taperSwims[event].getPPTs()
+
+		return totalPPts
+
 
 class Swim(Model):
 	swimmer = ForeignKeyField(Swimmer, null=True)
@@ -109,6 +224,22 @@ class Swim(Model):
 	split = False
 	pastTimes = []
 	taperTime = None
+
+	def getPPTs(self):
+		if self.powerpoints:
+			return self.powerpoints
+
+		if not self.gender or not self.division or not self.event or not self.time:
+			return None
+		slowecdf = getTimeCDF(self.gender, self.division, self.event, numsigma=1)
+		fastecdf = getTimeCDF(self.gender, self.division, self.event, numsigma=-1)
+		#print ecdf(self.time)
+		percentileScore = (1 - slowecdf(self.time)) * 1000
+		powerScore = 10 / log(1 + fastecdf(self.time), 10) - 10 / log(2, 10)
+
+		#print percentileScore, powerScore
+		self.powerpoints = percentileScore + powerScore
+		return round(self.powerpoints, 3)
 
 	def getScoreTeam(self):
 		if self.scoreTeam:
@@ -147,7 +278,6 @@ class Swim(Model):
 		return name+br+self.getScoreTeam()+genderStr+br+self.event+br+time+br+meet
 
 	def taper(self, weeks, noise=0):
-		#print self.name, self.id, self.swimmer, self.swimmer.team, self.swimmer.id
 		taper, taperStd = self.getTaperStats(weeks=weeks)
 		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
 		self.scoreTime = self.time - self.time * taper / 100.0 + self.time * noise
@@ -172,7 +302,6 @@ class Swim(Model):
 			else:
 				self.scoreTime = newTime
 		except:
-			print self.time, self. event
 			self.scoreTime = self.time
 
 		return self
@@ -188,7 +317,7 @@ class Swim(Model):
 				TeamSeason.season==self.season - 1).id
 			for stats in TeamStats.select().where(TeamStats.teamseasonid==teamid, TeamStats.week >= weeks).limit(1)\
 				.order_by(TeamStats.week):
-				#print stats
+				#print stats,
 				if not stats.toptaper or stats.toptaper==0:
 					#print teamid, stats.week
 					return 3, 3
@@ -204,6 +333,7 @@ class Swim(Model):
 		database = db
 		indexes = ('name', 'meet')
 
+
 class HSSwim(Model):
 	name = CharField()
 	event = CharField()
@@ -215,6 +345,7 @@ class HSSwim(Model):
 
 	class Meta:
 		database = db
+
 
 class Improvement(Model):
 	swimmer = ForeignKeyField(Swimmer, null=True)
@@ -238,6 +369,7 @@ class Improvement(Model):
 	class Meta:
 		database = db
 
+
 class Meet(Model):
 	season = IntegerField()
 	meet = CharField()
@@ -247,12 +379,14 @@ class Meet(Model):
 	class Meta:
 		database = db
 
+
 class TeamMeet(Model):
 	team = ForeignKeyField(TeamSeason)
 	meet = ForeignKeyField(Meet)
 
 	class Meta:
 		database = db
+
 
 class Team(Model):
 	name = CharField()
@@ -294,7 +428,7 @@ def seasonString(dateString):
 		year = date.year
 	return year, date
 
-#make time look nice
+# make time look nice
 def swimTime(time):
 	(seconds, point) = re.split("\.", str(time))
 	if int(seconds) < 60:
@@ -311,7 +445,7 @@ def swimTime(time):
 		point = point + '0'
 	return  minutes + ":" + seconds + "." + point[:2]
 
-#turn time into seconds, round to two digits
+# turn time into seconds, round to two digits
 def toTime(time):
 	if time[-1]=='r':
 		time = time[:-1]
@@ -407,6 +541,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 		div, year, gender = match.groups()
 
 		if not (int(year) == 17):  # or (not div=='DIII') or (not gender=='m'):  #and gender=='m'):
+			continue
+		if not 'new' in swimFileName:
 			continue
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
@@ -580,7 +716,6 @@ def migrateImprovement():
 			pass
 	'''
 	for swim in Swim.select(Swim.name, Swim.season, Swim.team, Swim.relay, Swim.id).where(Swim.swimmer >> None):
-
 		try:
 			#print swim.team
 			if swim.relay: continue
@@ -641,23 +776,18 @@ def addRelaySwimmers():
 		Swim.update(swimmer=swimmerID).where(Swim.id==swim.id).execute()
 
 if __name__ == '__main__':
-	'''
-	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
-		print teamMeet.meet.meet, teamMeet.team.team, teamMeet.team.season, teamMeet.team.gender, \
-			teamMeet.team.conference
-
-	select teamstats.winconf,teamseason.team,teamstats.week, teamseason.id from teamstats, teamseason where teamstats.teamseasonid_id=teamseason.id and teamseason.season=2017 and week=-1;
-	'''
-	#db.get_indexes(Swim)
-	#swims = {}
 	#db.drop_tables([TeamStats, MeetStats])
 	#db.create_tables([TeamStats, MeetStats])
 	start = Time.time()
+	#for swim in Swim.select().where(Swim.name=='Hallman, Kevin').order_by(Swim.time):
+	#	print swim.event, swim.time, swim.getPPTs()
+	#car = TeamSeason.get(TeamSeason.team=='California', TeamSeason.gender=='Women', TeamSeason.season==2017)
+	#print car.getTaperStats()
 	#load(loadTeams)
 	safeLoad()
-	deleteDups()
+	#deleteDups()
 	#migrateImprovement()
-	addRelaySwimmers()
+	#addRelaySwimmers()
 	#safeLoad()
 	'''
 	migrator = PostgresqlMigrator(db)
