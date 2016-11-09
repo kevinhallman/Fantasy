@@ -735,7 +735,8 @@ def showPreseason(topTeams):
 	for idx, team in enumerate(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
-		html += '<td> <a href=/teamstats/' + team.team + '>' + team.team + '</a></td>'
+		# html += '<td> <a href=/teamstats/' + team.team + '>' + team.team + '</a></td>'
+		html += '<td>' + team.team + '</td>'
 		try:
 			newSeason = team.getPrevious(-1)
 			print newSeason.id
