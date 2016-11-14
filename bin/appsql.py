@@ -6,6 +6,7 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
+from swimdb import swimTime
 
 from swimdb import Meet, TeamMeet, Team, TeamSeason
 
@@ -189,10 +190,6 @@ class Fantasy(object):
 	def GET(self):
 		return render.fantasy()
 
-meetCache = {}
-mcScoreCache = {}
-teamScoreCache = {}
-scoreCache = {}
 class Conf(object):
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
@@ -220,37 +217,23 @@ class Conf(object):
 		else:
 			swimdate = None
 
-
 		if form.conference:
-			sentinelString = form.taper + form.conference + str(swimdate) + gender + division + str(season)
-			if sentinelString in meetCache:  # check cache first
-				print 'cached'
-				scores = scoreCache[sentinelString]
-				winProb = mcScoreCache[sentinelString]
-				teamScores = teamScoreCache[sentinelString]
+			if form.taper == 'Top Time':
+				topTimes = True
 			else:
-				if form.taper == 'Top Time':
-					topTimes = True
-				else:
-					topTimes = False
-				if form.conference == 'Nationals':
-					confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
+				topTimes = False
+			if form.conference == 'Nationals':
+				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
-					scores = confMeet.scoreString(25)
-					teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
-				else:
-					confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
+				scores = confMeet.scoreString(25)
+				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
+			else:
+				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
-					scores = confMeet.scoreString()
-					teamScores = confMeet.scoreReport()
-				print Time.time() - start
-				winProb = confMeet.scoreMonteCarlo(runs=100)
-
-				#add to cache
-				#meetCache[sentinelString] = confMeet
-				#scoreCache[sentinelString] = scores
-				#mcScoreCache[sentinelString] = winProb
-				#teamScoreCache[sentinelString] = teamScores
+				scores = confMeet.scoreString()
+				teamScores = confMeet.scoreReport()
+			print Time.time() - start
+			winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
@@ -503,33 +486,38 @@ class PreseasonRankings():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		# database.nationals(nextYear=True, gender=session.gender, division=session.division, season=2016, update=True)
-		# database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=-1)
+		#database.nationals(nextYear=False, gender=session.gender, division=session.division, season=2017,
+		#				   update=True, weeksIn=4)
+		#database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=4)
 
 		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
+		#newTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
 
 		rank = showPreseason(oldTopTeams)
 		return render.preseason(rank)
 
 class TeamStats():
 	def GET(self, team=None):
+		form = web.input(gender=None, division=None)
+		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
+		setGenDiv(form.gender, form.division)
 		if not team:
-			return render.teamstats(None, None, None, None, None, None)
+			return render.teamstats(None, None, None, None, None, None, None, None, None)
 
 		try:
 			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
-										TeamSeason.season==2016)
+										TeamSeason.season==2016, TeamSeason.gender==session.gender)
 		except TeamSeason.DoesNotExist:
-			return render.teamstats(None, None, None, None, None, None)
+			return render.teamstats(None, None, None, None, None, None, None, None, None)
 
 		# team speed
 		# dual strength, invite strength, nats%, conf%
-		print teamseason.season
+		#print teamseason.season
 		winNats = teamseason.getWinnats()
 		winConf = teamseason.getWinconf()
 
 		# team development
-		print team, session.gender, session.division
+		# print team, session.gender, session.division
 		try:
 			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
 			inviteStr = stats.strengthinvite
@@ -541,14 +529,15 @@ class TeamStats():
 			imp = None
 
 		# top swimmers
-		print teamseason.getTopSwimmers(10)
-		#print database.teamSwimmerRank(team=team, gender=session.gender, conference=teamseason.conference, season=2016)
+		topSwimmers = teamseason.getTopSwimmers(17)
+		#print topSwimmers
+		swimTable = showTopSwimmers(topSwimmers)
 
 		(medtaper, stdtaper) = teamseason.getTaperStats()
-		print medtaper, stdtaper
+		#print medtaper, stdtaper
 
-		# top lineup?
-		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats)
+		conf = teamseason.conference
+		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
 
 class ImprovementCaclulator():
 	def GET(self):
@@ -735,14 +724,31 @@ def showPreseason(topTeams):
 	for idx, team in enumerate(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
-		# html += '<td> <a href=/teamstats/' + team.team + '>' + team.team + '</a></td>'
-		html += '<td>' + team.team + '</td>'
+		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+') + '>' + team.team + '</a></td>'
+		#html += '<td>' + team.team + '</td>'
 		try:
-			newSeason = team.getPrevious(-1)
-			print newSeason.id
-			html += '<td class=percent>' + str(newSeason.getWinnats() * 100) + '</td>'
+			newSeason = team.getPrevious(-1) # so one year forward
+			winNats = newSeason.getWinnats() * 100
+			if winNats == '': winNatsDelta = ''
+			else: winNatsDelta = winNats - newSeason.getWinnats(1) * 100
+			winConf = newSeason.getWinconf() * 100
+			if winConf == '': winConfDelta = ''
+			else: winConfDelta = winConf - newSeason.getWinconf(1) * 100
+			if winNatsDelta > 0:
+				natsColor = 'green'
+			else:
+				natsColor = 'red'
+			if winConfDelta > 0:
+				confColor = 'green'
+			else:
+				confColor = 'red'
+			#html += '<td class=percent>' + str(winNats)\
+			#		+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
+			html += '<td>' + winNats + '</td>'
 			html += '<td>' + team.conference + '</td>'
-			html += '<td class=percent>' + str(newSeason.getWinconf() * 100) + '</td>'
+			html += '<td>' + winConf + '</td>'
+			#html += '<td class=percent>' + str(winConf)\
+			#		+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
 		except TeamSeason.DoesNotExist:
 			pass
 		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
@@ -756,7 +762,35 @@ def showPreseason(topTeams):
 
 def showTopSwimmers(swimmers):
 	html = ''
+	html += '<table id="topswimmers">'
+	html += '<thead><tr>'
+	html += '<th>Rank</th>'
+	html += '<th>Name</th>'
+	html += '<th>Year</th>'
+	html += '<th>Power Score</th>'
+	html += '<th>Top Events</th>'
+	html += '</tr></thead>'
+	html += '<tbody>'
+	for (idx, (score, swimmer)) in enumerate(swimmers):
+		html += '<tr>'
+		html += '<td>' + str(idx + 1) + '</td>'
+		html += '<td>' + swimmer.name + '</td>'
+		html += '<td>' + swimmer.year + '</td>'
+		html += '<td>' + str(int(score)) + '</td>'
+		topSwims = swimmer.getTaperSwims()
+		swimStr =''
+		for event in topSwims:
+			#print topSwims[event].getPPTs()
+			#print int(topSwims[event].getPPTs())
+			#print str(int(topSwims[event].getPPTs()))
+			swimStr += event + ': <b>' + swimTime(topSwims[event].time)\
+					   + ' (' + str(int(topSwims[event].getPPTs())) + ')</b> - '
+		html += '<td>' + swimStr + '</td>'
+		html += '<tr>'
 
+	html += '</tbody>'
+	html += '</table>'
+	return html
 
 def googleTable(teamScores, scores):
 	table = ["['Name','Parent','Score'],"]

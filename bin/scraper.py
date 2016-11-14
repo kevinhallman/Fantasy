@@ -286,7 +286,8 @@ def topTimesLoop():
 	distances['FR-R'] = [200, 400, 800]
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	strokes = ['FR', 'FL', 'BR', 'BK', 'IM', 'FR-R', 'MED-R']
-	conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
+	# conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
+	conferences = ['']
 	years = ['17']  # ['15','14','13','12','11']
 
 	directory = 'data'
@@ -310,7 +311,7 @@ def topTimesLoop():
 							oldTimes.add(line)
 
 				with open(filePath, 'w+') as meetFile:
-					for conference in ['']:
+					for conference in conferences:
 						if conference == '':
 							confName = 'all'
 						else:

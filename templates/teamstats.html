@@ -1,9 +1,8 @@
-$def with(team, inviteStr, attrition, imp, winConf, winNats)
+$def with(team, inviteStr, attrition, imp, winConf, winNats, topSwimmers, conf, medTaper)
 
 <h1>
-$team Stats
+$team | $conf Stats
 </h1>
-
 <p>
 	<b>Invite Strength:</b> $inviteStr
 </p>
@@ -14,8 +13,14 @@ $team Stats
 	<b>Nationals Win %:</b> $winNats
 </p>
 <p>
-	<b>Attrition:</b> $attrition
+	<b>Attrition %:</b> $attrition
 </p>
 <p>
-	<b>Swimmer Improvement:</b> $imp
+	<b>Swimmer Improvement %:</b> $imp
+</p>
+<p>
+	<b>Taper %:</b> $medTaper
+</p>
+<p>
+	$:topSwimmers
 </p>
