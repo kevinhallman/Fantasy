@@ -744,9 +744,9 @@ def showPreseason(topTeams):
 				confColor = 'red'
 			#html += '<td class=percent>' + str(winNats)\
 			#		+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
-			html += '<td>' + winNats + '</td>'
+			html += '<td>' + str(winNats) + '</td>'
 			html += '<td>' + team.conference + '</td>'
-			html += '<td>' + winConf + '</td>'
+			html += '<td>' + str(winConf) + '</td>'
 			#html += '<td class=percent>' + str(winConf)\
 			#		+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
 		except TeamSeason.DoesNotExist:
