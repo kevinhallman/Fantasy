@@ -29,7 +29,7 @@ urls = ('/', 'Home',
 	'/teamMeets', 'teamMeets',
 	'/programs', 'Programs',
 	'/power', 'PowerRankings',
-	'/preseason', 'PreseasonRankings',
+	'/preseason', 'SeasonRankings',
 	'/impcalc', 'ImprovementCalculator',
 	'/teamstats/(.+)', 'TeamStats'
 )
@@ -481,24 +481,20 @@ class PowerRankings():
 		rank = showTopRanking(topTeams)
 		return render.powerRank(rank)
 
-class PreseasonRankings():
+class SeasonRankings():
 	def GET(self):
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		#database.nationals(nextYear=False, gender=session.gender, division=session.division, season=2017,
-		#				   update=True, weeksIn=4)
-		#database.updateConferenceProbs(division=session.division, gender=session.gender, season=2017, weeksIn=4)
-
 		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
-		#newTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
 
-		rank = showPreseason(oldTopTeams)
+		rank = showRank(oldTopTeams)
 		return render.preseason(rank)
 
 class TeamStats():
 	def GET(self, team=None):
-		form = web.input(gender=None, division=None)
+		form = web.input(gender=None, division=None, season=2016)
+		season = form.season
 		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
 		setGenDiv(form.gender, form.division)
 		if not team:
@@ -506,27 +502,28 @@ class TeamStats():
 
 		try:
 			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
-										TeamSeason.season==2016, TeamSeason.gender==session.gender)
+										TeamSeason.season==season, TeamSeason.gender==session.gender)
 		except TeamSeason.DoesNotExist:
 			return render.teamstats(None, None, None, None, None, None, None, None, None)
 
 		# team speed
 		# dual strength, invite strength, nats%, conf%
 		#print teamseason.season
-		winNats = teamseason.getWinnats()
-		winConf = teamseason.getWinconf()
+		winNats = round(teamseason.getWinnats(), 3) * 100
+		winConf = round(teamseason.getWinconf(), 3) * 100
 
 		# team development
 		# print team, session.gender, session.division
 		try:
 			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
 			inviteStr = stats.strengthinvite
-			attrition = stats.attrition
-			imp = stats.improvement
+			attrition = round(stats.attrition, 3)
+			imp = round(stats.improvement, 3)
 		except Team.DoesNotExist:
 			inviteStr = None
 			attrition = None
 			imp = None
+		inviteStr = teamseason.getStrength()
 
 		# top swimmers
 		topSwimmers = teamseason.getTopSwimmers(17)
@@ -708,17 +705,17 @@ def showTopRanking(topTeams):
 
 	return html
 
-def showPreseason(topTeams):
+def showRank(topTeams):
 	html = ''
 	html += '<table id="topteams">'
 	html += '<thead><tr>'
-	html += '<th>2016 Rank</th>'
+	html += '<th>Rank</th>'
 	html += '<th>Team</th>'
-	html += '<th>National Win % 2017</th>'
+	html += '<th>National Win % (delta)</th>'
 	html += '<th>Conference</th>'
-	html += '<th>Conference Win % 2017</th>'
-	html += '<th>Invite Strength 2016</th>'
-	html += '<th>Dual Strength 2016</th>'
+	html += '<th>Conference Win % (delta)</th>'
+	html += '<th>Invite Strength</th>'
+	html += '<th>Dual Strength</th>'
 	html += '</tr></thead>'
 	html += '<tbody>'
 	for idx, team in enumerate(topTeams):
@@ -736,23 +733,31 @@ def showPreseason(topTeams):
 			else: winConfDelta = winConf - newSeason.getWinconf(1) * 100
 			if winNatsDelta > 0:
 				natsColor = 'green'
-			else:
+			elif winNatsDelta < 0:
 				natsColor = 'red'
+			else:
+				natsColor = 'gray'
 			if winConfDelta > 0:
 				confColor = 'green'
-			else:
+			elif winConfDelta < 0:
 				confColor = 'red'
-			#html += '<td class=percent>' + str(winNats)\
-			#		+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
-			html += '<td class=percent>' + str(winNats) + '</td>'
+			else:
+				confColor = 'gray'
+
+			html += '<td class=percent>' + str(winNats)\
+					+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
+			# html += '<td class=percent>' + str(winNats) + '</td>'
 			html += '<td>' + team.conference + '</td>'
-			html += '<td class=percent>' + str(winConf) + '</td>'
-			#html += '<td class=percent>' + str(winConf)\
-			#		+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
+			# html += '<td class=percent>' + str(winConf) + '</td>'
+			if team.conference:
+				html += '<td class=percent>' + str(winConf)\
+					+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
+			else:
+				html += '<td class=percent></td>'
 		except TeamSeason.DoesNotExist:
 			pass
-		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
-		html += '<td class=dualpow>' + str(team.strengthdual) + '</td>'
+		html += '<td class=invpow>' + str(newSeason.getStrength()) + '</td>'
+		html += '<td class=dualpow>' + str(newSeason.getStrength(invite=False)) + '</td>'
 		html += '<tr>'
 
 	html += '</tbody>'

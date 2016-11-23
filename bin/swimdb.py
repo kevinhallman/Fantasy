@@ -6,7 +6,7 @@ import time as Time
 import urlparse
 from playhouse.migrate import *
 from math import log
-from scipy.stats import norm, truncnorm
+from scipy.stats import norm, truncnorm, skewnorm
 import numpy as np
 import heapq
 from operator import itemgetter
@@ -53,16 +53,16 @@ def getTimeCDF(gender, division, event, numsigma=-1):
 
 	# first check db
 	try:
-		dist = Timedist.get(Timedist.gender==gender, Timedist.division==division, Timedist.event==event,
-					 Timedist.percent==numsigma)
-		clipR = dist.mu + dist.sigma * dist.percent
+		dist = Timedist.get(Timedist.gender==gender, Timedist.division==division, Timedist.event==event)
+		clipR = dist.mu + dist.sigma * numsigma
 		#print dist.mu, dist.sigma, clipR, dist.event
 		ecdf = makeCDF(dist.mu, dist.sigma, clipR)
 		return ecdf
 
 	except Timedist.DoesNotExist:
 		times = []
-		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event):
+		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
+												 Swim.season==2016):
 			if swim.time > 15:
 				times.append(swim.time)
 		if len(times) == 0:
@@ -79,10 +79,36 @@ def getTimeCDF(gender, division, event, numsigma=-1):
 		#ecdfold = ECDF(fastTimes)
 		ecdf = makeCDF(mu, sigma, clipR)
 
-		newDist = Timedist(gender=gender, division=division, event=event, percent=numsigma, mu=mu, sigma=sigma)
+		newDist = Timedist(gender=gender, division=division, event=event, mu=mu, sigma=sigma, skew=False)
 		newDist.save()
 
 	return ecdf
+
+def getSkewCDF(gender, division, event):
+	try:
+		dist = Timedist.get(gender=gender, division=division, event=event, skew=True)
+		frozen = skewnorm(dist.a, dist.mu, dist.sigma)
+		return frozen
+
+	except Timedist.DoesNotExist:
+		times = [] # 2016 is the only season with all the times
+		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
+												 Swim.season==2016):
+			times.append(swim.time)
+		if len(times) == 0:
+			return
+		times = rejectOutliers(times, l=4, r=4)
+
+		# best fit of data
+		(mu, sigma) = norm.fit(times)
+		(a, mu, sigma) = skewnorm.fit(times, max(times)-mu, loc=mu, scale=sigma)
+		r = skewnorm(a, mu, sigma)
+
+		# save off the new dist
+		newDist = Timedist(gender=gender, division=division, event=event, a=a, mu=mu, sigma=sigma, skew=True)
+		newDist.save()
+	return r
+
 
 class TeamSeason(Model):
 	season = IntegerField()
@@ -110,8 +136,8 @@ class TeamSeason(Model):
 			return stats.toptaper, stats.toptaperstd
 
 	def getWinnats(self, previous=0):
-		for stats in TeamStats.select(TeamStats.winnats).where(TeamStats.winnats.is_null(False),
-				TeamStats.teamseasonid==self.id).limit(1).offset(previous):
+		for stats in TeamStats.select(TeamStats.winnats, TeamStats.week).where(TeamStats.winnats.is_null(False),
+				TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
 			if stats.winnats:
 				return stats.winnats
 		if self.winnats:
@@ -119,15 +145,33 @@ class TeamSeason(Model):
 		return 0
 
 	def getWinconf(self, previous=0):
+		#print self.team, self.id
 		if not self.conference:
 			return ''
-		for stats in TeamStats.select(TeamStats.winconf).where(TeamStats.winconf.is_null(False),
-				TeamStats.teamseasonid==self.id).limit(1).offset(previous):
+		for stats in TeamStats.select(TeamStats.winconf, TeamStats.week)\
+				.where(TeamStats.winconf.is_null(False), TeamStats.teamseasonid==self.id, TeamStats.week > 0)\
+				.order_by(TeamStats.week.desc()).limit(1).offset(previous):
 			if stats.winconf:
 				return stats.winconf
 		if self.winconf:
 			return self.winconf
 		return 0
+
+	def getStrength(self, previous=0, invite=True):
+		if invite:
+			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week).where(TeamStats.strengthinvite.is_null(False),
+					TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
+				if stats.strengthinvite:
+					return stats.strengthinvite
+			if self.strengthinvite:
+				return self.strengthinvite
+		else:
+			for stats in TeamStats.select(TeamStats.strengthdual, TeamStats.week).where(TeamStats.strengthdual.is_null(
+					False),	TeamStats.teamseasonid==self.id).limit(1).order_by(TeamStats.week.desc()).offset(previous):
+				if stats.strengthdual:
+					return stats.strengthdual
+			if self.strengthdual:
+				return self.strengthdual
 
 	def getTopSwimmers(self, num=10):
 		swimmers = []
@@ -310,15 +354,13 @@ class Swim(Model):
 
 		if not self.gender or not self.division or not self.event or not self.time:
 			return None
-		slowecdf = getTimeCDF(self.gender, self.division, self.event, numsigma=1)
-		fastecdf = getTimeCDF(self.gender, self.division, self.event, numsigma=-1)
-		#print self.name, self.event, self.time, slowecdf(self.time), fastecdf(self.time)
-		percentileScore = (1 - slowecdf(self.time)) * 1000
-		#powerScore = (1 - slowecdf(self.time)) * 1000
-		powerScore = 10 / log(1 + fastecdf(self.time), 10) - 10 / log(2, 10)
+		dist = getSkewCDF(self.gender, self.division, self.event)
+		percentileScore = (1 - dist.cdf(self.time)) * 500
+		powerScore = 1 / dist.cdf(self.time)
+		zscore = log(powerScore) * 50  # approximately the number of stds away from the means
 
-		print self.name, self.event, percentileScore, powerScore
-		self.powerpoints = percentileScore + powerScore
+		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
+		self.powerpoints = percentileScore + zscore
 		return round(self.powerpoints, 3)
 
 	def expectedPoints(self, numSwimmers=6, losses=0, numsigma=-1):
@@ -439,19 +481,6 @@ class Swim(Model):
 		indexes = ('name', 'meet')
 
 
-class HSSwim(Model):
-	name = CharField()
-	event = CharField()
-	time = FloatField()
-	season = IntegerField()
-	team = CharField()
-	gender = CharField()
-	year = CharField()
-
-	class Meta:
-		database = db
-
-
 class Improvement(Model):
 	swimmer = ForeignKeyField(Swimmer, null=True)
 	name = CharField()
@@ -515,7 +544,8 @@ class Timedist(Model):
 	division = CharField()
 	mu = FloatField()
 	sigma = FloatField()
-	percent = IntegerField(null=True)
+	a = FloatField(null=True)
+	skew = BooleanField(null=True)
 
 	class Meta:
 		database = db
@@ -577,29 +607,6 @@ def getConfs(confFile):
 				teams[team] = (conf, division)
 	return teams
 
-def loadHS():
-	file = 'data/HStimesMen827.txt'
-
-	#swimmers = Swim.where(Swim.)
-
-	with open(file) as swimFile:
-		swims = []
-		for line in swimFile:
-			parts = line.split('|')
-			print parts
-			(team, name, year, event, time, gender) = (parts[0].strip(), parts[1], int(parts[2]), parts[3], parts[4],
-													   parts[5].strip())
-			time = toTime(time)
-			newSwim = {'season': year, 'name': name, 'team': team, 'year': 'HS',
-					   'gender': gender, 'event': event, 'time': time}
-			swims.append(newSwim)
-
-	print swims
-
-	db.connect()
-	with db.transaction():
-		HSSwim.insert_many(swims).execute()
-
 '''
 load in new swim times
 can load in to all SQL tables if params are true
@@ -624,7 +631,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		div, year, gender = match.groups()
 
-		if not (int(year) == 17) and not (int(year) == 16):
+		if not (int(year) == 17): # and not (int(year) == 16):
 			continue
 		if not 'new' in swimFileName:
 			continue
@@ -770,10 +777,15 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 def deleteDups():
 	# cleanup for duplicate swims
-	Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
+	'''print Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY meet, name, event, time ORDER BY id) AS rnum '
         'FROM Swim) t '
-        'WHERE t.rnum > 1) and season=2017')
+        'WHERE t.rnum > 1) and season=2016').execute()'''
+
+	print TeamStats.raw('DELETE FROM TeamStats WHERE id IN (SELECT id FROM (SELECT id, '
+        'ROW_NUMBER() OVER (partition BY week, teamseasonid_id ORDER BY id) AS rnum '
+        'FROM TeamStats) t '
+        'WHERE t.rnum > 1)').execute()
 
 def migrateImprovement():
 

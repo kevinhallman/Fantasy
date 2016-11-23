@@ -273,6 +273,7 @@ def getConfs(confFile='./data/conferences.txt'):
 				confDiv[conf] = division
 	return confDiv
 
+
 def topTimesLoop():
 	confDiv = getConfs()
 	genders = ['m', 'f']
@@ -302,13 +303,24 @@ def topTimesLoop():
 			for gender in genders:
 				filePath = directory + '/' + division + year + gender + 'new'
 				oldFilePath = directory + '/' + division + year + gender
-				#if os.path.exists(filePath):
-				#	os.remove(filePath)
+
+				# load old times to prevent dups
 				oldTimes = set()
 				if os.path.exists(oldFilePath):
 					with open(oldFilePath, 'r') as oldMeetFile:
 						for line in oldMeetFile:
 							oldTimes.add(line)
+
+				# move last load's new times into old file
+				if os.path.exists(filePath):
+					with open(oldFilePath, 'a') as outfile:
+						with open(filePath, 'r') as infile:
+							for line in infile:
+								if line not in oldTimes:
+									outfile.write(line)
+									oldTimes.add(line)
+					os.remove(filePath)
+
 
 				with open(filePath, 'w+') as meetFile:
 					for conference in conferences:
@@ -321,9 +333,12 @@ def topTimesLoop():
 						for stroke in distances:
 							for distance in distances[stroke]:
 								print year, division, gender, distance, stroke
+
+								# now find the times and load them into the new file if they aren't in the old
 								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
 											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
 												  Number=7000, oldTimes=oldTimes)
+
 
 if __name__ == "__main__":
 	topTimesLoop()  # get all new times

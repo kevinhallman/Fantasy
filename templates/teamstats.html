@@ -3,24 +3,28 @@ $def with(team, inviteStr, attrition, imp, winConf, winNats, topSwimmers, conf, 
 <h1>
 $team | $conf Stats
 </h1>
+<form name=season method="GET">
+	<label>Season:</label>
+	<select name="season">
+		$for season in [2017, 2016, 2015, 2014, 2013, 2012, 2011]:
+			<option>$season</option>
+	</select>
+	<input type="submit" value="Submit">
+</form>
+
 <p>
 	<b>Invite Strength:</b> $inviteStr
-</p>
-<p>
+	<br>
 	<b>Conference Win %:</b> $winConf
-</p>
-<p>
+	<br>
 	<b>Nationals Win %:</b> $winNats
-</p>
-<p>
+	<br>
 	<b>Attrition %:</b> $attrition
-</p>
-<p>
+	<br>
 	<b>Swimmer Improvement %:</b> $imp
-</p>
-<p>
+	<br>
 	<b>Taper %:</b> $medTaper
+	<br>
 </p>
-<p>
-	$:topSwimmers
-</p>
+
+$:topSwimmers
