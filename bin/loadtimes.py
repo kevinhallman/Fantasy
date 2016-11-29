@@ -16,6 +16,26 @@ if "DATABASE_URL" in os.environ:  # production
 else:
 	db = PostgresqlDatabase('swimdb', user='hallmank')
 
+def getNewConfs():
+	confTeams = {}
+	with open('data/newconferences.txt', 'r') as file:
+		for line in file:
+			parts = re.split('\t', line.strip())
+			division = parts[0]
+			gender = parts[1]
+			year = '20' + parts[2]
+			conf = parts[3]
+			team = parts[4]
+			if not division in confTeams:
+				confTeams[division] = {}
+			if not gender in confTeams[division]:
+				confTeams[division][gender] = {}
+			if not year in confTeams[division][gender]:
+				confTeams[division][gender][year] = {}
+			if not conf in confTeams[division][gender][year]:
+				confTeams[division][gender][year][team] = conf
+	return confTeams
+
 '''
 load in new swim times
 can load in to all SQL tables if params are true
@@ -308,17 +328,27 @@ def fixRelays():
 		count +=1
 		if count%1000==0: print count
 	print count
-	#for swim in Swim.select(Swim.id, Swim.relay, Swimmer.name, Swimmer.teamid).join(Swimmer).where(Swim.relay is True,
-	#					~Swimmer.name.endswith('Relay')):
-	#	print swim
 
+def fixConfs():
+	newConfs = getNewConfs()
+	for team in TeamSeason.select().where(TeamSeason.season>2010):
+		try:
+			conf = newConfs[team.division][team.gender][str(team.season)][team.team]
+			if conf != team.conference:
+				print 'nope', team.id, team.team, team.conference, conf
+				team.conference = conf
+				team.save()
+		except:
+			pass
+			#print 'huh', team.id, team.team, team.division, team.gender, team.season
 
 if __name__ == '__main__':
 	start = Time.time()
 	# mergeSwimmers(165702, 165703)
 	# mergeTeams(4498, 3623)
 	# fixRelays()
-	safeLoad()
+	# safeLoad()
+	fixConfs()
 	# deleteDups()
 	# migrateImprovement()
 	# addRelaySwimmers()
