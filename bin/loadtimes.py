@@ -138,10 +138,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					if not key in swimmerKeys:
 						swimmerKeys.add(key)
 						try:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
+							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
+													Swimmer.gender==gender).id
 						except Swimmer.DoesNotExist:
-							if not teamID:
-								teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
 										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
 							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
 								gender, 'teamid': teamID}
@@ -151,10 +151,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					key = str(season) + meet + gender + team
 					if not key in teamMeetKeys:
 						teamMeetKeys.add(key)
-						if not meetID:
-							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
-						if not teamID:
-							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+						meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
+						teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
 										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
 						try:
 							teamMeetID = TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID).id
@@ -165,10 +163,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				if loadSwims:
 					try:
 						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-							Swim.date==swimDate)  # floats in SQL and python evidently different precision
+							Swim.date==swimDate)  # floats in SQL and python different precision
 					except Swim.DoesNotExist:
-						if not swimmerID and not relay:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
+						swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
+												Swimmer.gender==gender).id
 						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
 					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
 							division, 'relay': relay, 'swimmer': swimmerID}
@@ -305,6 +303,7 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 	Swimmer.delete().where(Swimmer.id==sourceSwimmerId).execute()
 
 def fixRelays():
+	'''
 	count = 0
 	for swim in Swim.select(Swim.name, Swim.id, Swim.relay, Swimmer.name, Swimmer.teamid, TeamSeason.team,
 							TeamSeason.season, TeamSeason.team, TeamSeason.gender).join(
@@ -328,6 +327,26 @@ def fixRelays():
 		count +=1
 		if count%1000==0: print count
 	print count
+	'''
+	count=0
+	for swim in Swim.select().join(Swimmer).where(Swimmer.gender=='Men', Swim.gender=='Women'):
+		count += 1
+		try:
+			newswimmer = Swimmer.get(Swimmer.season==swim.season, Swimmer.name==swim.name, Swimmer.team==swim.team,
+							  Swimmer.gender==swim.gender)
+			swim.swimmer = newswimmer.id
+			swim.save()
+		except Swimmer.DoesNotExist:
+			try:
+				team = TeamSeason.get(TeamSeason.season==swim.season, TeamSeason.gender==swim.gender,
+							   TeamSeason.team==swim.team)
+				n=Swimmer.create(teamid=team.id, gender=team.gender, season=team.season, team=team.team, name=swim.name)
+				swim.swimmer = n.id
+				swim.save()
+			except TeamSeason.DoesNotExist:
+				print swim.event, swim.name, swim.team, swim.season, swim.gender
+
+	print count
 
 def fixConfs():
 	newConfs = getNewConfs()
@@ -344,11 +363,15 @@ def fixConfs():
 
 if __name__ == '__main__':
 	start = Time.time()
-	# mergeSwimmers(165702, 165703)
-	# mergeTeams(4498, 3623)
-	# fixRelays()
-	# safeLoad()
-	fixConfs()
+	#mergeSwimmers(294608, 285526)
+	#mergeSwimmers(293514, 280998)
+	#mergeTeams(7495, 8434)
+	#mergeTeams(6582, 8450)
+	#mergeTeams(7625, 8435)
+	#mergeTeams(6785, 8453)
+	#fixRelays()
+	safeLoad()
+	# fixConfs()
 	# deleteDups()
 	# migrateImprovement()
 	# addRelaySwimmers()
