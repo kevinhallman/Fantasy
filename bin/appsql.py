@@ -576,7 +576,7 @@ class ProgramsJSON():
 		allConfs = conferences[division][gender]
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
-			return render.programs(conferences=sorted(allConfs.keys()), rankings=None)
+			return json.dumps({})
 		teamRecruits = {}
 		teamImprovement = {}
 		teamAttrition = {}
@@ -605,8 +605,7 @@ class ProgramsJSON():
 				teamRank[team][0] += idx
 				teamRank[team].append((idx, score))
 
-		html = showPrograms(teamRank)
-		return render.programs(conferences=sorted(allConfs.keys()), rankings=html)
+		return json.dumps(teamRank)
 
 class PowerRankings():
 	def GET(self):
