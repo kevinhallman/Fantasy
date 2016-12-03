@@ -1,15 +1,12 @@
 import web
 import sqlmeets
-import operator
 import re
 import json
 import os, urlparse
 import numpy
 from peewee import *
 from swimdb import swimTime
-
 from swimdb import Meet, TeamMeet, Team, TeamSeason
-
 from operator import itemgetter
 import time as Time
 
@@ -231,8 +228,9 @@ class SwimulateJSON():
 			newMeet.reset(True, True)
 			winProb = newMeet.scoreMonteCarlo()
 
+		labeledScores = JSONScores(scores)
 		response = {}
-		response['individual results'] = scores
+		response['individual results'] = labeledScores
 		response['team scores'] = teamScores
 		response['win probability'] = winProb
 
@@ -296,7 +294,7 @@ class Conf():
 								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
 								 table=table, winTable=showWinTable(winProb))
 
-class ConfJSON(object):
+class ConfJSON():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None)
 		web.header("Content-Type", "application/json")
@@ -335,14 +333,16 @@ class ConfJSON(object):
 			teamScores = confMeet.scoreReport()
 		winProb = confMeet.scoreMonteCarlo(runs=100)
 
+		labeledScores = JSONScores(scores)
+
 		response = {}
-		response['individual results'] = scores
+		response['individual results'] = labeledScores
 		response['team scores'] = teamScores
 		response['win probability'] = winProb
 
 		return json.dumps(response)
 
-class Times(object):
+class Times():
 	def GET(self):
 		division = session.division
 		gender = session.gender
@@ -367,7 +367,7 @@ class Times(object):
 
 		return render.times(conferences=sorted(confList.keys()), events=eventOrder, scores=scores)
 
-class Placing(object):
+class Placing():
 	def GET(self):
 		division = session.division
 		gender = session.gender
@@ -424,18 +424,13 @@ class Improvement():
 		if form.season in {'2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
-			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		elif form.season == 'All':
 			season1 = season
 			season2 = season - 3
-			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
-		elif form.season == 'High School':
-			teamImp = database.HSImprovement(gender=gender, teams=teams)
-
-			#print teamImp
-			table =googleCandle(teamImp)
 		else:
 			table = None
 
@@ -460,11 +455,11 @@ class ImprovementJSON():
 		if form.season in {'2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
-			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		elif form.season == 'All':
 			season1 = season
 			season2 = season - 3
-			teamImp = database.improvement2(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		else:
 			teamImp = None
 
@@ -605,7 +600,19 @@ class ProgramsJSON():
 				teamRank[team][0] += idx
 				teamRank[team].append((idx, score))
 
-		return json.dumps(teamRank)
+		teamRankLabel = {}
+		for team in teamRank:
+			teamRankLabel[team] = {}
+			teamRankLabel[team]['totalscore'] = teamRank[team][0]
+			for (idx, part) in enumerate(teamRank[team][1:]):
+				if idx == 0:
+					teamRankLabel[team]['strength'] = {'rank': part[0], 'value': part[1]}
+				elif idx == 1:
+					teamRankLabel[team]['attrition'] = {'rank': part[0], 'value': part[1]}
+				elif idx == 2:
+					teamRankLabel[team]['improvement'] = {'rank': part[0], 'value': part[1]}
+
+		return json.dumps(teamRankLabel)
 
 class PowerRankings():
 	def GET(self):
@@ -1076,20 +1083,21 @@ def showWinTable(winProb, top=20):
 
 	return html
 
-
-
-class Team(Model):
-	name = CharField()
-	improvement = FloatField()
-	attrition = FloatField()
-	strengthdual = FloatField()
-	strengthinvite = FloatField()
-	conference = CharField()
-	division = CharField()
-	gender = CharField()
-
-	class Meta:
-		database = db
+def JSONScores(scores):
+	# label scoring
+	scoresLabel = {}
+	for event in scores:
+		scoresLabel[event] = {}
+		for swimmer in scores[event]:
+			#print swimmer
+			if len(swimmer) == 5:
+				(name, team, event, time, score) = swimmer
+			if len(swimmer) == 4:
+				(name, team, event, time) = swimmer
+				score = 0
+			scoresLabel[event][name] = {}
+			scoresLabel[event][name] = {'team': team, 'time': time, 'score': score}
+	return scoresLabel
 
 if __name__ == "__main__":
 	app.run()
