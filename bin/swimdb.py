@@ -381,8 +381,9 @@ class Swim(Model):
 		if not self.gender or not self.division or not self.event or not self.time:
 			return None
 		cdf = getSkewCDF(self.gender, self.division, self.event)
-		percentileScore = (1 - cdf(self.time)) * 500
-		powerScore = 1 / cdf(self.time)
+		percent = 1 - cdf(self.time)
+		percentileScore = (1 - percent) * 500
+		powerScore = 1 / percent
 		zscore = log(powerScore) * 50  # approximately the number of stds away from the means
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
