@@ -667,7 +667,10 @@ class TeamStats():
 		#print topSwimmers
 		swimTable = showTopSwimmers(topSwimmers)
 
-		(medtaper, stdtaper) = teamseason.getTaperStats()
+		if teamseason.getTaperStats():
+			(medtaper, stdtaper) = teamseason.getTaperStats()
+		else:
+			(medtaper, stdtaper) = 0, 0
 		#print medtaper, stdtaper
 
 		conf = teamseason.conference
