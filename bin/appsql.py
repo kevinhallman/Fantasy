@@ -486,10 +486,10 @@ class Rankings():
 			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
 			bar = False
 		scores = {}
+		if not form.conference:
+			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
 		if form.conference in confList:
 			teams = confList[form.conference]
-		elif form.conference == 'All':
-			teams = allTeams[gender][division]
 		else:
 			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
 
