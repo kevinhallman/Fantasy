@@ -16,7 +16,7 @@ def toTime(time):
 conferenceMap = {59:'Allegheny Mountain',81:'American Southwest',346:'Appalachian (ASC)',125:'Bluegrass Mountain',82:'Capital Athletic',83:'Centennial',84:'City Univ. of New York',85:'College of Illinois/Wisc',86:'Colonial States Athletic',87:'Commonwealth Coast',88:'Empire 8',90:'Great Northeast Athletic',89:'Great South Athletic',91:'Heartland Collegiate',338:'Independent',92:'Iowa Intercollegiate',93:'Landmark',124:'Liberal Arts',94:'Liberty League',95:'Little East',96:'Massachusetts State',130:'Metropolitan Swim',97:'Michigan Intercollegiate',98:'Middle Atlantic',99:'Midwest',100:'MIAC',101:'New England Intercoll.',102:'NESCAC',103:'New England',104:'New Jersey Athletic',105:'North Atlantic',106:'North Coast Athletic',107:'North Eastern Athletic',108:'Northern Athletics',109:'Northwest Conference',110:'Ohio Athletic',111:'Old Dominion Athletic',129:'Pacific Collegiate',112:'Presidents',114:'Skyline',343:'Southern Athletic Associa',115:'Southern California',116:'Southern Collegiate',113:'St. Louis Intercollegiate',117:'State Univ of New York',119:'University Athletic',120:'Upper Midwest Athletic',118:'USA South Athletic',121:'Wisconsin Intercollegiate',25:'ACC (Atlantic Coast)',29:'America East',345:'American Athletic Conf',30:'Atlantic 10',27:'Big 12',31:'Big East',1:'Big Ten',49:'Coastal College (CCSA)',33:'Colonial Athletic Assoc',34:'Conference USA',35:'Horizon League',36:'Independent',37:'Ivy League',38:'Metro Atlantic Athl. Conf',340:'Metropolitan Swimming Con',39:'Mid',41:'Missouri Valley',336:'Mountain Pacific Sports',42:'Mountain West',43:'Northeast Conf',28:'Pac 12',26:'SEC',45:'Sun Belt',46:'The Patriot League',47:'The Summit League',48:'Western Athletic Conf',339:'Appalachian (ASC)',123:'Bluegrass Mountain',341:'California Collegiate',61:'Central Atlantic',64:'East Coast',66:'Great Lakes Intercoll',344:'Great Lakes Valley',337:'Independent',128:'Metropolitan Swimming',71:'Mid',127:'New South Intercollegiate',73:'Northeast Ten',72:'Northern Sun Intercoll',131:'Pacific Collegiate',122:'Pennsylvania State (PSAC)',76:'Rocky Mountain Athletic',79:'Sunshine State'}
 
 def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50', Stroke='1', Gender='rbGenderMale',
-				BestAll='radBestTimeOnly', Number=100, StartDate='', EndDate='', oldTimes=set()):
+				BestAll='radBestTimeOnly', Number=100, StartDate='', EndDate='', oldTimes=set(), printConf=False):
 	URL = 'http://usaswimming.org/DesktopDefault.aspx?TabId=1969&Alias=Rainbow&Lang=en'
 	Cut = '1'
 	Division = 1
@@ -222,7 +222,12 @@ def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50',
 			if '*' in time:  # getting some asterisks in times
 				time = re.split('\*', time)[0].strip()
 			num += 1
-			timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
+			if printConf:
+				conf = conferenceMap[Conference]
+				timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\t' \
+																						+conf+'\n'
+			else:
+				timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
 
 			if timeString not in oldTimes:
 				File.write(timeString)
@@ -272,7 +277,6 @@ def getConfs(confFile='./data/conferences.txt'):
 			if not conf in confDiv:
 				confDiv[conf] = division
 	return confDiv
-
 
 def topTimesLoop():
 	confDiv = getConfs()
@@ -339,10 +343,92 @@ def topTimesLoop():
 											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
 												  Number=7000, oldTimes=oldTimes)
 
+def getConferenceData():
+	confDiv = getConfs()
+	genders = ['m', 'f']
+	divisions = ['DIII', 'DII', 'DI']
+	distances = {}
+	distances['FR'] = [100]
+	conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
+	#conferences = ['']
+	years = ['17', '16', '15','14','13','12','11']
+
+	directory = 'data'
+	for year in years:
+		for division in divisions:
+			if division == 'DI':
+				divNum = 'D1'
+			elif division == 'DII':
+				divNum = 'D2'
+			else:
+				divNum = 'D3'
+			for gender in genders:
+				filePath = directory + '/confs/' + division + year + gender
+
+				with open(filePath, 'w+') as meetFile:
+					for conference in conferences:
+						print conferenceMap[conference]
+						if conference == '':
+							confName = 'all'
+						else:
+							confName = conferenceMap[conference]
+						if confName in confDiv and confDiv[confName] != divNum:
+							continue
+						for stroke in distances:
+							for distance in distances[stroke]:
+								print year, division, gender, distance, stroke
+
+								# now find the times and load them into the new file if they aren't in the old
+								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
+											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
+												  Number=7000, oldTimes=set(), printConf=True)
+
+def storeConfs():
+	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
+	root = 'data/confs/'
+	for fileName in os.listdir(root):
+		with open(root + fileName, 'r') as file:
+			match = re.search('(\D+)(\d+)([mf])', fileName)
+			if not match:
+				continue
+			division, year, gender = match.groups()
+			if division == 'DI':
+				div = 'D1'
+			elif division == 'DII':
+				div = 'D2'
+			else:
+				div = 'D3'
+			for line in file:
+				swimArray = re.split('\t', line)
+				meet = swimArray[0].strip()
+				d = swimArray[1]
+				name = swimArray[2]
+				#year = swimArray[3]
+				team = swimArray[4]
+				gender = swimArray[5]
+				event = swimArray[6]
+				time = toTime(swimArray[7])
+				conf = swimArray[8].strip()
+
+				if not year in confs[div][gender]:
+					confs[div][gender][year] = {}
+				if not conf in confs[div][gender][year]:
+					confs[div][gender][year][conf] = set()
+
+				confs[div][gender][year][conf].add(team)
+
+	with open('data/newconferences.txt', 'w+') as file:
+		for div in confs:
+			for gender in confs[div]:
+				for year in confs[div][gender]:
+					for conf in confs[div][gender][year]:
+						for team in confs[div][gender][year][conf]:
+							file.write(div+'\t'+gender+'\t'+year+'\t'+conf+'\t'+team+'\n')
+							#print div, gender, year, conf, team.strip()
 
 if __name__ == "__main__":
 	topTimesLoop()  # get all new times
-
+	#storeConfs()
 #getTopTimes(Date='12 DIII',Distance=100,Stroke='FL',Gender='f',Conference=100)
 
 #Parameters

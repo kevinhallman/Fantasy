@@ -12,6 +12,14 @@ import heapq
 from operator import itemgetter
 from sympy import binomial
 
+
+allEvents = {"400 Yard Medley Relay", "400 Yard Freestyle Relay", "800 Yard Freestyle Relay",
+			 "400 Yard Individual Medley", "1650 Yard Freestyle", "200 Yard Medley Relay", "200 Yard Freestyle",
+			 "100 Yard Backstroke", "100 Yard Breastroke", "200 Yard Butterfly", "50 Yard Freestyle",
+			 "100 Yard Freestyle", "200 Yard Backstroke", "200 Yard Breastroke", "500 Yard Freestyle",
+			 "100 Yard Butterfly", "200 Yard Individual Medley", "200 Yard Freestyle Relay", '1000 Yard Freestyle',
+			 '100 Yard Breastroke', '200 Yard Breastroke'}
+
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
 	url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -42,52 +50,19 @@ def rejectOutliers(dataX, dataY=None, l=5, r=6):
 '''
 used to find the the full distribution of times in a single event and a divsion, gender
 '''
-def getTimeCDF(gender, division, event, numsigma=-1):
-	# creates a frozen truncated normal distribution
-	def makeCDF(mu, sigma, clip):  # returns a frozen truncated normal CDF
-			a = -100  # arbitrarily fast times
-			b = (clip - mu) / sigma
-			def defaultCDF(x):
-				return truncnorm.cdf(x, a, b, mu, sigma)
-			return defaultCDF
+def getSkewCDF(gender, division, event, percent=1.0):
+	def makeCDF(a, mu, sigma, percent):  # returns a frozen truncated normal CDF
+		def freezeCDF(x):
+			rank = skewnorm.cdf(x, a, mu, sigma)
+			if rank < percent:
+				return (percent - rank) * (1 / percent)
+			else:
+				return 0
+		return freezeCDF
 
-	# first check db
-	try:
-		dist = Timedist.get(Timedist.gender==gender, Timedist.division==division, Timedist.event==event)
-		clipR = dist.mu + dist.sigma * numsigma
-		#print dist.mu, dist.sigma, clipR, dist.event
-		ecdf = makeCDF(dist.mu, dist.sigma, clipR)
-		return ecdf
-
-	except Timedist.DoesNotExist:
-		times = []
-		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
-												 Swim.season==2016):
-			if swim.time > 15:
-				times.append(swim.time)
-		if len(times) == 0:
-			return
-		times = rejectOutliers(times, l=5, r=5)
-
-		# best fit of data
-		(mu, sigma) = norm.fit(times)
-
-		'''top 10,1 percent'''
-		clipR = mu + sigma * numsigma  # slowest time to allow
-		fastTimes = [i for i in times if i< clipR]
-
-		#ecdfold = ECDF(fastTimes)
-		ecdf = makeCDF(mu, sigma, clipR)
-
-		newDist = Timedist(gender=gender, division=division, event=event, mu=mu, sigma=sigma, skew=False)
-		newDist.save()
-
-	return ecdf
-
-def getSkewCDF(gender, division, event):
 	try:
 		dist = Timedist.get(gender=gender, division=division, event=event, skew=True)
-		frozen = skewnorm(dist.a, dist.mu, dist.sigma)
+		frozen = makeCDF(dist.a, dist.mu, dist.sigma, percent)
 		return frozen
 
 	except Timedist.DoesNotExist:
@@ -95,6 +70,7 @@ def getSkewCDF(gender, division, event):
 		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
 												 Swim.season==2016):
 			times.append(swim.time)
+		print len(times)
 		if len(times) == 0:
 			return
 		times = rejectOutliers(times, l=4, r=4)
@@ -102,12 +78,12 @@ def getSkewCDF(gender, division, event):
 		# best fit of data
 		(mu, sigma) = norm.fit(times)
 		(a, mu, sigma) = skewnorm.fit(times, max(times)-mu, loc=mu, scale=sigma)
-		r = skewnorm(a, mu, sigma)
+		frozen = makeCDF(a, mu, sigma, percent)
 
 		# save off the new dist
 		newDist = Timedist(gender=gender, division=division, event=event, a=a, mu=mu, sigma=sigma, skew=True)
 		newDist.save()
-	return r
+	return frozen
 
 
 class TeamSeason(Model):
@@ -180,6 +156,56 @@ class TeamSeason(Model):
 			heapq.heappush(swimmers, (swimmer.getPPTs(), swimmer))
 
 		return heapq.nlargest(num, swimmers)
+
+	def topTimes(self, events=None, topTimes=True, meetForm=False, date=None):
+		if not events:
+			events = allEvents
+
+		topMeet = Meet(events=events)
+		swimmers = {}
+
+		select = Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason) \
+				.where(TeamSeason.gender==self.gender, TeamSeason.team==self.team, TeamSeason.division==self.division,
+			   	TeamSeason.season==self.season, Swim.event << list(events))
+
+		if topTimes:
+			if date:
+				qwery = select.select(Swim.name, Swim.event, fn.Min(Swim.time), Swimmer.team, Swimmer.year).group_by(
+					Swim.name, Swim.event, Swimmer.team, Swimmer.year).where(Swim.date < date)
+			else:
+				qwery = select.select(Swim.name, Swim.event, fn.Min(Swim.time), Swimmer.team, Swimmer.year).group_by(Swim.name,
+					Swim.event, Swimmer.team, Swimmer.year)
+		else:  # mean time for the season
+			qwery = select.select(Swim.name, Swim.event, fn.Avg(Swim.time), Swimmer.team, Swimmer.year).group_by(Swim.name,
+				Swim.event, Swimmer.team, Swimmer.year)
+
+		for swim in qwery:
+			if topTimes:
+				time = swim.min
+			else:
+				time = swim.avg
+			newSwim = Swim(name=swim.name, event=swim.event, time=time, gender=swim.gender, team=self.team,
+									  season=swim.season, year=swim.swimmer.year, swimmer=swim.swimmer)
+			if meetForm:
+				topMeet.addSwim(newSwim)
+			else:
+				if not swim.name in swimmers:
+						swimmers[swim.name] = {}
+				swimmers[swim.name][swim.event] = newSwim
+
+		if meetForm:
+			topMeet.place()
+			return topMeet
+
+		return swimmers
+
+	def addUpRelay(self, event):
+		if event not in {'400 Yard Medley Relay', '400 Yard Freestyle Relay', '800 Yard Freestyle Relay'}:
+			return
+
+		if event=='400 Yard Freestyle Relay':
+			pass
+
 
 	class Meta:
 		database = db
@@ -354,16 +380,17 @@ class Swim(Model):
 
 		if not self.gender or not self.division or not self.event or not self.time:
 			return None
-		dist = getSkewCDF(self.gender, self.division, self.event)
-		percentileScore = (1 - dist.cdf(self.time)) * 500
-		powerScore = 1 / dist.cdf(self.time)
+		cdf = getSkewCDF(self.gender, self.division, self.event)
+		percentileScore = (1 - cdf(self.time)) * 500
+		powerScore = 1 / cdf(self.time)
 		zscore = log(powerScore) * 50  # approximately the number of stds away from the means
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
 		return round(self.powerpoints, 3)
 
-	def expectedPoints(self, numSwimmers=6, losses=0, numsigma=-1):
+	def expectedPoints(self, numSwimmers=6, losses=0, percent=None):
+		#print self.name, self.time, self.getScoreTime()
 		scoresR = None
 		if numSwimmers == 24:
 			scores = [32, 28, 27, 26, 25, 24, 23, 22, 20, 17, 16, 15, 14, 13, 12, 11, 9, 7, 6, 5, 4, 3, 2, 1]
@@ -379,7 +406,6 @@ class Swim(Model):
 			else:
 				if losses < 1:
 					return 0
-
 			scores = [9, 4, 3, 2, 1]
 			scoresR = [11, 4, 2]
 
@@ -390,18 +416,26 @@ class Swim(Model):
 				scores = [x*2 for x in scores]
 
 		scores = scores[losses:]  # people who you know you will lose to
-
-		cdf = getTimeCDF(self.gender, self.division, self.event, numsigma=numsigma)
-		lose = 1 - cdf(self.getScoreTime())
-		win = cdf(self.getScoreTime())
-		num = numSwimmers - 1 - losses  # other swimmers
 		totalScore = 0
 
-		for place, score in enumerate(scores):
-			comb = binomial(num, place)
-			totalScore += score * comb * (lose**(num-place) * win**(place))
+		if not percent:  # now we will do a combined national, conference, and full level scoring
+			percents = [.01, .2, 1.0]
+		else:
+			percents = [percent]
 
-		return totalScore
+		for percent in percents:
+			#print self.gender, self.division, self.event
+			cdf = getSkewCDF(self.gender, self.division, self.event, percent=percent)
+			win = cdf(self.getScoreTime())
+			lose = 1 - win
+			num = numSwimmers - losses - 1  # other swimmers
+
+			for place, score in enumerate(scores[losses:]):
+				comb = binomial(num, place)
+				totalScore += score * comb * (lose**place * win**(num -place))
+			#print totalScore, percent
+
+		return totalScore / len(percents)
 
 	def getScoreTeam(self):
 		if self.scoreTeam:
@@ -607,284 +641,31 @@ def getConfs(confFile):
 				teams[team] = (conf, division)
 	return teams
 
-'''
-load in new swim times
-can load in to all SQL tables if params are true
-'''
-def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False):
-	swims = []
-	swimmers = []
-	swimmerKeys = set()
-	newTeams = []
-	teamKeys = set()
-	meets = []
-	meetKeys = set()
-	teamMeets = []
-	teamMeetKeys = set()
-	root = 'data'
-
-	teams = getConfs('data/conferences.txt')
-	divisions = {}
-	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
-		if not match:
-			continue
-		div, year, gender = match.groups()
-
-		if not (int(year) == 17): # and not (int(year) == 16):
-			continue
-		if not 'new' in swimFileName:
-			continue
-		with open(root + '/' + swimFileName) as swimFile:
-			if div == 'DI':
-				division = 'D1'
-			elif div == 'DII':
-				division = 'D2'
-			elif div == 'DIII':
-				division = 'D3'
-			print division, swimFileName
-
-			for line in swimFile:
-				swimArray = re.split('\t', line)
-				meet = swimArray[0].strip()
-				d = swimArray[1]
-				(season, swimDate) = seasonString(d)
-				name = swimArray[2]
-				year = swimArray[3]
-				team = swimArray[4]
-				gender = swimArray[5]
-				event = swimArray[6]
-				time = toTime(swimArray[7])
-
-				if not team in divisions:
-					divisions[team] = division
-
-				if team in teams:
-					conference = teams[team][0]
-				else:
-					conference = ''
-
-
-				if team=='Connecticut':
-					if division=='D1':
-						conference = 'American Athletic Conf'
-					else:
-						conference = 'NESCAC'
-
-				if 'Relay' in event: relay = True
-				else: relay = False
-
-				if relay:
-					name = team + ' Relay'
-
-				#clear old values
-				teamID = None
-				meetID = None
-				swimmerID = None
-
-				if loadTeams:
-					key = str(season) + team + gender + conference + division
-					if not key in teamKeys:  # try each team once
-						teamKeys.add(key)
-						try:  # don't double add for teams not loaded yet
-							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
-						except TeamSeason.DoesNotExist:
-							newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
-								gender, 'division': division}
-							newTeams.append(newTeam)
-
-				if loadMeets:
-					key = str(season) + meet + gender
-					if not key in meetKeys:
-						meetKeys.add(key)  # try each meet once
-						try:  # don't double add for meets not loaded yet
-							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
-						except Meet.DoesNotExist:
-							newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
-							meets.append(newMeet)
-
-				if loadSwimmers:
-					key = str(season) + name + year + team + gender
-					if not key in swimmerKeys:
-						swimmerKeys.add(key)
-						try:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
-						except Swimmer.DoesNotExist:
-							if not teamID:
-								teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
-							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
-								gender, 'teamid': teamID}
-							swimmers.append(newSwimmer)
-
-				if loadTeamMeets:
-					key = str(season) + meet + gender + team
-					if not key in teamMeetKeys:
-						teamMeetKeys.add(key)
-						if not meetID:
-							meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
-						if not teamID:
-							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
-						try:
-							teamMeetID = TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID).id
-						except TeamMeet.DoesNotExist:
-							newTeamMeet = {'meet': meetID, 'team': teamID}
-							teamMeets.append(newTeamMeet)
-
-				if loadSwims:
-					try:
-						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-							Swim.date==swimDate)  # floats in SQL and python evidently different precision
-					except Swim.DoesNotExist:
-						if not swimmerID and not relay:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team).id
-						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
-					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
-							division, 'relay': relay, 'swimmer': swimmerID}
-						swims.append(newSwim)
-
-	db.connect()
-
-	if loadTeams and len(newTeams) > 0:
-		print 'Teams:', len(newTeams)
-		TeamSeason.insert_many(newTeams).execute()
-
-	if loadMeets and len(meets) > 0:
-		print 'Meets:', len(meets)
-		Meet.insert_many(meets).execute()
-
-	if loadSwimmers and len(swimmers) > 0:
-		print 'Swimmers:', len(swimmers)
-		Swimmer.insert_many(swimmers).execute()
-
-	if loadTeamMeets and len(teamMeets) > 0:
-		print 'Team Meets:', len(teamMeets)
-		TeamMeet.insert_many(teamMeets).execute()
-
-	if loadSwims and len(swims) > 0:
-		print 'Swims: ', len(swims)
-		Swim.insert_many(swims).execute()
-
-	'''
-	for i in range(len(newSwims) / 100):
-		print i
-		with db.transaction():
-			print newSwims[i*100:(i+1)*100]
-			Swim.insert_many(newSwims[i*100:(i+1)*100]).execute()
-	'''
-
-def deleteDups():
-	# cleanup for duplicate swims
-	'''print Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
-        'ROW_NUMBER() OVER (partition BY meet, name, event, time ORDER BY id) AS rnum '
-        'FROM Swim) t '
-        'WHERE t.rnum > 1) and season=2016').execute()'''
-
-	print TeamStats.raw('DELETE FROM TeamStats WHERE id IN (SELECT id FROM (SELECT id, '
-        'ROW_NUMBER() OVER (partition BY week, teamseasonid_id ORDER BY id) AS rnum '
-        'FROM TeamStats) t '
-        'WHERE t.rnum > 1)').execute()
-
-def migrateImprovement():
-
-	migrator = PostgresqlMigrator(db)
-	with db.transaction():
-		migrate(
-			migrator.add_column('improvement', 'swimmer_id', Improvement.swimmer)
-			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
-			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
-		)
-	count = 0
-	'''
-	for swimmer in Swimmer.select(Swimmer.name, Swimmer.season, Swimmer.team):
-		try:
-
-			team = TeamSeason.select().where(TeamSeason.team==swimmer.team, TeamSeason.season==swimmer.season).get()
-			#print team.id, swimmer.name
-			Swimmer.update(teamid=team.id).where(Swimmer.name==swimmer.name,
-								Swimmer.season==swimmer.season).execute()
-			count += 1
-			if count %100==0:
-				print count
-		except Swimmer.DoesNotExist:
-			pass
-	'''
-	for swim in Swim.select(Swim.name, Swim.season, Swim.team, Swim.relay, Swim.id).where(Swim.swimmer >> None):
-		try:
-			#print swim.team
-			if swim.relay: continue
-			swimmer = Swimmer.select().where(Swimmer.team==swim.team, Swimmer.season==swim.season,
-										  Swimmer.name==swim.name).get()
-			#print swimmer.id, swimmer.name, swim.id
-			Swim.update(swimmer=swimmer.id).where(Swim.id==swim.id).execute()
-			count += 1
-			if count %100==0:
-				print count
-		except Swimmer.DoesNotExist:
-			pass
-
-def safeLoad():
-	print 'loading teams...'
-	load(loadTeams=True)
-	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True)
-	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True)
-
-def addRelaySwimmers():
-	'''
-	relaySwimmers = []
-	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender).distinct().where(Swim.relay==True):
-		try:
-			teamID = TeamSeason.get(TeamSeason.season==swim.season, TeamSeason.team==swim.team,
-										   TeamSeason.gender==swim.gender, TeamSeason.conference==swim.conference).id
-		except TeamSeason.DoesNotExist:
-			print swim.team
-		relayName = swim.team + ' Relay'
-		newSwim = {'season': swim.season, 'name': relayName, 'year': None, 'team': swim.team, 'gender': swim.gender,
-				   'teamid': teamID}
-		relaySwimmers.append(newSwim)
-	print 'Swimmers: ' + str(len(relaySwimmers))
-	Swimmer.insert_many(relaySwimmers).execute()
-	'''
-	#print relaySwimmers
-	swimmers = {}
-	i=0
-	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender, Swim.id).where(Swim.relay==True,
-																		Swim.swimmer==None):
-		i+=1
-		if i%1000==0:
-			print i
-		key = swim.team + str(swim.season) + swim.gender
-		if not key in swimmers:
-			try:
-				swimmerID = Swimmer.get(Swimmer.team==swim.team, Swimmer.season==swim.season,
-									Swimmer.gender==swim.gender).id
-				swimmers[key] = swimmerID
-			except Swimmer.DoesNotExist:
-				print swim.team, swim.season, swim.conference
-				continue
-		else:
-			swimmerID = swimmers[key]
-
-		Swim.update(swimmer=swimmerID).where(Swim.id==swim.id).execute()
-
 if __name__ == '__main__':
-	#db.drop_tables([TeamStats, MeetStats])
-	#db.create_tables([TeamStats, MeetStats])
-	start = Time.time()
-	#for swim in Swim.select().where(Swim.name=='Hallman, Kevin').order_by(Swim.time):
-	#	print swim.event, swim.time, swim.getPPTs()
-	#car = TeamSeason.get(TeamSeason.team=='California', TeamSeason.gender=='Women', TeamSeason.season==2017)
-	#print car.getTaperStats()
-	#load(loadTeams)
-	safeLoad()
-	#deleteDups()
-	#migrateImprovement()
-	#addRelaySwimmers()
-	#safeLoad()
+	'''
+	scores = [20, 17, 16, 15, 14, 13, 12, 11, 9, 7, 6, 5, 4, 3, 2, 1]
+	totalScore = 0
+	lose = 1.0
+	win = 1.0 - lose
+	print win
+	losses = 0
+	num = 16 - losses - 1# other swimmers
+
+	for place, score in enumerate(scores[losses:]):
+		comb = binomial(num, place)
+		print place, score, comb, lose**(place), win**(num - place)
+		totalScore += score * comb * (lose**place * win**(num - place))
+	print 'total score', totalScore
+	'''
+	#cdf = getSkewCDF('Women', 'D3', '200 Yard Medley Relay', .2)
+	#for time in range(110, 130):
+	#	print time, cdf(time)
+	times = TeamSeason.get(team='Carleton', season=2017).topTimes()
+	for swimmer in times:
+		for event in times[swimmer]:
+			print swimmer, event, times[swimmer][event].time
+
+
 	'''
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
@@ -897,7 +678,5 @@ if __name__ == '__main__':
 	'''
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
-	stop = Time.time()
-	print stop - start
 
 

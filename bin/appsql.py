@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import web
 import sqlmeets
 import re
@@ -467,30 +469,27 @@ class ImprovementJSON():
 
 class Rankings():
 	def GET(self):
-		confList = conferences[session.division][session.gender]
+		form = web.input(conference=None, season=None, gender=None, division=None, dual=None)
+		setGenDiv(form.gender, form.division)
+		division = session.division
 		gender = session.gender
-		form = web.input(conference=None, dual=None, season=None)
+		confList = conferences[division][gender]
 
-		recruits = False
 		if form.dual == 'Dual':
 			dual = True
 		else:
 			dual = False
-		if form.season in {'2016', '2015', '2014', '2013', '2012'}:
+		if form.season in {'2017', '2016', '2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
 			bar = True
-		elif form.season == 'Recruits':
-			seasons = {'All Recruits'}
-			recruits = True
-			bar = True
 		else:
-			seasons = {2016, 2015, 2014, 2013, 2012}
+			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
 			bar = False
 		scores = {}
 		if form.conference in confList:
 			teams = confList[form.conference]
 		elif form.conference == 'All':
-			teams = allTeams[gender][session.division]
+			teams = allTeams[gender][division]
 		else:
 			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
 
@@ -499,8 +498,7 @@ class Rankings():
 			scores[team] = {}
 			for season in seasons:
 				scores[team][season] = database.topTeamScore(team=team, dual=dual, season=season,
-															  gender=session.gender, division=session.division,
-															  recruits=recruits)
+															  gender=gender, division=division)
 		# remove nulls
 		remove = set()
 		for team in scores:
@@ -1009,6 +1007,7 @@ def googleLine(teams):
 	for team in teams:
 		seasons = teams[team].keys()
 		break
+	seasons.sort()
 	for season in seasons:
 		line = "['{0}'".format(season)
 		for team in teams:
