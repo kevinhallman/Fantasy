@@ -630,7 +630,7 @@ class SeasonRankings():
 
 class TeamStats():
 	def GET(self, team=None):
-		form = web.input(gender=None, division=None, season=2016)
+		form = web.input(gender=None, division=None, season=2017)
 		season = form.season
 		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
 		setGenDiv(form.gender, form.division)
