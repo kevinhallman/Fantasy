@@ -606,7 +606,7 @@ class SeasonRankings():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
+		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2017)
 
 		rank = showRank(oldTopTeams)
 		return render.preseason(rank)
@@ -875,42 +875,38 @@ def showRank(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
 		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+') + '>' + team.team + '</a></td>'
-		#html += '<td>' + team.team + '</td>'
-		try:
-			newSeason = team.getPrevious(-1) # so one year forward
-			winNats = newSeason.getWinnats() * 100
-			if winNats == '': winNatsDelta = ''
-			else: winNatsDelta = winNats - newSeason.getWinnats(1) * 100
-			winConf = newSeason.getWinconf() * 100
-			if winConf == '': winConfDelta = ''
-			else: winConfDelta = winConf - newSeason.getWinconf(1) * 100
-			if winNatsDelta > 0:
-				natsColor = 'green'
-			elif winNatsDelta < 0:
-				natsColor = 'red'
-			else:
-				natsColor = 'gray'
-			if winConfDelta > 0:
-				confColor = 'green'
-			elif winConfDelta < 0:
-				confColor = 'red'
-			else:
-				confColor = 'gray'
+		winNats = team.getWinnats() * 100
+		if winNats == '': winNatsDelta = ''
+		else: winNatsDelta = winNats - team.getWinnats(1) * 100
+		winConf = team.getWinconf() * 100
+		if winConf == '': winConfDelta = ''
+		else: winConfDelta = winConf - team.getWinconf(1) * 100
 
-			html += '<td class=percent>' + str(winNats)\
-					+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
-			# html += '<td class=percent>' + str(winNats) + '</td>'
-			html += '<td>' + team.conference + '</td>'
-			# html += '<td class=percent>' + str(winConf) + '</td>'
-			if team.conference:
-				html += '<td class=percent>' + str(winConf)\
-					+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
-			else:
-				html += '<td class=percent></td>'
-		except TeamSeason.DoesNotExist:
-			pass
-		html += '<td class=invpow>' + str(newSeason.getStrength()) + '</td>'
-		html += '<td class=dualpow>' + str(newSeason.getStrength(invite=False)) + '</td>'
+		if winNatsDelta > 0:
+			natsColor = 'green'
+		elif winNatsDelta < 0:
+			natsColor = 'red'
+		else:
+			natsColor = 'gray'
+		if winConfDelta > 0:
+			confColor = 'green'
+		elif winConfDelta < 0:
+			confColor = 'red'
+		else:
+			confColor = 'gray'
+
+		html += '<td class=percent>' + str(winNats)\
+				+'<span style="color:' + natsColor + ';"> (' + str(winNatsDelta) + ')</span></td>'
+		# html += '<td class=percent>' + str(winNats) + '</td>'
+		html += '<td>' + team.conference + '</td>'
+		# html += '<td class=percent>' + str(winConf) + '</td>'
+		if team.conference:
+			html += '<td class=percent>' + str(winConf)\
+				+'<span style="color:' + confColor + ';"> (' + str(winConfDelta) + ')</span></td>'
+		else:
+			html += '<td class=percent></td>'
+		html += '<td class=invpow>' + str(team.getStrength()) + '</td>'
+		html += '<td class=dualpow>' + str(team.getStrength(invite=False)) + '</td>'
 		html += '<tr>'
 
 	html += '</tbody>'

@@ -121,7 +121,7 @@ def date2week(d):
 	else:
 		season = d.year
 	startDate = date(season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
-	weeksIn = int((date - startDate).days / 7)
+	weeksIn = int((d - startDate).days / 7)
 	return weeksIn
 
 '''converts week to a date'''
