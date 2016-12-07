@@ -28,9 +28,9 @@ urls = ('/', 'Home',
 	'/rankings', 'Rankings',
 	'/teamMeets', 'teamMeets',
 	'/getConfs', 'getConfs',
+	'/getTeams', 'getTeams',
 	'/programs', 'Programs',
 	'/programsJSON', 'ProgramsJSON',
-	'/power', 'PowerRankings',
 	'/preseason', 'SeasonRankings',
 	'/teamstats/(.+)', 'TeamStats'
 )
@@ -476,9 +476,9 @@ class Rankings():
 		confList = conferences[division][gender]
 
 		if form.dual == 'Dual':
-			dual = True
+			invite = False
 		else:
-			dual = False
+			invite = True
 		if form.season in {'2017', '2016', '2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
 			bar = True
@@ -486,31 +486,20 @@ class Rankings():
 			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
 			bar = False
 		scores = {}
-		if not form.conference:
+		if not form.conference or not (form.conference in confList):
 			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
-		if form.conference in confList:
-			teams = confList[form.conference]
-		else:
-			return render.rankings(conferences=sorted(confList.keys()), table=None, bar=False)
+		teams = confList[form.conference]
 
-		#print form.season, recruits
 		for team in teams:
 			scores[team] = {}
 			for season in seasons:
-				scores[team][season] = database.topTeamScore(team=team, dual=dual, season=season,
-															  gender=gender, division=division)
-		# remove nulls
-		remove = set()
-		for team in scores:
-			remove.add(team)
-			for season in scores[team]:
-				if scores[team][season]:
-					remove.remove(team)
-					break
-		for team in remove:
-			del scores[team]
-
-
+				try:
+					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
+					strength = teamseason.getStrength(invite=invite)
+					if strength > 0:
+						scores[team][season] = strength
+				except TeamSeason.DoesNotExist:
+					pass
 		if bar:
 			table = googleBar(scores)
 		else:
@@ -611,12 +600,6 @@ class ProgramsJSON():
 					teamRankLabel[team]['improvement'] = {'rank': part[0], 'value': part[1]}
 
 		return json.dumps(teamRankLabel)
-
-class PowerRankings():
-	def GET(self):
-		topTeams = database.teamRank(gender=session.gender, division=session.division, season=2016)
-		rank = showTopRanking(topTeams)
-		return render.powerRank(rank)
 
 class SeasonRankings():
 	def GET(self):
@@ -1014,7 +997,10 @@ def googleLine(teams):
 	for season in seasons:
 		line = "['{0}'".format(season)
 		for team in teams:
-			score = teams[team][season]
+			if season in teams[team]:
+				score = teams[team][season]
+			else:
+				score = 0
 			if score == None:
 				score = 0
 			line += ",{0}".format(score)
@@ -1094,11 +1080,18 @@ def JSONScores(scores):
 			#print swimmer
 			if len(swimmer) == 5:
 				(name, team, event, time, score) = swimmer
-			if len(swimmer) == 4:
+				meet = None
+			elif len(swimmer) == 4:
 				(name, team, event, time) = swimmer
 				score = 0
+				meet = None
+			elif len(swimmer) == 6:
+				(name, team, event, time, meet, score) = swimmer
+			else:
+				print swimmer
+				continue
 			scoresLabel[event][name] = {}
-			scoresLabel[event][name] = {'team': team, 'time': time, 'score': score}
+			scoresLabel[event][name] = {'team': team, 'time': time, 'score': score, 'meet': meet}
 	return scoresLabel
 
 if __name__ == "__main__":
