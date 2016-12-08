@@ -465,7 +465,21 @@ class ImprovementJSON():
 		else:
 			teamImp = None
 
-		return json.dumps(teamImp)
+		jsonImp = {}
+		for team in teamImp:
+			if teamImp[team] == []:
+				continue
+			jsonImp[team] = {}
+			med = numpy.median(teamImp[team])
+			nums = teamImp[team]
+			jsonImp[team]['min'] = min(nums)
+			jsonImp[team]['bottomquartile'] = numpy.percentile(nums, 25)
+			jsonImp[team]['topquartile'] = numpy.percentile(nums, 75)
+			jsonImp[team]['max'] = max(nums)
+			jsonImp[team]['median'] = med
+			jsonImp[team]['n'] = len(nums)
+
+		return json.dumps(jsonImp)
 
 class Rankings():
 	def GET(self):
