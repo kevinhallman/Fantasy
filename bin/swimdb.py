@@ -147,6 +147,31 @@ def thisSeason():
 		return today.year + 1
 	return today.year
 
+def seasonString(dateString):
+	dateParts = re.split('/', dateString)
+	year = int(dateParts[2])
+	month = int(dateParts[0])
+	day = int(dateParts[1])
+	d = date(year, month, day)
+
+	if d > date(d.year, 6, 1):
+		year = d.year + 1
+	else:
+		year = d.year
+	return year, d
+
+def getConfs(confFile):
+	with open(confFile,'r') as file:
+		teams = {}
+		for line in file:
+			parts = re.split('\t', line.strip())
+			division = parts[0]
+			conf = parts[1]
+			team = parts[2]
+			if not team in teams:
+				teams[team] = (conf, division)
+	return teams
+
 class TeamSeason(Model):
 	season = IntegerField()
 	team = CharField()
@@ -641,6 +666,7 @@ class Meet(Model):
 
 	class Meta:
 		database = db
+
 
 class TempMeet:
 	def __init__(self, name=None, events=list(allEvents), gender=None, topSwim=True, teams=None, season=None):
@@ -1338,31 +1364,6 @@ class Timedist(Model):
 
 	class Meta:
 		database = db
-
-def seasonString(dateString):
-	dateParts = re.split('/', dateString)
-	year = int(dateParts[2])
-	month = int(dateParts[0])
-	day = int(dateParts[1])
-	date = date(year, month, day)
-
-	if date > date(date.year, 6, 1):
-		year = date.year + 1
-	else:
-		year = date.year
-	return year, date
-
-def getConfs(confFile):
-	with open(confFile,'r') as file:
-		teams = {}
-		for line in file:
-			parts = re.split('\t', line.strip())
-			division = parts[0]
-			conf = parts[1]
-			team = parts[2]
-			if not team in teams:
-				teams[team] = (conf, division)
-	return teams
 
 if __name__ == '__main__':
 	team = TeamSeason.get(team='Carleton', season=2017)

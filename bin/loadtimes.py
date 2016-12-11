@@ -106,11 +106,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				if relay:
 					name = team + ' Relay'
 
-				#clear old values
-				teamID = None
-				meetID = None
-				swimmerID = None
-
 				if loadTeams:
 					key = str(season) + team + gender + conference + division
 					if not key in teamKeys:  # try each team once
