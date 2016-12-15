@@ -26,12 +26,14 @@ urls = ('/', 'Home',
 	'/improvement', 'Improvement',
 	'/improvementJSON', 'ImprovementJSON',
 	'/rankings', 'Rankings',
+	'/rankingsJSON', 'RankingsJSON',
 	'/teamMeets', 'teamMeets',
 	'/getConfs', 'getConfs',
 	'/getTeams', 'getTeams',
 	'/programs', 'Programs',
 	'/programsJSON', 'ProgramsJSON',
 	'/preseason', 'SeasonRankings',
+	'/preseasonJSON', 'SeasonRankingsJSON',
 	'/teamstats/(.+)', 'TeamStats'
 )
 
@@ -520,6 +522,41 @@ class Rankings():
 			table = googleLine(scores)
 		return render.rankings(conferences=sorted(confList.keys()), table=table, bar=bar)
 
+class RankingsJSON():
+	def GET(self):
+		form = web.input(conference=None, season=None, gender=None, division=None, dual=None)
+		gender = form.gender
+		division = form.division
+		confList = conferences[division][gender]
+
+		if form.dual == 'Dual':
+			invite = False
+		else:
+			invite = True
+		if form.season in {'2017', '2016', '2015', '2014', '2013', '2012'}:
+			seasons = {int(form.season)}
+			bar = True
+		else:
+			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
+			bar = False
+		scores = {}
+		if not form.conference or not (form.conference in confList):
+			return json.dumps({})
+
+		teams = confList[form.conference]
+		for team in teams:
+			scores[team] = {}
+			for season in seasons:
+				try:
+					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
+					strength = teamseason.getStrength(invite=invite)
+					if strength > 0:
+						scores[team][season] = strength
+				except TeamSeason.DoesNotExist:
+					pass
+
+		return json.dumps(scores)
+
 class Programs():
 	def GET(self):
 		form = web.input(conference=None, tableOnly=False, gender=None, division=None)
@@ -624,6 +661,41 @@ class SeasonRankings():
 
 		rank = showRank(oldTopTeams)
 		return render.preseason(rank)
+
+class SeasonRankingsJSON():
+	def GET(self):
+		form = web.input(gender=None, division=None)
+		setGenDiv(form.gender, form.division)
+
+		topTeams = database.teamRank(gender=session.gender, division=session.division, season=2017)
+
+		response = {}
+		for idx, team in enumerate(topTeams):
+			response[team.team] = {}
+			response[team.team]['rank'] = str(idx + 1)
+
+			winNats = team.getWinnats() * 100
+			if winNats == '':
+				winNatsDelta = 0
+				winNats = 0
+			else:
+				winNatsDelta = winNats - team.getWinnats(1) * 100
+			response[team.team]['winnationals'] = round(winNats, 1)
+			response[team.team]['winnationalsdelta'] = round(winNatsDelta, 1)
+
+			winConf = team.getWinconf() * 100
+			if winConf == '':
+				winConfDelta = 0
+				winConf = 0
+			else:
+				winConfDelta = winConf - team.getWinconf(1) * 100
+			response[team.team]['winconference'] = round(winConf, 1)
+			response[team.team]['winconferencedelta'] = round(winConfDelta, 1)
+
+			response[team.team]['invitestrength'] = str(team.getStrength())
+			response[team.team]['dualstrength'] = str(team.getStrength(invite=False))
+
+		return json.dumps(response)
 
 class TeamStats():
 	def GET(self, team=None):
@@ -836,35 +908,6 @@ def showPrograms(teamRank):
 		for (idx, part) in enumerate(rank[1:]):
 			html += '<td>' + str(part[0]) + '</td>'
 			html += '<td>' + str(round(part[1], 3)) + '</td>'
-		html += '<tr>'
-
-	html += '</tbody>'
-	html += '</table>'
-
-	return html
-
-def showTopRanking(topTeams):
-	html = ''
-	html += '<table id="topteams">'
-	html += '<thead><tr>'
-	html += '<th>Rank</th>'
-	html += '<th>Team</th>'
-	html += '<th>National Win %</th>'
-	html += '<th>Conference</th>'
-	html += '<th>Conference Win %</th>'
-	html += '<th>Power Invite</th>'
-	html += '<th>Power Dual</th>'
-	html += '</tr></thead>'
-	html += '<tbody>'
-	for idx, team in enumerate(topTeams):
-		html += '<tr>'
-		html += '<td>' + str(idx+1) + '</td>'
-		html += '<td>' + team.team + '</td>'
-		html += '<td class=percent>' + str(team.winnats * 100) + '</td>'
-		html += '<td>' + team.conference + '</td>'
-		html += '<td class=percent>' + str(team.winconf * 100) + '</td>'
-		html += '<td class=invpow>' + str(team.strengthinvite) + '</td>'
-		html += '<td class=dualpow>' + str(team.strengthdual) + '</td>'
 		html += '<tr>'
 
 	html += '</tbody>'
