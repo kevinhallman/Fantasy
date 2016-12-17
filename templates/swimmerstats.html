@@ -1,0 +1,22 @@
+$def with(swimmers, data)
+
+<h1>
+Powerpoint Calculator
+</h1>
+
+<p>
+Find your points!
+</p>
+
+<form>
+	<select name="name">
+		$for swimmer in swimmers:
+			<option> $swimmer </option>
+	</select>
+	<input name="num" type="number" value="10" maxlength="2"/>
+
+	<input type="submit" value="Calculate">
+</form>
+
+$if data:
+	$:data

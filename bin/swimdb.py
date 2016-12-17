@@ -84,6 +84,32 @@ def getSkewCDF(gender, division, event, percent=1.0):
 		newDist.save()
 	return frozen
 
+def getSkewDist(gender, division, event):
+	try:
+		dist = Timedist.get(gender=gender, division=division, event=event, skew=True)
+		frozen = skewnorm(dist.a, dist.mu, dist.sigma)
+		return frozen
+
+	except Timedist.DoesNotExist:
+		times = [] # 2016 is the only season with all the times
+		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
+												 Swim.season==2016):
+			times.append(swim.time)
+		print event, division, gender, len(times)
+		if len(times) == 0:
+			return
+		times = rejectOutliers(times, l=4, r=4)
+
+		# best fit of data
+		(mu, sigma) = norm.fit(times)
+		(a, mu, sigma) = skewnorm.fit(times, max(times)-mu, loc=mu, scale=sigma)
+		frozen = skewnorm(a, mu, sigma)
+
+		# save off the new dist
+		newDist = Timedist(gender=gender, division=division, event=event, a=a, mu=mu, sigma=sigma, skew=True)
+		newDist.save()
+	return frozen
+
 '''make time look nice'''
 def swimTime(time):
 	(seconds, point) = re.split("\.", str(time))
@@ -172,6 +198,7 @@ def getConfs(confFile):
 				teams[team] = (conf, division)
 	return teams
 
+
 class TeamSeason(Model):
 	season = IntegerField()
 	team = CharField()
@@ -193,6 +220,8 @@ class TeamSeason(Model):
 
 	def getTaperStats(self, weeks=12):
 		lastSeason = self.getPrevious()
+		print lastSeason.id
+		# underestimate taper by using later weeks
 		for stats in TeamStats.select().where(TeamStats.teamseasonid==lastSeason.id, TeamStats.week >= weeks)\
 				.limit(1).order_by(TeamStats.week):
 			return stats.toptaper, stats.toptaperstd
@@ -594,7 +623,7 @@ class Swim(Model):
 		return name+br+self.getScoreTeam()+genderStr+br+self.event+br+time+br+meet
 
 	def taper(self, weeks, noise=0):
-		taper, taperStd = self.getTaperStats(weeks=weeks)
+		taper, taperStd = self.swimmer.teamid.getTaperStats(weeks=weeks)
 		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
 		self.scoreTime = self.time - self.time * taper / 100.0 + self.time * noise
 
@@ -1366,8 +1395,16 @@ class Timedist(Model):
 		database = db
 
 if __name__ == '__main__':
-	team = TeamSeason.get(team='Carleton', season=2017)
-	print team.getStrength()
+	#team = TeamSeason.get(team='Carleton', season=2017)
+	#print team.season, team.gender
+	#print team.getTaperStats(7)
+	event = '500 Yard Freestyle'
+	division = 'D3'
+	gender = 'Men'
+	frozen = getSkewDist(gender, division, event)
+	for i in range(1, 10):
+		time = round(frozen.ppf(float(i)/10))
+		print i, swimTime(time), round(Swim(event=event, division=division, gender=gender, time=time).getPPTs())
 
 	'''
 	migrator = PostgresqlMigrator(db)

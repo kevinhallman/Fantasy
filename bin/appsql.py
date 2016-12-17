@@ -8,7 +8,7 @@ import os, urlparse
 import numpy
 from peewee import *
 from swimdb import swimTime
-from swimdb import Meet, TeamMeet, Team, TeamSeason
+from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist
 from operator import itemgetter
 import time as Time
 
@@ -34,7 +34,9 @@ urls = ('/', 'Home',
 	'/programsJSON', 'ProgramsJSON',
 	'/preseason', 'SeasonRankings',
 	'/preseasonJSON', 'SeasonRankingsJSON',
-	'/teamstats/(.+)', 'TeamStats'
+	'/teamstats/(.+)', 'TeamStats',
+	'/powerpoints', 'Powerpoints',
+	'/swimmer', 'Swimmerstats'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -713,37 +715,97 @@ class TeamStats():
 			return render.teamstats(None, None, None, None, None, None, None, None, None)
 
 		# team speed
-		# dual strength, invite strength, nats%, conf%
-		#print teamseason.season
 		winNats = round(teamseason.getWinnats(), 3) * 100
 		winConf = round(teamseason.getWinconf(), 3) * 100
 
 		# team development
-		# print team, session.gender, session.division
 		try:
 			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
-			inviteStr = stats.strengthinvite
 			attrition = round(stats.attrition, 3)
 			imp = round(stats.improvement, 3)
 		except Team.DoesNotExist:
-			inviteStr = None
 			attrition = None
 			imp = None
 		inviteStr = teamseason.getStrength()
 
 		# top swimmers
 		topSwimmers = teamseason.getTopSwimmers(17)
-		#print topSwimmers
 		swimTable = showTopSwimmers(topSwimmers)
 
-		if teamseason.getTaperStats():
-			(medtaper, stdtaper) = teamseason.getTaperStats()
+		if teamseason.getTaperStats(weeks=8):
+			(medtaper, stdtaper) = teamseason.getTaperStats(weeks=8)
 		else:
 			(medtaper, stdtaper) = 0, 0
 		#print medtaper, stdtaper
 
 		conf = teamseason.conference
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
+
+class Powerpoints():
+	def GET(self):
+		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None)
+		setGenDiv(form.gender, form.division)
+
+		if not form.event:  # empty
+			return render.powerpoints(events=eventOrderInd, points=None, table=None)
+
+		time = 0
+		try:
+			time += 60 * int(form.min)
+			time += int(form.sec)
+			time += .01 * int(form.hun)
+		except:
+			time = None
+
+		if time == 0:  # get table
+			frozen = getSkewDist(form.gender, form. division, form.event)
+			html = '<table>'
+			html += '<tr><th>Time</th><th>Powerpoints</th></tr>'
+			times = set()
+			for i in [.1, 1, 2, 3, 4, 5, 6, 7, 8, 9]:  # get times for percentiles
+				time = round(frozen.ppf(float(i)/10))
+				fancyTime = swimTime(time)
+				if fancyTime in times:  # do this to avoid duplicates
+					continue
+				times.add(fancyTime)
+				ppt = round(Swim(event=form.event, division=form.division, gender=form.gender, time=time).getPPTs())
+				html += '<tr><td>' + fancyTime + '</td><td>' + str(ppt) + '</td></tr>'
+			html += '</table>'
+
+			return render.powerpoints(events=eventOrderInd, points=None, table=html)
+
+		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
+		#print swim
+		points = swim.getPPTs()
+		return render.powerpoints(events=eventOrderInd, points=points, table=None)
+
+class Swimmerstats():
+	def GET(self):
+		form = web.input(gender=None, division=None, name=None, num=20, season=None)
+		setGenDiv(form.gender, form.division)
+
+		swimmers = []
+		for swimmer in Swimmer.select(Swimmer.name, TeamSeason).join(TeamSeason).where(
+				Swimmer.gender==form.gender, TeamSeason.division==form.division):
+			swimmers.append(swimmer.name)
+		swimmers.sort()
+		if not form.name:
+			return render.swimmerstats(swimmers=swimmers, data=None)
+
+		try:
+			print form.name
+			swimmer = Swimmer.select().join(TeamSeason).where(Swimmer.name==form.name, Swimmer.gender==form.gender,
+							TeamSeason.division==form.division).get()
+		except Swimmer.DoesNotExist:
+			return render.swimmerstats(swimmers=swimmers, data=None)
+
+		print 'found!'
+		swims = swimmer.topSwims(10)
+		html = ''
+		for swim in swims:
+			html += '<p>' + swim.event + ' ' + swimTime(swim.time) + ' PPTs:' + str(round(swim.getPPTs(), 1))+ '</p>'
+
+		return render.swimmerstats(swimmers=swimmers, data=html)
 
 class teamMeets():
 	def GET(self):

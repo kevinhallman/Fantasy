@@ -1,0 +1,27 @@
+$def with(events, points, table)
+
+<h1>
+Powerpoint Calculator
+</h1>
+
+<p>
+Find your points!
+</p>
+
+<form>
+	<select name="event">
+		$for event in events:
+			<option> $event </option>
+	</select>
+	<input name="min" type="number" value="0" maxlength="2"/>:
+	<input name="sec" type="number" value="00" maxlength="2"/>.
+	<input name="hun" type="number" value="00" maxlength="2"/>
+
+	<input type="submit" value="Calculate">
+</form>
+
+$if points:
+	Points: $points
+
+$if table:
+	$:table
