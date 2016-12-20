@@ -675,6 +675,7 @@ class SeasonRankingsJSON():
 		for idx, team in enumerate(topTeams):
 			response[team.team] = {}
 			response[team.team]['rank'] = str(idx + 1)
+			response[team.team]['conference'] = team.conference
 
 			winNats = team.getWinnats() * 100
 			if winNats == '':
