@@ -85,20 +85,11 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				event = swimArray[6]
 				time = toTime(swimArray[7])
 
-				if not team in divisions:
-					divisions[team] = division
-
-				if team in teams:
-					conference = teams[team][0]
-				else:
-					conference = ''
-
-
-				if team == 'Connecticut':
-					if division=='D1':
-						conference = 'American Athletic Conf'
-					else:
-						conference = 'NESCAC'
+				confTeams = getNewConfs()
+				try:
+					conference = confTeams[division][gender][str(season)][team]
+				except KeyError:
+					conference = None
 
 				if 'Relay' in event: relay = True
 				else: relay = False
@@ -375,8 +366,8 @@ def fixDupTeams():
 			pass
 
 def fixDivision():
-	for swim in Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason).where(Swim.division=='D1',
-																	TeamSeason.division=='D3'):
+	for swim in Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason).where(Swim.division=='D3',
+																	TeamSeason.division=='D1'):
 		try:
 			newTeam = TeamSeason.get(team=swim.team, division=swim.division, season=swim.season, gender=swim.gender)
 			if newTeam.id != swim.swimmer.teamid.id:
@@ -390,6 +381,7 @@ def fixDivision():
 
 if __name__ == '__main__':
 	start = Time.time()
+	safeLoad()
 	fixDivision()
 	fixDupTeams()
 	#mergeSwimmers(294608, 285526)
@@ -399,7 +391,6 @@ if __name__ == '__main__':
 	#mergeTeams(7625, 8435)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
-	#safeLoad()
 	# fixConfs()
 	# deleteDups()
 	# migrateImprovement()
