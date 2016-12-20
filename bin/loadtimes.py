@@ -356,24 +356,58 @@ def fixConfs():
 			pass
 			#print 'huh', team.id, team.team, team.division, team.gender, team.season
 
+def fixDupTeams():
+	confTeams = getNewConfs()
+
+	for team in TeamSeason.raw('SELECT id, team, conference, gender, division, season FROM '
+							'(SELECT id, gender, team, division, conference, season, ROW_NUMBER() '
+	 						'OVER (partition BY season, gender, team, division ORDER BY id) '
+							'AS rnum FROM teamseason) t WHERE t.rnum > 1'):
+		print team.id, team.team, team.conference, team.division
+		try:
+			conf = confTeams[team.division][team.gender][str(team.season)][team.team]
+			print conf
+			if not team.conference:
+				newTeam = TeamSeason.get(team=team.team, conference=conf, division=team.division,
+							   gender=team.gender, season=team.season)
+				if newTeam.id!=team.id:
+					mergeTeams(team.id, newTeam.id)
+
+		except KeyError:
+			pass
+
+def fixDivision():
+	for swim in Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason).where(Swim.division=='D1',
+																	TeamSeason.division=='D3'):
+		try:
+			newTeam = TeamSeason.get(team=swim.team, division=swim.division, season=swim.season, gender=swim.gender)
+			if newTeam.id != swim.swimmer.teamid.id:
+				print newTeam.team, newTeam.division, newTeam.season
+			newSwimmer = Swimmer(name=swim.name, teamid=newTeam.id)
+			print newSwimmer.name
+			swim.swimmer = newSwimmer.id
+			swim.save()
+		except TeamSeason.DoesNotExist:
+			pass
+
 if __name__ == '__main__':
 	start = Time.time()
+	fixDivision()
+	fixDupTeams()
 	#mergeSwimmers(294608, 285526)
 	#mergeSwimmers(293514, 280998)
-	#mergeTeams(7495, 8434)
-	#mergeTeams(6582, 8450)
+	#mergeTeams(8533, 8377)
+	#mergeTeams(8545, 8239)
 	#mergeTeams(7625, 8435)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
-	safeLoad()
+	#safeLoad()
 	# fixConfs()
 	# deleteDups()
 	# migrateImprovement()
 	# addRelaySwimmers()
 	stop = Time.time()
 	print stop - start
-
-# SELECT id, team FROM (SELECT id, team, ROW_NUMBER() OVER (partition BY season, gender, team ORDER BY id) AS rnum
-	# FROM teamseason) t WHERE t.rnum > 1
+		#print swim.team
 
 # select from Swimmer,Swim where Swim.swimmer_id=Swimmer.id and Swim.relay='t' and Swimmer.name not like '%Relay'
