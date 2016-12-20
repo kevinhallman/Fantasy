@@ -367,12 +367,10 @@ def fixDupTeams():
 		try:
 			conf = confTeams[team.division][team.gender][str(team.season)][team.team]
 			print conf
-			if not team.conference:
-				newTeam = TeamSeason.get(team=team.team, conference=conf, division=team.division,
-							   gender=team.gender, season=team.season)
-				if newTeam.id!=team.id:
-					mergeTeams(team.id, newTeam.id)
-
+			newTeam = TeamSeason.get(team=team.team, conference=conf, division=team.division,
+						   gender=team.gender, season=team.season)
+			if newTeam.id!=team.id:
+				mergeTeams(team.id, newTeam.id)
 		except KeyError:
 			pass
 
