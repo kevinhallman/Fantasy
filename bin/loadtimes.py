@@ -85,11 +85,17 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				event = swimArray[6]
 				time = toTime(swimArray[7])
 
+				if season and swimDate and name and team and gender and event and time:
+					pass
+				else:
+					print season, swimDate, name, year, team, gender, event, time
+					continue
+
 				confTeams = getNewConfs()
 				try:
 					conference = confTeams[division][gender][str(season)][team]
 				except KeyError:
-					conference = None
+					conference = ''
 
 				if 'Relay' in event: relay = True
 				else: relay = False
@@ -98,7 +104,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					name = team + ' Relay'
 
 				if loadTeams:
-					key = str(season) + team + gender + conference + division
+					key = str(season) + team + gender + division
 					if not key in teamKeys:  # try each team once
 						teamKeys.add(key)
 						try:  # don't double add for teams not loaded yet
@@ -385,10 +391,6 @@ if __name__ == '__main__':
 	fixDivision()
 	fixDupTeams()
 	#mergeSwimmers(294608, 285526)
-	#mergeSwimmers(293514, 280998)
-	#mergeTeams(8533, 8377)
-	#mergeTeams(8545, 8239)
-	#mergeTeams(7625, 8435)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
 	# fixConfs()
