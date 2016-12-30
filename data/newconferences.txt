@@ -20,6 +20,8 @@ D2	Men	11	Great Lakes Valley	Drury
 D2	Men	11	Great Lakes Valley	Indy
 D2	Men	11	Great Lakes Valley	Truman St.
 D2	Men	11	Great Lakes Valley	Lewis
+D2	Men	11	Metropolitan Swimming	Bridgeport
+D2	Men	11	Metropolitan Swimming	Queens
 D2	Men	11	Northeast Ten	Adelphi
 D2	Men	11	Northeast Ten	Southern Conn
 D2	Men	11	Northeast Ten	St. Michael's
@@ -28,8 +30,13 @@ D2	Men	11	Northeast Ten	Pace
 D2	Men	11	Northeast Ten	Saint Rose
 D2	Men	11	Northeast Ten	Le Moyne
 D2	Men	11	Pacific Collegiate	UCSD
-D2	Men	11	Metropolitan Swimming	Bridgeport
-D2	Men	11	Metropolitan Swimming	Queens
+D2	Men	11	Bluegrass Mountain	Limestone
+D2	Men	11	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	11	Bluegrass Mountain	Fairmont
+D2	Men	11	Bluegrass Mountain	Davis & Elkins
+D2	Men	11	Bluegrass Mountain	Queens (NC)
+D2	Men	11	Bluegrass Mountain	Catawba
+D2	Men	11	Bluegrass Mountain	Wingate
 D2	Men	11	Appalachian (ASC)	Mars Hill
 D2	Men	11	Appalachian (ASC)	Wheeling Jesuit
 D2	Men	11	Appalachian (ASC)	Urbana
@@ -66,6 +73,8 @@ D2	Men	13	Great Lakes Valley	Lewis
 D2	Men	13	Great Lakes Valley	Indy
 D2	Men	13	Great Lakes Valley	Jewell
 D2	Men	13	Great Lakes Valley	Bellarmine
+D2	Men	13	Metropolitan Swimming	Bridgeport
+D2	Men	13	Metropolitan Swimming	Queens
 D2	Men	13	Northeast Ten	Adelphi
 D2	Men	13	Northeast Ten	Southern Conn
 D2	Men	13	Northeast Ten	St. Michael's
@@ -75,8 +84,13 @@ D2	Men	13	Northeast Ten	Saint Rose
 D2	Men	13	Northeast Ten	Le Moyne
 D2	Men	13	Pacific Collegiate	Simon Fraser
 D2	Men	13	Pacific Collegiate	UCSD
-D2	Men	13	Metropolitan Swimming	Bridgeport
-D2	Men	13	Metropolitan Swimming	Queens
+D2	Men	13	Bluegrass Mountain	Limestone
+D2	Men	13	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	13	Bluegrass Mountain	Fairmont
+D2	Men	13	Bluegrass Mountain	Davis & Elkins
+D2	Men	13	Bluegrass Mountain	Queens (NC)
+D2	Men	13	Bluegrass Mountain	Catawba
+D2	Men	13	Bluegrass Mountain	Wingate
 D2	Men	13	Appalachian (ASC)	Mars Hill
 D2	Men	13	Appalachian (ASC)	King
 D2	Men	13	Appalachian (ASC)	NDC
@@ -113,6 +127,8 @@ D2	Men	12	Great Lakes Valley	Drury
 D2	Men	12	Great Lakes Valley	Indy
 D2	Men	12	Great Lakes Valley	Truman St.
 D2	Men	12	Great Lakes Valley	Lewis
+D2	Men	12	Metropolitan Swimming	Bridgeport
+D2	Men	12	Metropolitan Swimming	Queens
 D2	Men	12	Northeast Ten	Adelphi
 D2	Men	12	Northeast Ten	Southern Conn
 D2	Men	12	Northeast Ten	St. Michael's
@@ -121,8 +137,13 @@ D2	Men	12	Northeast Ten	Pace
 D2	Men	12	Northeast Ten	Saint Rose
 D2	Men	12	Northeast Ten	Le Moyne
 D2	Men	12	Pacific Collegiate	UCSD
-D2	Men	12	Metropolitan Swimming	Bridgeport
-D2	Men	12	Metropolitan Swimming	Queens
+D2	Men	12	Bluegrass Mountain	Limestone
+D2	Men	12	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	12	Bluegrass Mountain	Fairmont
+D2	Men	12	Bluegrass Mountain	Davis & Elkins
+D2	Men	12	Bluegrass Mountain	Queens (NC)
+D2	Men	12	Bluegrass Mountain	Catawba
+D2	Men	12	Bluegrass Mountain	Wingate
 D2	Men	12	Appalachian (ASC)	Mars Hill
 D2	Men	12	Appalachian (ASC)	Wheeling Jesuit
 D2	Men	12	Appalachian (ASC)	Urbana
@@ -163,6 +184,8 @@ D2	Men	15	Great Lakes Valley	Lewis
 D2	Men	15	Great Lakes Valley	Indy
 D2	Men	15	Great Lakes Valley	Jewell
 D2	Men	15	Great Lakes Valley	Bellarmine
+D2	Men	15	Metropolitan Swimming	Bridgeport
+D2	Men	15	Metropolitan Swimming	Queens
 D2	Men	15	Northeast Ten	Adelphi
 D2	Men	15	Northeast Ten	Southern Conn
 D2	Men	15	Northeast Ten	St. Michael's
@@ -173,8 +196,14 @@ D2	Men	15	Northeast Ten	Saint Rose
 D2	Men	15	Northeast Ten	Le Moyne
 D2	Men	15	Pacific Collegiate	Simon Fraser
 D2	Men	15	Pacific Collegiate	UCSD
-D2	Men	15	Metropolitan Swimming	Bridgeport
-D2	Men	15	Metropolitan Swimming	Queens
+D2	Men	15	Bluegrass Mountain	Limestone
+D2	Men	15	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	15	Bluegrass Mountain	Fairmont
+D2	Men	15	Bluegrass Mountain	Carson-Newman
+D2	Men	15	Bluegrass Mountain	Davis & Elkins
+D2	Men	15	Bluegrass Mountain	Queens (NC)
+D2	Men	15	Bluegrass Mountain	Catawba
+D2	Men	15	Bluegrass Mountain	Wingate
 D2	Men	15	Appalachian (ASC)	Mars Hill
 D2	Men	15	Appalachian (ASC)	King
 D2	Men	15	Appalachian (ASC)	NDC
@@ -218,6 +247,8 @@ D2	Men	14	Great Lakes Valley	Lewis
 D2	Men	14	Great Lakes Valley	Indy
 D2	Men	14	Great Lakes Valley	Jewell
 D2	Men	14	Great Lakes Valley	Bellarmine
+D2	Men	14	Metropolitan Swimming	Bridgeport
+D2	Men	14	Metropolitan Swimming	Queens
 D2	Men	14	Northeast Ten	Adelphi
 D2	Men	14	Northeast Ten	Southern Conn
 D2	Men	14	Northeast Ten	St. Michael's
@@ -227,8 +258,14 @@ D2	Men	14	Northeast Ten	Saint Rose
 D2	Men	14	Northeast Ten	Le Moyne
 D2	Men	14	Pacific Collegiate	Simon Fraser
 D2	Men	14	Pacific Collegiate	UCSD
-D2	Men	14	Metropolitan Swimming	Bridgeport
-D2	Men	14	Metropolitan Swimming	Queens
+D2	Men	14	Bluegrass Mountain	Limestone
+D2	Men	14	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	14	Bluegrass Mountain	Fairmont
+D2	Men	14	Bluegrass Mountain	Carson-Newman
+D2	Men	14	Bluegrass Mountain	Davis & Elkins
+D2	Men	14	Bluegrass Mountain	Queens (NC)
+D2	Men	14	Bluegrass Mountain	Catawba
+D2	Men	14	Bluegrass Mountain	Wingate
 D2	Men	14	Appalachian (ASC)	Mars Hill
 D2	Men	14	Appalachian (ASC)	King
 D2	Men	14	Appalachian (ASC)	NDC
@@ -260,13 +297,13 @@ D2	Men	17	Great Lakes Intercoll	Saginaw Valley
 D2	Men	17	Great Lakes Intercoll	Wayne State
 D2	Men	17	Great Lakes Intercoll	Grand Valley
 D2	Men	17	Great Lakes Intercoll	Ashland
-D2	Men	17	Pennsylvania State (PSAC)	Edinboro
 D2	Men	17	Pennsylvania State (PSAC)	West Chester
 D2	Men	17	Pennsylvania State (PSAC)	Clarion
+D2	Men	17	Pennsylvania State (PSAC)	Gannon
 D2	Men	17	Pennsylvania State (PSAC)	Bloomsburg
 D2	Men	17	Pennsylvania State (PSAC)	IUP
+D2	Men	17	Pennsylvania State (PSAC)	Edinboro
 D2	Men	17	Pennsylvania State (PSAC)	SHIP
-D2	Men	17	Pennsylvania State (PSAC)	Gannon
 D2	Men	17	Great Lakes Valley	Drury
 D2	Men	17	Great Lakes Valley	Maryville
 D2	Men	17	Great Lakes Valley	Truman St.
@@ -276,6 +313,9 @@ D2	Men	17	Great Lakes Valley	Lewis
 D2	Men	17	Great Lakes Valley	Indy
 D2	Men	17	Great Lakes Valley	Jewell
 D2	Men	17	Great Lakes Valley	Bellarmine
+D2	Men	17	Great Lakes Valley	McKendree
+D2	Men	17	Metropolitan Swimming	Bridgeport
+D2	Men	17	Metropolitan Swimming	Queens
 D2	Men	17	Northeast Ten	Adelphi
 D2	Men	17	Northeast Ten	Southern Conn
 D2	Men	17	Northeast Ten	St. Michael's
@@ -284,11 +324,18 @@ D2	Men	17	Northeast Ten	Pace
 D2	Men	17	Northeast Ten	Saint Rose
 D2	Men	17	Northeast Ten	Le Moyne
 D2	Men	17	Pacific Collegiate	Fresno Pacific
-D2	Men	17	Pacific Collegiate	Simon Fraser
 D2	Men	17	Pacific Collegiate	Concordia Irvine
 D2	Men	17	Pacific Collegiate	UCSD
-D2	Men	17	Metropolitan Swimming	Bridgeport
-D2	Men	17	Metropolitan Swimming	Queens
+D2	Men	17	Pacific Collegiate	Simon Fraser
+D2	Men	17	Bluegrass Mountain	Limestone
+D2	Men	17	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	17	Bluegrass Mountain	Barton
+D2	Men	17	Bluegrass Mountain	Fairmont
+D2	Men	17	Bluegrass Mountain	Carson-Newman
+D2	Men	17	Bluegrass Mountain	Davis & Elkins
+D2	Men	17	Bluegrass Mountain	Queens (NC)
+D2	Men	17	Bluegrass Mountain	Catawba
+D2	Men	17	Bluegrass Mountain	Wingate
 D2	Men	17	Appalachian (ASC)	Mars Hill
 D2	Men	17	Appalachian (ASC)	King
 D2	Men	17	Appalachian (ASC)	NDC
@@ -299,8 +346,8 @@ D2	Men	17	Appalachian (ASC)	Alderson Broadd.
 D2	Men	17	Appalachian (ASC)	Wheeling Jesuit
 D2	Men	17	Sunshine State	Nova S'eastern
 D2	Men	17	Sunshine State	Rollins
-D2	Men	17	Sunshine State	Florida Southern
 D2	Men	17	Sunshine State	Florida Tech
+D2	Men	17	Sunshine State	Florida Southern
 D2	Men	17	Sunshine State	Saint Leo
 D2	Men	17	Sunshine State	TAMPA
 D2	Men	17	Rocky Mountain Athletic	Colorado Mesa
@@ -336,6 +383,8 @@ D2	Men	16	Great Lakes Valley	Lewis
 D2	Men	16	Great Lakes Valley	Indy
 D2	Men	16	Great Lakes Valley	Jewell
 D2	Men	16	Great Lakes Valley	Bellarmine
+D2	Men	16	Metropolitan Swimming	Bridgeport
+D2	Men	16	Metropolitan Swimming	Queens
 D2	Men	16	Northeast Ten	Adelphi
 D2	Men	16	Northeast Ten	Southern Conn
 D2	Men	16	Northeast Ten	St. Michael's
@@ -347,8 +396,14 @@ D2	Men	16	Pacific Collegiate	Fresno Pacific
 D2	Men	16	Pacific Collegiate	Simon Fraser
 D2	Men	16	Pacific Collegiate	Concordia Irvine
 D2	Men	16	Pacific Collegiate	UCSD
-D2	Men	16	Metropolitan Swimming	Bridgeport
-D2	Men	16	Metropolitan Swimming	Queens
+D2	Men	16	Bluegrass Mountain	Limestone
+D2	Men	16	Bluegrass Mountain	Lenoir-Rhyne
+D2	Men	16	Bluegrass Mountain	Fairmont
+D2	Men	16	Bluegrass Mountain	Carson-Newman
+D2	Men	16	Bluegrass Mountain	Davis & Elkins
+D2	Men	16	Bluegrass Mountain	Queens (NC)
+D2	Men	16	Bluegrass Mountain	Catawba
+D2	Men	16	Bluegrass Mountain	Wingate
 D2	Men	16	Appalachian (ASC)	Mars Hill
 D2	Men	16	Appalachian (ASC)	King
 D2	Men	16	Appalachian (ASC)	NDC
@@ -398,6 +453,9 @@ D2	Women	11	Great Lakes Valley	Drury
 D2	Women	11	Great Lakes Valley	Indy
 D2	Women	11	Great Lakes Valley	Truman St.
 D2	Women	11	Great Lakes Valley	Lewis
+D2	Women	11	Metropolitan Swimming	Bridgeport
+D2	Women	11	Metropolitan Swimming	LIU Post
+D2	Women	11	Metropolitan Swimming	Queens
 D2	Women	11	Northeast Ten	Adelphi
 D2	Women	11	Northeast Ten	Southern Conn
 D2	Women	11	Northeast Ten	St. Michael's
@@ -408,9 +466,14 @@ D2	Women	11	Northeast Ten	Assumption
 D2	Women	11	Northeast Ten	Le Moyne
 D2	Women	11	Pacific Collegiate	Alaska Fairbanks
 D2	Women	11	Pacific Collegiate	UCSD
-D2	Women	11	Metropolitan Swimming	Bridgeport
-D2	Women	11	Metropolitan Swimming	LIU Post
-D2	Women	11	Metropolitan Swimming	Queens
+D2	Women	11	Bluegrass Mountain	Limestone
+D2	Women	11	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	11	Bluegrass Mountain	Converse
+D2	Women	11	Bluegrass Mountain	Fairmont
+D2	Women	11	Bluegrass Mountain	Davis & Elkins
+D2	Women	11	Bluegrass Mountain	Queens (NC)
+D2	Women	11	Bluegrass Mountain	Catawba
+D2	Women	11	Bluegrass Mountain	Wingate
 D2	Women	11	Appalachian (ASC)	Mars Hill
 D2	Women	11	Appalachian (ASC)	Wheeling Jesuit
 D2	Women	11	Appalachian (ASC)	Urbana
@@ -457,6 +520,9 @@ D2	Women	13	Great Lakes Valley	Lewis
 D2	Women	13	Great Lakes Valley	Indy
 D2	Women	13	Great Lakes Valley	Jewell
 D2	Women	13	Great Lakes Valley	Bellarmine
+D2	Women	13	Metropolitan Swimming	Bridgeport
+D2	Women	13	Metropolitan Swimming	LIU Post
+D2	Women	13	Metropolitan Swimming	Queens
 D2	Women	13	Northeast Ten	Adelphi
 D2	Women	13	Northeast Ten	Southern Conn
 D2	Women	13	Northeast Ten	St. Michael's
@@ -469,9 +535,14 @@ D2	Women	13	Pacific Collegiate	Alaska Fairbanks
 D2	Women	13	Pacific Collegiate	Simon Fraser
 D2	Women	13	Pacific Collegiate	UCSD
 D2	Women	13	Pacific Collegiate	CSU East Bay
-D2	Women	13	Metropolitan Swimming	Bridgeport
-D2	Women	13	Metropolitan Swimming	LIU Post
-D2	Women	13	Metropolitan Swimming	Queens
+D2	Women	13	Bluegrass Mountain	Limestone
+D2	Women	13	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	13	Bluegrass Mountain	Converse
+D2	Women	13	Bluegrass Mountain	Fairmont
+D2	Women	13	Bluegrass Mountain	Davis & Elkins
+D2	Women	13	Bluegrass Mountain	Queens (NC)
+D2	Women	13	Bluegrass Mountain	Catawba
+D2	Women	13	Bluegrass Mountain	Wingate
 D2	Women	13	Appalachian (ASC)	Mars Hill
 D2	Women	13	Appalachian (ASC)	King
 D2	Women	13	Appalachian (ASC)	NDC
@@ -520,6 +591,9 @@ D2	Women	12	Great Lakes Valley	Drury
 D2	Women	12	Great Lakes Valley	Indy
 D2	Women	12	Great Lakes Valley	Truman St.
 D2	Women	12	Great Lakes Valley	Lewis
+D2	Women	12	Metropolitan Swimming	Bridgeport
+D2	Women	12	Metropolitan Swimming	LIU Post
+D2	Women	12	Metropolitan Swimming	Queens
 D2	Women	12	Northeast Ten	Adelphi
 D2	Women	12	Northeast Ten	Southern Conn
 D2	Women	12	Northeast Ten	St. Michael's
@@ -531,9 +605,14 @@ D2	Women	12	Northeast Ten	Le Moyne
 D2	Women	12	Pacific Collegiate	Alaska Fairbanks
 D2	Women	12	Pacific Collegiate	UCSD
 D2	Women	12	Pacific Collegiate	CSU East Bay
-D2	Women	12	Metropolitan Swimming	Bridgeport
-D2	Women	12	Metropolitan Swimming	LIU Post
-D2	Women	12	Metropolitan Swimming	Queens
+D2	Women	12	Bluegrass Mountain	Limestone
+D2	Women	12	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	12	Bluegrass Mountain	Converse
+D2	Women	12	Bluegrass Mountain	Fairmont
+D2	Women	12	Bluegrass Mountain	Davis & Elkins
+D2	Women	12	Bluegrass Mountain	Queens (NC)
+D2	Women	12	Bluegrass Mountain	Catawba
+D2	Women	12	Bluegrass Mountain	Wingate
 D2	Women	12	Appalachian (ASC)	Mars Hill
 D2	Women	12	Appalachian (ASC)	Wheeling Jesuit
 D2	Women	12	Appalachian (ASC)	Urbana
@@ -588,6 +667,9 @@ D2	Women	15	Great Lakes Valley	Lewis
 D2	Women	15	Great Lakes Valley	Indy
 D2	Women	15	Great Lakes Valley	Jewell
 D2	Women	15	Great Lakes Valley	Bellarmine
+D2	Women	15	Metropolitan Swimming	Bridgeport
+D2	Women	15	Metropolitan Swimming	LIU Post
+D2	Women	15	Metropolitan Swimming	Queens
 D2	Women	15	Northeast Ten	Adelphi
 D2	Women	15	Northeast Ten	Southern Conn
 D2	Women	15	Northeast Ten	St. Michael's
@@ -602,9 +684,15 @@ D2	Women	15	Pacific Collegiate	Azusa Pacific
 D2	Women	15	Pacific Collegiate	Simon Fraser
 D2	Women	15	Pacific Collegiate	UCSD
 D2	Women	15	Pacific Collegiate	CSU East Bay
-D2	Women	15	Metropolitan Swimming	Bridgeport
-D2	Women	15	Metropolitan Swimming	LIU Post
-D2	Women	15	Metropolitan Swimming	Queens
+D2	Women	15	Bluegrass Mountain	Limestone
+D2	Women	15	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	15	Bluegrass Mountain	Converse
+D2	Women	15	Bluegrass Mountain	Fairmont
+D2	Women	15	Bluegrass Mountain	Carson-Newman
+D2	Women	15	Bluegrass Mountain	Davis & Elkins
+D2	Women	15	Bluegrass Mountain	Queens (NC)
+D2	Women	15	Bluegrass Mountain	Catawba
+D2	Women	15	Bluegrass Mountain	Wingate
 D2	Women	15	Appalachian (ASC)	King
 D2	Women	15	Appalachian (ASC)	Mars Hill
 D2	Women	15	Appalachian (ASC)	NDC
@@ -664,6 +752,9 @@ D2	Women	14	Great Lakes Valley	Lewis
 D2	Women	14	Great Lakes Valley	Indy
 D2	Women	14	Great Lakes Valley	Jewell
 D2	Women	14	Great Lakes Valley	Bellarmine
+D2	Women	14	Metropolitan Swimming	Bridgeport
+D2	Women	14	Metropolitan Swimming	LIU Post
+D2	Women	14	Metropolitan Swimming	Queens
 D2	Women	14	Northeast Ten	Adelphi
 D2	Women	14	Northeast Ten	Southern Conn
 D2	Women	14	Northeast Ten	St. Michael's
@@ -676,9 +767,15 @@ D2	Women	14	Pacific Collegiate	Alaska Fairbanks
 D2	Women	14	Pacific Collegiate	Simon Fraser
 D2	Women	14	Pacific Collegiate	UCSD
 D2	Women	14	Pacific Collegiate	CSU East Bay
-D2	Women	14	Metropolitan Swimming	Bridgeport
-D2	Women	14	Metropolitan Swimming	LIU Post
-D2	Women	14	Metropolitan Swimming	Queens
+D2	Women	14	Bluegrass Mountain	Limestone
+D2	Women	14	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	14	Bluegrass Mountain	Converse
+D2	Women	14	Bluegrass Mountain	Fairmont
+D2	Women	14	Bluegrass Mountain	Carson-Newman
+D2	Women	14	Bluegrass Mountain	Davis & Elkins
+D2	Women	14	Bluegrass Mountain	Queens (NC)
+D2	Women	14	Bluegrass Mountain	Catawba
+D2	Women	14	Bluegrass Mountain	Wingate
 D2	Women	14	Appalachian (ASC)	King
 D2	Women	14	Appalachian (ASC)	Mars Hill
 D2	Women	14	Appalachian (ASC)	NDC
@@ -715,24 +812,24 @@ D2	Women	17	New South Intercollegiate	UTPB
 D2	Women	17	New South Intercollegiate	Delta State
 D2	Women	17	Great Lakes Intercoll	Tiffin
 D2	Women	17	Great Lakes Intercoll	NMU
+D2	Women	17	Great Lakes Intercoll	Findlay
 D2	Women	17	Great Lakes Intercoll	Hillsdale
 D2	Women	17	Great Lakes Intercoll	Saginaw Valley
 D2	Women	17	Great Lakes Intercoll	Wayne State
 D2	Women	17	Great Lakes Intercoll	Grand Valley
 D2	Women	17	Great Lakes Intercoll	Ashland
-D2	Women	17	Great Lakes Intercoll	Findlay
-D2	Women	17	Pennsylvania State (PSAC)	Edinboro
 D2	Women	17	Pennsylvania State (PSAC)	West Chester
 D2	Women	17	Pennsylvania State (PSAC)	East Stroudsburg
 D2	Women	17	Pennsylvania State (PSAC)	Clarion
 D2	Women	17	Pennsylvania State (PSAC)	Millersville
-D2	Women	17	Pennsylvania State (PSAC)	Lock Haven
+D2	Women	17	Pennsylvania State (PSAC)	Gannon
 D2	Women	17	Pennsylvania State (PSAC)	CALU-PA
 D2	Women	17	Pennsylvania State (PSAC)	Kutztown
 D2	Women	17	Pennsylvania State (PSAC)	Bloomsburg
 D2	Women	17	Pennsylvania State (PSAC)	IUP
 D2	Women	17	Pennsylvania State (PSAC)	SHIP
-D2	Women	17	Pennsylvania State (PSAC)	Gannon
+D2	Women	17	Pennsylvania State (PSAC)	Lock Haven
+D2	Women	17	Pennsylvania State (PSAC)	Edinboro
 D2	Women	17	Great Lakes Valley	Drury
 D2	Women	17	Great Lakes Valley	Maryville
 D2	Women	17	Great Lakes Valley	Truman St.
@@ -741,7 +838,11 @@ D2	Women	17	Great Lakes Valley	Lewis
 D2	Women	17	Great Lakes Valley	Indy
 D2	Women	17	Great Lakes Valley	Jewell
 D2	Women	17	Great Lakes Valley	Bellarmine
+D2	Women	17	Great Lakes Valley	McKendree
 D2	Women	17	Great Lakes Valley	Quincy
+D2	Women	17	Metropolitan Swimming	Bridgeport
+D2	Women	17	Metropolitan Swimming	LIU Post
+D2	Women	17	Metropolitan Swimming	Queens
 D2	Women	17	Northeast Ten	Adelphi
 D2	Women	17	Northeast Ten	Southern Conn
 D2	Women	17	Northeast Ten	St. Michael's
@@ -759,9 +860,17 @@ D2	Women	17	Pacific Collegiate	UCSD
 D2	Women	17	Pacific Collegiate	Fresno Pacific
 D2	Women	17	Pacific Collegiate	Simon Fraser
 D2	Women	17	Pacific Collegiate	CSU East Bay
-D2	Women	17	Metropolitan Swimming	Bridgeport
-D2	Women	17	Metropolitan Swimming	LIU Post
-D2	Women	17	Metropolitan Swimming	Queens
+D2	Women	17	Bluegrass Mountain	Chowan
+D2	Women	17	Bluegrass Mountain	Limestone
+D2	Women	17	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	17	Bluegrass Mountain	Converse
+D2	Women	17	Bluegrass Mountain	Barton
+D2	Women	17	Bluegrass Mountain	Fairmont
+D2	Women	17	Bluegrass Mountain	Carson-Newman
+D2	Women	17	Bluegrass Mountain	Davis & Elkins
+D2	Women	17	Bluegrass Mountain	Queens (NC)
+D2	Women	17	Bluegrass Mountain	Catawba
+D2	Women	17	Bluegrass Mountain	Wingate
 D2	Women	17	Appalachian (ASC)	King
 D2	Women	17	Appalachian (ASC)	Mars Hill
 D2	Women	17	Appalachian (ASC)	NDC
@@ -778,10 +887,10 @@ D2	Women	17	Sunshine State	Florida Southern
 D2	Women	17	Sunshine State	Saint Leo
 D2	Women	17	Sunshine State	TAMPA
 D2	Women	17	Rocky Mountain Athletic	Adams St.
+D2	Women	17	Rocky Mountain Athletic	Cal Baptist
 D2	Women	17	Rocky Mountain Athletic	Nebraska Kearney
 D2	Women	17	Rocky Mountain Athletic	Mines
 D2	Women	17	Rocky Mountain Athletic	Colorado Mesa
-D2	Women	17	Rocky Mountain Athletic	Cal Baptist
 D2	Women	17	Rocky Mountain Athletic	WSCU
 D2	Women	17	Rocky Mountain Athletic	CSU-Pueblo
 D2	Women	17	Rocky Mountain Athletic	Oklahoma Baptist
@@ -825,6 +934,9 @@ D2	Women	16	Great Lakes Valley	Indy
 D2	Women	16	Great Lakes Valley	Jewell
 D2	Women	16	Great Lakes Valley	Bellarmine
 D2	Women	16	Great Lakes Valley	Quincy
+D2	Women	16	Metropolitan Swimming	Bridgeport
+D2	Women	16	Metropolitan Swimming	LIU Post
+D2	Women	16	Metropolitan Swimming	Queens
 D2	Women	16	Northeast Ten	Adelphi
 D2	Women	16	Northeast Ten	Southern Conn
 D2	Women	16	Northeast Ten	St. Michael's
@@ -842,9 +954,15 @@ D2	Women	16	Pacific Collegiate	UCSD
 D2	Women	16	Pacific Collegiate	Fresno Pacific
 D2	Women	16	Pacific Collegiate	Simon Fraser
 D2	Women	16	Pacific Collegiate	CSU East Bay
-D2	Women	16	Metropolitan Swimming	Bridgeport
-D2	Women	16	Metropolitan Swimming	LIU Post
-D2	Women	16	Metropolitan Swimming	Queens
+D2	Women	16	Bluegrass Mountain	Limestone
+D2	Women	16	Bluegrass Mountain	Lenoir-Rhyne
+D2	Women	16	Bluegrass Mountain	Converse
+D2	Women	16	Bluegrass Mountain	Fairmont
+D2	Women	16	Bluegrass Mountain	Carson-Newman
+D2	Women	16	Bluegrass Mountain	Davis & Elkins
+D2	Women	16	Bluegrass Mountain	Queens (NC)
+D2	Women	16	Bluegrass Mountain	Catawba
+D2	Women	16	Bluegrass Mountain	Wingate
 D2	Women	16	Appalachian (ASC)	King
 D2	Women	16	Appalachian (ASC)	Mars Hill
 D2	Women	16	Appalachian (ASC)	NDC
