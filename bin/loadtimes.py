@@ -387,7 +387,7 @@ def fixDivision():
 
 if __name__ == '__main__':
 	start = Time.time()
-	#safeLoad()
+	safeLoad()
 	fixConfs()
 	fixDivision()
 	fixDupTeams()
