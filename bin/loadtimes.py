@@ -438,7 +438,10 @@ def uniqueSwimmers():
 		for targetSwimmer in Swimmer.select().where(Swimmer.name==swimmer.name, Swimmer.season==swimmer.season,
 									   Swimmer.teamid==swimmer.teamid, Swimmer.gender==swimmer.gender):
 			if targetSwimmer.id != swimmer.id:
-				mergeSwimmers(swimmer.id, targetSwimmer.id)
+				try:
+					mergeSwimmers(swimmer.id, targetSwimmer.id)
+				except Swimmer.DoesNotExist: # alrady merged
+					pass
 			#print targetSwimmer.name, targetSwimmer.id, targetSwimmer.season, targetSwimmer.team, targetSwimmer.gender
 
 if __name__ == '__main__':
