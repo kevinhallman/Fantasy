@@ -50,6 +50,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	meetKeys = set()
 	teamMeets = []
 	teamMeetKeys = set()
+	swimKeys = set()
 	root = 'data'
 
 	teams = getConfs('data/conferences.txt')
@@ -64,6 +65,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			continue
 		if not 'new' in swimFileName:
 			continue
+
+		confTeams = getNewConfs()
+
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
 				division = 'D1'
@@ -73,7 +77,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				division = 'D3'
 			print division, swimFileName
 
-			for line in swimFile:
+			for idx, line in enumerate(swimFile):
+				#if idx %1000==0:
+				#	print idx
 				swimArray = re.split('\t', line)
 				meet = swimArray[0].strip()
 				d = swimArray[1]
@@ -87,11 +93,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 				if season and swimDate and name and team and gender and event and time:
 					pass
-				else:
+				else:  # missing some information
 					print season, swimDate, name, year, team, gender, event, time
 					continue
 
-				confTeams = getNewConfs()
 				try:
 					conference = confTeams[division][gender][str(season)][team]
 				except KeyError:
@@ -109,7 +114,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						teamKeys.add(key)
 						try:  # don't double add for teams not loaded yet
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
+										   TeamSeason.gender==gender, TeamSeason.division==division).id
 						except TeamSeason.DoesNotExist:
 							newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
 								gender, 'division': division}
@@ -126,7 +131,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							meets.append(newMeet)
 
 				if loadSwimmers:
-					key = str(season) + name + year + team + gender
+					key = str(season) + name + team + gender
 					if not key in swimmerKeys:
 						swimmerKeys.add(key)
 						try:
@@ -134,7 +139,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 													Swimmer.gender==gender).id
 						except Swimmer.DoesNotExist:
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
+										   TeamSeason.gender==gender, TeamSeason.division==division).id
+							if name=='Bushey, Brenna':
+								print name, year, team, gender, teamID
 							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
 								gender, 'teamid': teamID}
 							swimmers.append(newSwimmer)
@@ -145,7 +152,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						teamMeetKeys.add(key)
 						meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
 						teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.conference==conference).id
+										   TeamSeason.gender==gender, TeamSeason.division==division).id
 						try:
 							teamMeetID = TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID).id
 						except TeamMeet.DoesNotExist:
@@ -153,16 +160,19 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							teamMeets.append(newTeamMeet)
 
 				if loadSwims:
-					try:
-						Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
-							Swim.date==swimDate)  # floats in SQL and python different precision
-					except Swim.DoesNotExist:
-						swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
+					key = name + event + str(time) + str(swimDate)
+					if not key in swimKeys:
+						swimKeys.add(key)
+						try:
+							Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+								Swim.date==swimDate)  # floats in SQL and python different precision
+						except Swim.DoesNotExist:
+							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
 												Swimmer.gender==gender).id
-						newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
-					   		'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
-							division, 'relay': relay, 'swimmer': swimmerID}
-						swims.append(newSwim)
+							newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
+					   			'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
+								division, 'relay': relay, 'swimmer': swimmerID}
+							swims.append(newSwim)
 
 	db.connect()
 
@@ -196,15 +206,17 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 def deleteDups():
 	# cleanup for duplicate swims
-	'''print Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
-        'ROW_NUMBER() OVER (partition BY meet, name, event, time, season ORDER BY id) AS rnum '
+	print Swim.raw('DELETE FROM Swim WHERE id IN (SELECT id FROM (SELECT id, '
+        'ROW_NUMBER() OVER (partition BY name, event, time, date ORDER BY id) AS rnum '
         'FROM Swim) t '
-        'WHERE t.rnum > 1)').execute()'''
+        'WHERE t.rnum > 1)').execute()
 
+	'''
 	print TeamStats.raw('DELETE FROM TeamStats WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY week, teamseasonid_id ORDER BY id) AS rnum '
         'FROM TeamStats) t '
         'WHERE t.rnum > 1)').execute()
+    '''
 
 def safeLoad():
 	print 'loading teams...'
@@ -264,11 +276,14 @@ def mergeTeams(sourceTeamId, targetTeamId):
 		swimmer.teamid = targetTeam.id
 		swimmer.team = targetTeam.team
 		swimmer.save()
+		# update their swims
 		for swim in Swim.select().where(Swim.swimmer==swimmer.id):
 			swim.division = targetTeam.division
 			swim.conference = targetTeam.conference
 			swim.team = targetTeam.team
 			swim.season = targetTeam.season
+			if swim.relay: # change relay names
+				swim.name = targetTeam.team + ' Relay'
 			swim.save()
 
 	# now switch the meet linking table
@@ -290,6 +305,7 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 		swim.conference = targetTeam.conference
 		swim.season = targetTeam.season
 		swim.swimmer = targetSwimmer
+		swim.name = targetSwimmer.name
 		swim.save()
 
 	Swimmer.delete().where(Swimmer.id==sourceSwimmerId).execute()
@@ -385,21 +401,60 @@ def fixDivision():
 		except TeamSeason.DoesNotExist:
 			pass
 
+def fixDupSwimmers():
+	for swim in Swim.raw('SELECT id, time, meet, event, season, gender, name, swimmer_id, team, year FROM '
+							'(SELECT id, time, meet, event, season, gender, name, swimmer_id, team, year, ROW_NUMBER() '
+	 						'OVER (partition BY time, meet, event, season, gender, team, year ORDER BY id) '
+							'AS rnum FROM swim) s WHERE s.rnum > 1'):
+		for swim2 in Swim.select().where(Swim.time==swim.time, Swim.meet==swim.meet, Swim.event==swim.event,
+								Swim.season==swim.season, Swim.gender==swim.gender, Swim.team==swim.team):
+			if swim.id==swim2.id:
+				continue
+			if swim.swimmer==swim2.swimmer:
+				continue
+			if not ',' in swim.name:
+				print swim.name, swim.id
+				continue
+			if not ',' in swim2.name:
+				print swim2.name, swim2.id
+				continue
+			first, last = re.split(',', swim.name)
+			first2, last2 = re.split(',', swim2.name)
+			if first==first2 or last==last2:
+				print swim.id, swim.event, swim.time, swim.name, swim2.name, swim.swimmer.id, swim2.swimmer.id
+				response = raw_input('Merge (y/n)?')
+				if response=='y':
+					try:
+						mergeSwimmers(swim2.swimmer.id, swim.swimmer.id)  # higher id # coming later and is target
+					except Swimmer.DoesNotExist: # already merged
+						pass
+
+def uniqueSwimmers():
+	for swimmer in Swimmer.raw('SELECT id, season, name, teamid_id, gender FROM '
+						'(SELECT id, season, name, teamid_id, gender, ROW_NUMBER() '
+	 					'OVER (partition BY season, name, teamid_id, gender ORDER BY id) '
+						'AS rnum FROM swimmer) s WHERE s.rnum > 1'):
+		print swimmer.name, swimmer.id, swimmer.season, swimmer.teamid, swimmer.gender
+		for targetSwimmer in Swimmer.select().where(Swimmer.name==swimmer.name, Swimmer.season==swimmer.season,
+									   Swimmer.teamid==swimmer.teamid, Swimmer.gender==swimmer.gender):
+			if targetSwimmer.id != swimmer.id:
+				mergeSwimmers(swimmer.id, targetSwimmer.id)
+			#print targetSwimmer.name, targetSwimmer.id, targetSwimmer.season, targetSwimmer.team, targetSwimmer.gender
+
 if __name__ == '__main__':
 	start = Time.time()
-	safeLoad()
-	fixConfs()
-	fixDivision()
-	fixDupTeams()
-	#mergeSwimmers(294608, 285526)
+	uniqueSwimmers()
+	deleteDups()
+	#fixDupSwimmers()
+	#safeLoad()
+	#fixConfs()
+	#fixDivision()
+	#fixDupTeams()
+	#mergeSwimmers(285999, 294793)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
 	# fixConfs()
-	# deleteDups()
 	# migrateImprovement()
 	# addRelaySwimmers()
 	stop = Time.time()
 	print stop - start
-		#print swim.team
-
-# select from Swimmer,Swim where Swim.swimmer_id=Swimmer.id and Swim.relay='t' and Swimmer.name not like '%Relay'
