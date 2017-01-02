@@ -51,7 +51,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	root = 'data'
+	root = 'data/2017'
 
 	teams = getConfs('data/conferences.txt')
 	divisions = {}
@@ -440,19 +440,19 @@ def uniqueSwimmers():
 			if targetSwimmer.id != swimmer.id:
 				try:
 					mergeSwimmers(swimmer.id, targetSwimmer.id)
-				except Swimmer.DoesNotExist: # alrady merged
+				except Swimmer.DoesNotExist:  # already merged
 					pass
 			#print targetSwimmer.name, targetSwimmer.id, targetSwimmer.season, targetSwimmer.team, targetSwimmer.gender
 
 if __name__ == '__main__':
 	start = Time.time()
-	uniqueSwimmers()
-	deleteDups()
+	#uniqueSwimmers()
+	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad()
-	#fixConfs()
-	#fixDivision()
-	#fixDupTeams()
+	safeLoad()
+	fixConfs()
+	fixDivision()
+	fixDupTeams()
 	#mergeSwimmers(285999, 294793)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
