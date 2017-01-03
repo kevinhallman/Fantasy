@@ -169,6 +169,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 								division, 'relay': relay, 'swimmer': swimmerID}
 							swims.append(newSwim)
 
+						if len(swims) > 1000:
+							print 'Swims: ', len(swims)
+							print Swim.insert_many(swims).execute()
+							swims = []
+
+
 	db.connect()
 
 	if loadTeams and len(newTeams) > 0:
@@ -189,16 +195,14 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 	if loadSwims and len(swims) > 0:
 		print 'Swims: ', len(swims)
-		print Swim.insert_many(swims).execute()
-	print 'Done!'
+		#print Swim.insert_many(swims).execute()
 
-	'''
-	for i in range(len(newSwims) / 100):
-		print i
-		with db.transaction():
-			print newSwims[i*100:(i+1)*100]
-			Swim.insert_many(newSwims[i*100:(i+1)*100]).execute()
-	'''
+		#for i in range(len(swims) / 100):
+		#	print i
+		#	with db.transaction():
+		#		print swims[i*100:(i+1)*100]
+		#		Swim.insert_many(swims[i*100:(i+1)*100]).execute()
+		print 'Done!'
 
 def deleteDups():
 	# cleanup for duplicate swims
