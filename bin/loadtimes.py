@@ -53,7 +53,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	swimKeys = set()
 	root = 'data/2017'
 
-	teams = getConfs('data/conferences.txt')
 	divisions = {}
 	for swimFileName in os.listdir(root):
 		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
@@ -78,8 +77,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 			print division, swimFileName
 
 			for idx, line in enumerate(swimFile):
-				#if idx %1000==0:
-				#	print idx
 				swimArray = re.split('\t', line)
 				meet = swimArray[0].strip()
 				d = swimArray[1]
@@ -140,8 +137,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						except Swimmer.DoesNotExist:
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
 										   TeamSeason.gender==gender, TeamSeason.division==division).id
-							if name=='Bushey, Brenna':
-								print name, year, team, gender, teamID
 							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
 								gender, 'teamid': teamID}
 							swimmers.append(newSwimmer)
@@ -194,7 +189,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 	if loadSwims and len(swims) > 0:
 		print 'Swims: ', len(swims)
-		Swim.insert_many(swims).execute()
+		print Swim.insert_many(swims).execute()
+	print 'Done!'
 
 	'''
 	for i in range(len(newSwims) / 100):
@@ -220,11 +216,12 @@ def deleteDups():
 
 def safeLoad():
 	print 'loading teams...'
-	load(loadTeams=True)
+	#load(loadTeams=True)
 	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True)
+	#load(loadMeets=True, loadSwimmers=True)
 	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True)
+	#load(loadTeamMeets=True, loadSwims=True)
+	load(loadSwims=True)
 
 def addRelaySwimmers():
 	'''
