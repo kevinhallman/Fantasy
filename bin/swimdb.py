@@ -11,7 +11,7 @@ import numpy as np
 import heapq
 from operator import itemgetter
 from sympy import binomial
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 eventsDualS = ["200 Yard Medley Relay","1000 Yard Freestyle","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
 eventsChamp = ["400 Yard Medley Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","400 Yard Individual Medley","1650 Yard Freestyle","200 Yard Medley Relay","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
