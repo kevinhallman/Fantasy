@@ -6,11 +6,12 @@ import time as Time
 import urlparse
 from playhouse.migrate import *
 from math import log
-from scipy.stats import norm, truncnorm, skewnorm
+from scipy.stats import norm, truncnorm, skewnorm, linregress
 import numpy as np
 import heapq
 from operator import itemgetter
 from sympy import binomial
+import matplotlib.pyplot as plt
 
 eventsDualS = ["200 Yard Medley Relay","1000 Yard Freestyle","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
 eventsChamp = ["400 Yard Medley Relay","400 Yard Freestyle Relay","800 Yard Freestyle Relay","400 Yard Individual Medley","1650 Yard Freestyle","200 Yard Medley Relay","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
@@ -391,43 +392,55 @@ class Swimmer(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
+	eventppts = CharField(null=True)
 	teamid = ForeignKeyField(TeamSeason, null=True)
 	taperSwims = {}
 
 	class Meta:
 		database = db
 
-	def similarSwimmers(self, numSimilar):
-		# finds n most similar swimmers
-		distNum = 10
-		topNum = 3
-		eventDist, avgPpt = self.stats(self.id, distNum, topNum)  # we will compare on event selection and ppt
+	def similarSwimmers(self, num=10):
+		swims1 = self.eventPPts()
+		print swims1
 
-		n = 0
-		similar = []
-		for swimmer in Swimmer.select().where(Swimmer.year==self.year, Swimmer.gender==self.gender):
-			n+=1
-			if n>1000:
+
+		totalDeltas = {}
+		for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
+				Swimmer.year==self.year, TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(5000):
+			swims2 = s2.eventPPts()
+			#print swims2
+
+			totalDeltas[s2] = 0
+			for event in allEvents:
+				if event in swims1 and event in swims2:
+					totalDeltas[s2] += (swims1[event] - swims2[event]) ** 2
+				elif event in swims1:
+					totalDeltas[s2] += swims1[event] ** 2
+				elif event in swims2:
+					totalDeltas[s2] += swims2[event] ** 2
+
+		totalSwimmers = 0
+		totalEvents = 0
+		events = {}
+		for key, value in sorted(totalDeltas.iteritems(), key=lambda (k, v): (v, k)):
+			totalSwimmers += 1
+			if totalSwimmers > num:
 				break
+			tapers = key.getTaperSwims()
+			for event in tapers:
+				if not event in events:
+					events[event] = []
+				events[event].append(tapers[event].time)
+				totalEvents += 1
 
-			newEventDist, newAvgPpt = self.stats(swimmer.id)
+		for event in events:
+			print event, np.mean(events[event]), float(len(events[event]))/ float(totalEvents)
 
-			# print swimmer.name, newEventDist, eventDist
 
-			eventDiff = distNum * 2  # find event selection difference
-			for event in eventDist:
-				if event in newEventDist:
-					eventDiff -= abs(eventDist[event] - newEventDist[event])
-			eventDiff /= (distNum * 2.0)
-
-			timeDiff = abs(newAvgPpt - avgPpt)
-			diff = eventDiff**2 + timeDiff
-
-			similar.append((swimmer, eventDiff, timeDiff, diff))
-
-			# print eventDiff, timeDiff, diff
-		for swimmerStats in sorted(similar, key=itemgetter(3))[:numSimilar]:
-			print swimmerStats[0].name, swimmerStats
+		print 'swimmer1'
+		tapers = s1.getTaperSwims()
+		for event in tapers:
+			print event, tapers[event].time
 
 	def stats(self, distNum=20, topNum=3):  # used to find if two swimmers are similar
 		topSwims = self.topSwims(distNum)
@@ -438,18 +451,18 @@ class Swimmer(Model):
 
 		avgPpt = 0
 		for swim in topSwims[:topNum]:
-			avgPpt += swim.powerpoints
+			avgPpt += swim.getPPTs()
 		avgPpt /= topNum
 
-		for swim in topSwims[:topNum]:
-			print swim.event, swim.time
+		#for swim in topSwims[:topNum]:
+		##	print swim.event, swim.time
 
 		return eventDist, avgPpt
 
 	def topSwims(self, n=20, event=None, distinctEvents=False):
 		times = []
 		for swim in Swim.select().where(Swim.swimmer==self, Swim.relay==False):
-			swim.getPPTs()
+			swim.getPPTs(zscore=False)
 			if swim.event=='1000 Yard Freestyle': continue
 			times.append(swim)
 
@@ -470,6 +483,29 @@ class Swimmer(Model):
 		if event:
 			topTimes = [time for time in topTimes if time.event==event]
 		return topTimes
+
+	def eventPPts(self):
+		if self.eventppts:
+			swims = {}
+			parts = re.split(',', self.eventppts)
+			for part in parts:
+				event, points = re.split(':', part)
+				swims[event] = int(points)
+			return swims
+
+		swims = {}
+		for swim in self.topSwims():
+			if swim.event not in swims:
+				swims[swim.event] = 0
+			swims[swim.event] += int(swim.powerpoints)
+
+		pptstr = ''
+		for event in swims:
+			pptstr += event + ':' + str(swims[event]) + ','
+		self.eventppts = pptstr[:-1]  # save as hashed string and remove trailing comma
+		if len(self.eventppts)<255:
+			self.save()
+		return swims
 
 	def getTaperSwims(self, num=3):
 		taperSwims = {}
@@ -523,17 +559,21 @@ class Swim(Model):
 	pastTimes = []
 	taperTime = None
 
-	def getPPTs(self):
+	def getPPTs(self, zscore=True):
 		if self.powerpoints:
 			return self.powerpoints
 
 		if not self.gender or not self.division or not self.event or not self.time:
 			return None
 		cdf = getSkewCDF(self.gender, self.division, self.event)
+		#cdf = getSkewCDF(self.gender, 'D1', self.event)
 		percent = 1 - cdf(self.time)
 		percentileScore = (1 - percent) * 500
 		powerScore = 1 / percent
-		zscore = log(powerScore) * 50  # approximately the number of stds away from the means
+		if zscore:
+			zscore = log(powerScore) * 50  # approximately the number of stds away from the means
+		else:
+			zscore = 0
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
@@ -1265,9 +1305,9 @@ class TempMeet:
 	lists swimmers by team and by points scored
 	'''
 	def scoreReport(self, repressSwim=False, repressTeam=False):
-		scores={}
+		scores = {}
 		for team in self.teams:
-			scores[team]={'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
+			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
 				if swim.relay:
@@ -1314,7 +1354,6 @@ class TempMeet:
 		print self.scores
 
 	def scoreString(self, showNum='all', showScores=True, showPlace=False):
-		self.score()
 		string = {}
 		events = self.getEvents('')
 		for event in events:
@@ -1395,9 +1434,23 @@ class Timedist(Model):
 		database = db
 
 if __name__ == '__main__':
+	'''
+	migrator = PostgresqlMigrator(db)
+	with db.transaction():
+		migrate(
+			migrator.add_column('swimmer', 'eventppts', Swimmer.eventppts),
+			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
+			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
+		)
+	'''
+	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Freshman').order_by(fn.Random()).limit(3):
+		s1.similarSwimmers()
+
 	#team = TeamSeason.get(team='Carleton', season=2017)
 	#print team.season, team.gender
 	#print team.getTaperStats(7)
+	'''
 	event = '500 Yard Freestyle'
 	division = 'D3'
 	gender = 'Men'
@@ -1405,17 +1458,8 @@ if __name__ == '__main__':
 	for i in range(1, 10):
 		time = round(frozen.ppf(float(i)/10))
 		print i, swimTime(time), round(Swim(event=event, division=division, gender=gender, time=time).getPPTs())
+	'''
 
-	'''
-	migrator = PostgresqlMigrator(db)
-	with db.transaction():
-		migrate(
-			migrator.add_column('teamstats', 'toptaperstd', TeamStats.toptaperstd),
-			migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
-			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
-			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
-		)
-	'''
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
 

@@ -8,6 +8,8 @@ import os, urlparse
 import numpy
 from peewee import *
 from swimdb import swimTime
+#from guppy import hpy
+
 from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist
 from operator import itemgetter
 import time as Time
@@ -35,7 +37,7 @@ urls = ('/', 'Home',
 	'/preseason', 'SeasonRankings',
 	'/preseasonJSON', 'SeasonRankingsJSON',
 	'/teamstats/(.+)', 'TeamStats',
-	'/powerpoints', 'Powerpoints',
+	'/powerscore', 'Powerscore',
 	'/swimmer', 'Swimmerstats'
 )
 
@@ -277,11 +279,15 @@ class Conf():
 			if form.conference == 'Nationals':
 				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
+				if form.heats=='3':
+					confMeet.score(heats=3)
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
+				if form.heats=='3':
+					confMeet.score(heats=3)
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
 			print Time.time() - start
@@ -742,7 +748,7 @@ class TeamStats():
 		conf = teamseason.conference
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
 
-class Powerpoints():
+class Powerscore():
 	def GET(self):
 		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None)
 		setGenDiv(form.gender, form.division)
@@ -776,7 +782,6 @@ class Powerpoints():
 			return render.powerpoints(events=eventOrderInd, points=None, table=html)
 
 		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
-		#print swim
 		points = swim.getPPTs()
 		return render.powerpoints(events=eventOrderInd, points=points, table=None)
 
