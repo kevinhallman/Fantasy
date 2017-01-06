@@ -247,7 +247,7 @@ class SwimulateJSON():
 class Conf():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
-						 gender=None)
+						 gender=None, heats=None)
 		setGenDiv(form.gender, form.division)
 
 		start = Time.time()
