@@ -1314,7 +1314,7 @@ class TempMeet:
 					name = 'Relays'
 				else:
 					name = swim.name
-				if repressSwim and swim.score == 0:
+				if repressSwim and (swim.score == 0 or not swim.score):
 					continue   # repess zero scores
 
 				team = swim.getScoreTeam()

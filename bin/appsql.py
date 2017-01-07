@@ -279,14 +279,14 @@ class Conf():
 			if form.conference == 'Nationals':
 				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
-				if form.heats and form.heats=='3':
+				if form.heats and form.heats=='24':
 					confMeet.score(heats=3)
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
-				if form.heats and form.heats=='3':
+				if form.heats and form.heats=='24':
 					confMeet.score(heats=3)
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
@@ -999,7 +999,8 @@ def showRank(topTeams):
 	for idx, team in enumerate(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
-		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+') + '>' + team.team + '</a></td>'
+		genDiv = '?Gender=' + team.gender + '&Division=' + team.division
+		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+') + '>' + team.team+genDiv+'</a></td>'
 		winNats = team.getWinnats() * 100
 		if winNats == '': winNatsDelta = ''
 		else: winNatsDelta = winNats - team.getWinnats(1) * 100

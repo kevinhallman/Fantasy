@@ -53,7 +53,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	swimKeys = set()
 	root = 'data/2017'
 
-	divisions = {}
 	for swimFileName in os.listdir(root):
 		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
@@ -162,17 +161,19 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
 								Swim.date==swimDate)  # floats in SQL and python different precision
 						except Swim.DoesNotExist:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
-												Swimmer.gender==gender).id
+							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.division==division).id
+							swimmerID = Swimmer.get(Swimmer.name==name, Swimmer.teamid==teamID).id
 							newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
 					   			'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
 								division, 'relay': relay, 'swimmer': swimmerID}
 							swims.append(newSwim)
 
-						if len(swims) > 1000:
-							print 'Swims: ', len(swims)
-							print Swim.insert_many(swims).execute()
-							swims = []
+						# incremental load
+						#if len(swims) > 1000:
+						#	print 'Swims: ', len(swims)
+						#	print Swim.insert_many(swims).execute()
+						#	swims = []
 
 
 	db.connect()
@@ -195,7 +196,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 	if loadSwims and len(swims) > 0:
 		print 'Swims: ', len(swims)
-		#print Swim.insert_many(swims).execute()
+		Swim.insert_many(swims).execute()
 
 		#for i in range(len(swims) / 100):
 		#	print i
@@ -226,44 +227,6 @@ def safeLoad():
 	print 'loading teamMeets and swims...'
 	#load(loadTeamMeets=True, loadSwims=True)
 	load(loadSwims=True)
-
-def addRelaySwimmers():
-	'''
-	relaySwimmers = []
-	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender).distinct().where(Swim.relay==True):
-		try:
-			teamID = TeamSeason.get(TeamSeason.season==swim.season, TeamSeason.team==swim.team,
-										   TeamSeason.gender==swim.gender, TeamSeason.conference==swim.conference).id
-		except TeamSeason.DoesNotExist:
-			print swim.team
-		relayName = swim.team + ' Relay'
-		newSwim = {'season': swim.season, 'name': relayName, 'year': None, 'team': swim.team, 'gender': swim.gender,
-				   'teamid': teamID}
-		relaySwimmers.append(newSwim)
-	print 'Swimmers: ' + str(len(relaySwimmers))
-	Swimmer.insert_many(relaySwimmers).execute()
-	'''
-	#print relaySwimmers
-	swimmers = {}
-	i=0
-	for swim in Swim.select(Swim.team, Swim.season, Swim.conference, Swim.gender, Swim.id).where(Swim.relay==True,
-																		Swim.swimmer==None):
-		i+=1
-		if i%1000==0:
-			print i
-		key = swim.team + str(swim.season) + swim.gender
-		if not key in swimmers:
-			try:
-				swimmerID = Swimmer.get(Swimmer.team==swim.team, Swimmer.season==swim.season,
-									Swimmer.gender==swim.gender).id
-				swimmers[key] = swimmerID
-			except Swimmer.DoesNotExist:
-				print swim.team, swim.season, swim.conference
-				continue
-		else:
-			swimmerID = swimmers[key]
-
-		Swim.update(swimmer=swimmerID).where(Swim.id==swim.id).execute()
 
 def mergeTeams(sourceTeamId, targetTeamId):
 	sourceTeam = TeamSeason.get(id=sourceTeamId)
@@ -312,7 +275,7 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 	Swimmer.delete().where(Swimmer.id==sourceSwimmerId).execute()
 
 def fixRelays():
-	'''
+	'''finds relays that are attached to non-relay swimmers'''
 	count = 0
 	for swim in Swim.select(Swim.name, Swim.id, Swim.relay, Swimmer.name, Swimmer.teamid, TeamSeason.team,
 							TeamSeason.season, TeamSeason.team, TeamSeason.gender).join(
@@ -336,8 +299,9 @@ def fixRelays():
 		count +=1
 		if count%1000==0: print count
 	print count
-	'''
-	count=0
+
+	'''now fix ones with gender mismatch'''
+	count = 0
 	for swim in Swim.select().join(Swimmer).where(Swimmer.gender=='Men', Swim.gender=='Women'):
 		count += 1
 		try:
@@ -389,8 +353,8 @@ def fixDupTeams():
 			pass
 
 def fixDivision():
-	for swim in Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason).where(Swim.division=='D3',
-																	TeamSeason.division=='D1'):
+	for swim in Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason).where(Swim.division!=
+																	TeamSeason.division):
 		try:
 			newTeam = TeamSeason.get(team=swim.team, division=swim.division, season=swim.season, gender=swim.gender)
 			if newTeam.id != swim.swimmer.teamid.id:
@@ -450,10 +414,10 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
-	fixConfs()
+	#safeLoad()
+	#fixConfs()
 	fixDivision()
-	fixDupTeams()
+	#fixDupTeams()
 	#mergeSwimmers(285999, 294793)
 	#mergeTeams(6785, 8453)
 	#fixRelays()

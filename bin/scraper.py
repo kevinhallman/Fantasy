@@ -15,7 +15,7 @@ def toTime(time):
 	
 conferenceMap = {59:'Allegheny Mountain',81:'American Southwest',346:'Appalachian (ASC)',125:'Bluegrass Mountain',82:'Capital Athletic',83:'Centennial',84:'City Univ. of New York',85:'College of Illinois/Wisc',86:'Colonial States Athletic',87:'Commonwealth Coast',88:'Empire 8',90:'Great Northeast Athletic',89:'Great South Athletic',91:'Heartland Collegiate',338:'Independent',92:'Iowa Intercollegiate',93:'Landmark',124:'Liberal Arts',94:'Liberty League',95:'Little East',96:'Massachusetts State',130:'Metropolitan Swim',97:'Michigan Intercollegiate',98:'Middle Atlantic',99:'Midwest',100:'MIAC',101:'New England Intercoll.',102:'NESCAC',103:'New England',104:'New Jersey Athletic',105:'North Atlantic',106:'North Coast Athletic',107:'North Eastern Athletic',108:'Northern Athletics',109:'Northwest Conference',110:'Ohio Athletic',111:'Old Dominion Athletic',129:'Pacific Collegiate',112:'Presidents',114:'Skyline',343:'Southern Athletic Associa',115:'Southern California',116:'Southern Collegiate',113:'St. Louis Intercollegiate',117:'State Univ of New York',119:'University Athletic',120:'Upper Midwest Athletic',118:'USA South Athletic',121:'Wisconsin Intercollegiate',25:'ACC (Atlantic Coast)',29:'America East',345:'American Athletic Conf',30:'Atlantic 10',27:'Big 12',31:'Big East',1:'Big Ten',49:'Coastal College (CCSA)',33:'Colonial Athletic Assoc',34:'Conference USA',35:'Horizon League',36:'Independent',37:'Ivy League',38:'Metro Atlantic Athl. Conf',340:'Metropolitan Swimming Con',39:'Mid',41:'Missouri Valley',336:'Mountain Pacific Sports',42:'Mountain West',43:'Northeast Conf',28:'Pac 12',26:'SEC',45:'Sun Belt',46:'The Patriot League',47:'The Summit League',48:'Western Athletic Conf',339:'Appalachian (ASC)',123:'Bluegrass Mountain',341:'California Collegiate',61:'Central Atlantic',64:'East Coast',66:'Great Lakes Intercoll',344:'Great Lakes Valley',337:'Independent',128:'Metropolitan Swimming',71:'Mid',127:'New South Intercollegiate',73:'Northeast Ten',72:'Northern Sun Intercoll',131:'Pacific Collegiate',122:'Pennsylvania State (PSAC)',76:'Rocky Mountain Athletic',79:'Sunshine State'}
 
-def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50', Stroke='1', Gender='rbGenderMale',
+def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50', Stroke='1', Gender='rbGenderMale',
 				BestAll='radBestTimeOnly', Number=100, StartDate='', EndDate='', oldTimes=set(), printConf=False):
 	URL = 'http://usaswimming.org/DesktopDefault.aspx?TabId=1969&Alias=Rainbow&Lang=en'
 	Cut = '1'
@@ -76,13 +76,13 @@ def getTopTimes(File,Conference="", Team='radAllTeam', Date='30', Distance='50',
 		ED = split[2]+'-'+split[0]+'-'+split[1]
 		SDValid = SD+'-00-00-00'
 		EDValid = ED+'-00-00-00'
-	DateDict = {'17 DI':'42', '17 DII':'43', '17 DIII':'44', '16 DI':'37','16 DII':'38','16 DIII':'39','15 DIII':'35',
-				'14 DIII':'31','13 DIII':'27',
-				'12 DIII':'22','11 DIII':'8','15 DI':'33','14 DI':'30', '13 DI':'25','12 DI':'20','11 DI':'7',
-				'10 DI':'4','09 DI':'5','08 DI':'6','15 DII':'34','14 DII':'29','13 DII':'26','12 DII':'21','11 DII':'9'}
-	Date=DateDict[Date]
-	revd=dict([reversed(i) for i in DateDict.items()])
-	DateDict.update(revd)
+	dateDict = {'17 DI': '42', '17 DII': '43', '17 DIII': '44', '16 DI': '37', '16 DII': '38', '16 DIII': '39',
+				'15 DIII': '35', '14 DIII': '31', '13 DIII': '27', '12 DIII': '22', '11 DIII': '8', '15 DI': '33',
+				'14 DI': '30', '13 DI': '25', '12 DI': '20', '11 DI': '7', '10 DI': '4', '09 DI': '5', '08 DI': '6',
+				'15 DII': '34', '14 DII': '29', '13 DII': '26', '12 DII': '21', '11 DII': '9'}
+	Date = dateDict[Date]
+	revd = dict([reversed(i) for i in dateDict.items()])
+	dateDict.update(revd)
 	if Stroke=='FR':
 		strokeOut='Freestyle'
 		Stroke='1'
@@ -344,14 +344,16 @@ def topTimesLoop():
 												  Number=7000, oldTimes=oldTimes)
 
 def getConferenceData():
+	# just get 100 free results for every conference to figure out which teams are in a conference
 	confDiv = getConfs()
 	genders = ['m', 'f']
-	divisions = ['DIII', 'DII', 'DI']
+	#divisions = ['DIII', 'DII', 'DI']
+	divisions = ['DII']
 	distances = {}
 	distances['FR'] = [100]
 	conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
 	#conferences = ['']
-	years = ['17', '16', '15','14','13','12','11']
+	years = ['17', '16', '15', '14', '13', '12', '11']
 
 	directory = 'data'
 	for year in years:
@@ -373,12 +375,14 @@ def getConferenceData():
 						else:
 							confName = conferenceMap[conference]
 						if confName in confDiv and confDiv[confName] != divNum:
-							continue
+							if conference != 123:  # allow for Bluegrass Mountain which is D2 and D3
+								continue
 						for stroke in distances:
 							for distance in distances[stroke]:
 								print year, division, gender, distance, stroke
 
 								# now find the times and load them into the new file if they aren't in the old
+								print conference
 								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
 											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
 												  Number=7000, oldTimes=set(), printConf=True)
@@ -427,9 +431,10 @@ def storeConfs():
 							#print div, gender, year, conf, team.strip()
 
 if __name__ == "__main__":
+	#getConferenceData()
 	topTimesLoop()  # get all new times
 	#storeConfs()
-#getTopTimes(Date='12 DIII',Distance=100,Stroke='FL',Gender='f',Conference=100)
+	#getTopTimes(Date='12 DIII',Distance=100,Stroke='FL',Gender='f',Conference=100)
 
 #Parameters
 #1 RelInd Relay or individual (default is individual)
