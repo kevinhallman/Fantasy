@@ -1000,7 +1000,7 @@ def showRank(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
 		genDiv = '?Gender=' + team.gender + '&Division=' + team.division
-		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+') + '>' + team.team+genDiv+'</a></td>'
+		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+')+genDiv+'>' + team.team + '</a></td>'
 		winNats = team.getWinnats() * 100
 		if winNats == '': winNatsDelta = ''
 		else: winNatsDelta = winNats - team.getWinnats(1) * 100
