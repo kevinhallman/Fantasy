@@ -127,15 +127,15 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							meets.append(newMeet)
 
 				if loadSwimmers:
-					key = str(season) + name + team + gender
+					teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.division==division).id
+					key = str(season) + name + str(teamID) + gender
 					if not key in swimmerKeys:
 						swimmerKeys.add(key)
 						try:
-							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.team==team,
+							swimmerID = Swimmer.get(Swimmer.season==season, Swimmer.name==name, Swimmer.teamid==teamID,
 													Swimmer.gender==gender).id
 						except Swimmer.DoesNotExist:
-							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.division==division).id
 							newSwimmer = {'season': season, 'name': name, 'year': year, 'team': team, 'gender':
 								gender, 'teamid': teamID}
 							swimmers.append(newSwimmer)
@@ -221,12 +221,11 @@ def deleteDups():
 
 def safeLoad():
 	print 'loading teams...'
-	#load(loadTeams=True)
+	load(loadTeams=True)
 	print 'loading meets and swimmers...'
-	#load(loadMeets=True, loadSwimmers=True)
+	load(loadMeets=True, loadSwimmers=True)
 	print 'loading teamMeets and swims...'
-	#load(loadTeamMeets=True, loadSwims=True)
-	load(loadSwims=True)
+	load(loadTeamMeets=True, loadSwims=True)
 
 def mergeTeams(sourceTeamId, targetTeamId):
 	sourceTeam = TeamSeason.get(id=sourceTeamId)
@@ -414,7 +413,7 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad()
+	safeLoad()
 	#fixConfs()
 	fixDivision()
 	#fixDupTeams()
