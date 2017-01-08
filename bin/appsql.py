@@ -750,7 +750,9 @@ class TeamStats():
 
 class Powerscore():
 	def GET(self):
-		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None)
+		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None,
+						 submit=None)
+		#print form.submit
 		setGenDiv(form.gender, form.division)
 
 		if not form.event:  # empty
@@ -764,7 +766,7 @@ class Powerscore():
 		except:
 			time = None
 
-		if time == 0:  # get table
+		if time == 0 or form.submit=='Show Table':  # get table if no time or button hit
 			frozen = getSkewDist(form.gender, form. division, form.event)
 			html = '<table>'
 			html += '<tr><th>Time</th><th>Powerpoints</th></tr>'
@@ -781,6 +783,7 @@ class Powerscore():
 
 			return render.powerpoints(events=eventOrderInd, points=None, table=html)
 
+		# otherwise return the points
 		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
 		points = swim.getPPTs()
 		return render.powerpoints(events=eventOrderInd, points=points, table=None)
