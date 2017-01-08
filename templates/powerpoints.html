@@ -1,27 +1,43 @@
 $def with(events, points, table)
 
 <h1>
-Powerpoint Calculator
+Powerscore Calculator
 </h1>
 
 <p>
-Find your points!
+The powerscore calculator assigns each swimming time a score based on its strength within a given gender, event, and
+	division. Click on "Table" to get a table of times/values. The median time will score approximately 350
+	points; national records are usually around 950 points.
 </p>
 
-<form>
+<script type="text/javascript">
+\$(document).ready(function() {
+	\$('[type="submit"]').click(function (evt) {
+    	\$(this.form).data('submitted', this.value);
+	});
+});
+</script>
+
+<form method="GET" class="ajax" name="powerscore">
 	<select name="event">
 		$for event in events:
 			<option> $event </option>
 	</select>
-	<input name="min" type="number" value="0" maxlength="2"/>:
-	<input name="sec" type="number" value="00" maxlength="2"/>.
-	<input name="hun" type="number" value="00" maxlength="2"/>
+	<input name="min" type="text" value="0" size="2" maxlength="2"/>:
+	<input name="sec" type="text" value="00" size="2" maxlength="2"/>.
+	<input name="hun" type="text" value="00" size="2" maxlength="2"/>
 
-	<input type="submit" value="Calculate">
+	<!--<input id="Calc" type="submit" name="test" value="Calculate">-->
+	<input id="table" type="submit" name="submit" value="Table">
+	<input id="Calc" type="submit" name="submit" value="Calculate">
 </form>
+
+<div id="results">
 
 $if points:
 	Points: $points
 
 $if table:
 	$:table
+
+</div>

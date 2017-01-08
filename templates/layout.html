@@ -45,11 +45,15 @@ $def with (content)
 			function prepAjaxForms(gendiv) {
 				//handles the form submissions and does a partial ajax page reload
 				$$('form.ajax').submit(function(form) {  // catch any form submission event
-
-					newURL = location.pathname + '?' + $$(this).serialize() + '&gender=' + $$('ul#gender li.active')[0]
-					.id + '&division=' + $$('ul#division li.active')[0].id;
+					dataURL = $$(this).serialize() + '&gender=' + $$('ul#gender li.active')[0].id + '&division=' +
+															$$('ul#division li.active')[0].id;
+					newURL = location.pathname + '?' + dataURL;
 					$$("#loading").show();
-					$$('#results').load( location.pathname + ' #results', $$(this).serialize(), function(){
+					pptsubmit = $$(this).data('submitted'); //we can say which ppt button was pushed
+					if (pptsubmit != null) {
+						dataURL += '&submit=' + pptsubmit;
+					}
+					$$('#results').load( location.pathname + ' #results', dataURL, function(){
 						$$("#loading").hide();
 						sumType();
 						$$("#programs").tablesorter(); //also needs to be done on re-load

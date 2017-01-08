@@ -752,7 +752,6 @@ class Powerscore():
 	def GET(self):
 		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None,
 						 submit=None)
-		#print form.submit
 		setGenDiv(form.gender, form.division)
 
 		if not form.event:  # empty
@@ -766,7 +765,7 @@ class Powerscore():
 		except:
 			time = None
 
-		if time == 0 or form.submit=='Show Table':  # get table if no time or button hit
+		if time == 0 or form.submit=='Table':  # get table if no time or button hit
 			frozen = getSkewDist(form.gender, form. division, form.event)
 			html = '<table>'
 			html += '<tr><th>Time</th><th>Powerpoints</th></tr>'

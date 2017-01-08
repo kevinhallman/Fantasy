@@ -399,14 +399,17 @@ class Swimmer(Model):
 	class Meta:
 		database = db
 
-	def similarSwimmers(self, num=10):
+	def similarSwimmers(self, num=3):
 		swims1 = self.eventPPts()
 		print swims1
 
 
 		totalDeltas = {}
+		# same season
 		for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
-				Swimmer.year==self.year, TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(5000):
+				Swimmer.year==self.year, TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(10000):
+			if s2.id==self.id:  # don't use own times
+				continue
 			swims2 = s2.eventPPts()
 			#print swims2
 
@@ -419,28 +422,65 @@ class Swimmer(Model):
 				elif event in swims2:
 					totalDeltas[s2] += swims2[event] ** 2
 
+		# previous season
+		previous = self.nextSeason(-1)
+		if previous:
+			swims1 = previous.eventPPts()
+			for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
+					Swimmer.year=='Freshman', TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(10000):
+				if s2.id==self.id:  # don't use own times
+					continue
+				swims2 = s2.eventPPts()
+				next2 = s2.nextSeason()
+				if not next2 in totalDeltas:  # previous year doesn't match
+					continue
+				for event in allEvents:
+					if event in swims1 and event in swims2:
+						totalDeltas[next2] += (swims1[event] - swims2[event]) ** 2
+					elif event in swims1:
+						totalDeltas[next2] += swims1[event] ** 2
+					elif event in swims2:
+						totalDeltas[next2] += swims2[event] ** 2
+
 		totalSwimmers = 0
 		totalEvents = 0
 		events = {}
-		for key, value in sorted(totalDeltas.iteritems(), key=lambda (k, v): (v, k)):
+		for swimmer, value in sorted(totalDeltas.iteritems(), key=lambda (k, v): (v, k)):
 			totalSwimmers += 1
 			if totalSwimmers > num:
 				break
-			tapers = key.getTaperSwims()
-			for event in tapers:
-				if not event in events:
-					events[event] = []
-				events[event].append(tapers[event].time)
-				totalEvents += 1
+			futureSwimmer = swimmer.nextSeason()
+			if futureSwimmer:
+				tapers = futureSwimmer.getTaperSwims()
+				for event in tapers:
+					if not event in events:
+						events[event] = []
+					events[event].append(tapers[event].time)
+					totalEvents += 1
 
+		# now average out the times for the most similar swimmers
+		predictedTapers = {}
 		for event in events:
-			print event, np.mean(events[event]), float(len(events[event]))/ float(totalEvents)
+			time = np.mean(events[event])
+			ppt = round(Swim(event=event, division=self.teamid.division, gender=self.gender, time=time).getPPTs())
+			std = np.std(events[event])
+			percent = float(len(events[event]))/ float(totalEvents)
+			predictedTapers[event] = {'time':time, 'std': std, 'ppts': ppt, 'percent': percent}
+			print event, time, std, ppt, percent
 
 
 		print 'swimmer1'
 		tapers = s1.getTaperSwims()
 		for event in tapers:
 			print event, tapers[event].time
+		print 'next season'
+		futureSelf = s1.nextSeason()
+		if futureSelf:
+			futureTapers = futureSelf.getTaperSwims()
+			for event in futureTapers:
+				print event, futureTapers[event].time, futureTapers[event].getPPTs()
+
+		return tapers, futureTapers, predictedTapers
 
 	def stats(self, distNum=20, topNum=3):  # used to find if two swimmers are similar
 		topSwims = self.topSwims(distNum)
@@ -535,6 +575,12 @@ class Swimmer(Model):
 
 		return totalPPts
 
+	def nextSeason(self, years=1):
+		try:
+			return Swimmer.get(Swimmer.team==self.team, Swimmer.gender==self.gender,
+						   Swimmer.name==self.name, Swimmer.season==self.season + years)
+		except Swimmer.DoesNotExist:
+			return
 
 class Swim(Model):
 	swimmer = ForeignKeyField(Swimmer, null=True)
@@ -1444,8 +1490,20 @@ if __name__ == '__main__':
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
 	'''
-	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Freshman').order_by(fn.Random()).limit(3):
-		s1.similarSwimmers()
+	misses = []
+	flatMisses = []
+	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Sophomore').order_by(fn.Random()).limit(200):
+		if not s1.nextSeason():
+			continue
+		times, futureTimes, predictedTimes = s1.similarSwimmers()
+		for event in futureTimes:
+			if event in predictedTimes:
+				misses.append(abs(futureTimes[event].time - predictedTimes[event]['time']) / futureTimes[event].time)
+			if event in times:
+				flatMisses.append(abs(times[event].time*.99 - futureTimes[event].time) / futureTimes[event].time)
+	print 'knn', np.mean(misses), np.std(misses)
+	print 'flat', np.mean(flatMisses), np.std(flatMisses)
+
 
 	#team = TeamSeason.get(team='Carleton', season=2017)
 	#print team.season, team.gender
