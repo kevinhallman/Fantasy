@@ -280,14 +280,16 @@ class Conf():
 				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
-					confMeet.score(heats=3)
+					confMeet.setHeats(heats=3)
+				confMeet.score()
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
 				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
-					confMeet.score(heats=3)
+					confMeet.setHeats(heats=3)
+				confMeet.score()
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
 			print Time.time() - start

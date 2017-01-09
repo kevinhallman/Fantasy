@@ -803,6 +803,7 @@ class TempMeet:
 		self.date = None
 		self.season = None
 		self.winMatrix = None
+		self.heats = 2
 
 		if isinstance(teams, basestring):
 			teams = [teams]
@@ -1164,10 +1165,10 @@ class TempMeet:
 				for idx, swim in enumerate(self.eventSwims[event]):
 					swim.place = idx + 1
 
-	def score(self, dual=None, events='', heatSize=8, heats=2):
+	def score(self, dual=None, events='', heatSize=8):
 		events = self.getEvents(events)
 		self.place(events)
-		self.assignPoints(heats=heats, heatSize=heatSize, dual=dual, events=events)
+		self.assignPoints(heats=self.heats, heatSize=heatSize, dual=dual, events=events)
 
 		return self.teamScores(events)
 
@@ -1358,6 +1359,7 @@ class TempMeet:
 	lists swimmers by team and by points scored
 	'''
 	def scoreReport(self, repressSwim=False, repressTeam=False):
+		self.score()
 		scores = {}
 		for team in self.teams:
 			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
@@ -1370,7 +1372,7 @@ class TempMeet:
 				else:
 					name = swim.name
 				if repressSwim and (swim.score == 0 or not swim.score):
-					continue   # repess zero scores
+					continue   # repress zero scores
 
 				team = swim.getScoreTeam()
 				if not name in scores[team]['swimmer']:
@@ -1386,7 +1388,7 @@ class TempMeet:
 					scores[team]['year'][swim.year] += swim.score
 
 		if repressTeam:
-			zeroTeams=set()
+			zeroTeams = set()
 			for team in scores:
 				if scores[team]['total'] == 0:
 					zeroTeams.add(team)
@@ -1394,6 +1396,9 @@ class TempMeet:
 				del(scores[team])
 
 		return scores
+
+	def setHeats(self, heats=2):
+		self.heats = heats
 
 	def printout(self, events=''):
 		events=self.getEvents(events)
@@ -1409,6 +1414,7 @@ class TempMeet:
 		print self.scores
 
 	def scoreString(self, showNum='all', showScores=True, showPlace=False):
+		self.score()
 		string = {}
 		events = self.getEvents('')
 		for event in events:
