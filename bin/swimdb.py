@@ -1363,6 +1363,8 @@ class TempMeet:
 			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
+				if not swim.score:
+					swim.score = 0
 				if swim.relay:
 					name = 'Relays'
 				else:
@@ -1374,7 +1376,7 @@ class TempMeet:
 				if not name in scores[team]['swimmer']:
 					scores[team]['swimmer'][name] = 0
 				if not event in scores[team]['event']:
-					scores[team]['event'][event]=0
+					scores[team]['event'][event] = 0
 				scores[team]['swimmer'][name] += swim.score
 				scores[team]['total'] += swim.score
 				scores[team]['event'][event] += swim.score

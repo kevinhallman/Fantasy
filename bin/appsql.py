@@ -301,7 +301,6 @@ class Conf():
 		else:
 			table = ''
 
-		confMeet.printout()
 		print Time.time() - start
 		return render.conference(conferences=sorted(confList.keys()), scores=showMeet(scores),
 								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
