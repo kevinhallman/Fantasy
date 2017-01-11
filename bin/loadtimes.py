@@ -1,5 +1,5 @@
 import time as Time
-from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, getConfs, Meet, seasonString, TeamStats
+from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, getConfs, Meet, seasonString, TeamStats, Improvement
 import re
 import os
 import urlparse
@@ -393,6 +393,12 @@ def fixDupSwimmers():
 					except Swimmer.DoesNotExist: # already merged
 						pass
 
+def deleteDupImprovement():
+	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
+        'ROW_NUMBER() OVER (partition BY name, event, fromseason, team ORDER BY id) AS rnum '
+        'FROM Improvement) i '
+        'WHERE i.rnum > 1)').execute()
+
 def uniqueSwimmers():
 	for swimmer in Swimmer.raw('SELECT id, season, name, teamid_id, gender FROM '
 						'(SELECT id, season, name, teamid_id, gender, ROW_NUMBER() '
@@ -413,9 +419,10 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
+	#safeLoad()
+	deleteDupImprovement()
 	#fixConfs()
-	fixDivision()
+	#fixDivision()
 	#fixDupTeams()
 	#mergeSwimmers(285999, 294793)
 	#mergeTeams(6785, 8453)

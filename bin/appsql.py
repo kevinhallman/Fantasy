@@ -281,6 +281,8 @@ class Conf():
 											   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
+				else:
+					confMeet.setHeats(heats=2)
 				confMeet.score()
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
@@ -289,6 +291,8 @@ class Conf():
 											   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
+				else:
+					confMeet.setHeats(heats=2)
 				confMeet.score()
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
