@@ -9,6 +9,7 @@ import numpy
 from peewee import *
 from swimdb import swimTime
 #from guppy import hpy
+from math import isnan
 
 from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist
 from operator import itemgetter
@@ -38,7 +39,8 @@ urls = ('/', 'Home',
 	'/preseasonJSON', 'SeasonRankingsJSON',
 	'/teamstats/(.+)', 'TeamStats',
 	'/powerscore', 'Powerscore',
-	'/swimmer', 'Swimmerstats'
+	'/swimmer', 'Swimmerstats',
+	'/taper', 'Taper'
 )
 
 urlparse.uses_netloc.append("postgres")
@@ -821,6 +823,46 @@ class Swimmerstats():
 
 		return render.swimmerstats(swimmers=swimmers, data=html)
 
+class Taper():
+	def GET(self):
+		form = web.input(conference=None, season=None, gender=None, division=None, toptime=None)
+		setGenDiv(form.gender, form.division)
+		division = session.division
+		gender = session.gender
+		confList = conferences[division][gender]
+
+		if form.toptime == 'Top Time':
+			toptime = True
+		else:
+			toptime = False  # use average times
+
+		if form.season in {'2016', '2015'}:
+			seasons = {int(form.season)}
+		else:
+			seasons = {2016}
+
+		if not form.conference or not (form.conference in confList):
+			return render.taper(conferences=sorted(confList.keys()), table=None)
+
+		tapers = {}
+		teams = confList[form.conference]
+		for team in teams:
+			tapers[team] = {}
+			for season in seasons:
+				try:
+					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
+					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
+						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
+						if taper < 0 or taper > 100 or isnan(taper):
+							taper = ''
+						#if taperstd < 0 or taperstd > 100 or isnan(taperstd):
+						#	taperstd = ''
+						tapers[team][week] = taper
+				except TeamSeason.DoesNotExist:
+					pass
+		table = googleLine(tapers, 'Week')
+		return render.taper(conferences=sorted(confList.keys()), table=table)
+
 class teamMeets():
 	def GET(self):
 		form = web.input(team=None, division=None, season=None)
@@ -1111,9 +1153,9 @@ def googleCandle(confImp):
 			nums, 75))+","+str(max(nums)) + ",'" + str(round(med, 2)) + ' n=' + str(len(nums)) + "'],")
 	return table
 
-def googleLine(teams):
+def googleLine(teams, xaxis='Season'):
 	table = []
-	line = "['Season'"
+	line = "['" + xaxis + "'"
 	for team in teams:
 		teamName = re.sub("'", "", team)
 		line += ",'{}'".format(teamName)

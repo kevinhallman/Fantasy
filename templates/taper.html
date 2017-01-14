@@ -1,0 +1,51 @@
+$def with (conferences, table)
+
+$if table:
+	<script type="text/javascript">
+    google.load('visualization', '1.1', {packages: ['line']});
+    google.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+		var data = google.visualization.arrayToDataTable([
+			$for line in table:
+				$:line
+		]);
+
+		var options = {
+			chart: {
+				title: 'Average % Difference Between In-Season and Taper Times',
+        	},
+			width: 1200,
+			height: 700,
+			displayExactValues: true
+		};
+
+		var chart = new google.charts.Line(document.getElementById('chart'));
+
+		chart.draw(data, options);
+	}
+  </script>
+
+<h1>
+Team Taper
+</h1>
+See how a team tapers over time.
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+	<br>
+	Year: <select name="season">
+	$for year in [2016, 2015]:
+		<option>$year</option>
+	</select>
+	<br>
+	Taper method: <select name="toptime">
+		<option>Top Time</option>
+		<option>Average Time</option>
+	</select>
+	<input type="submit" value="Show">
+</form>
+
+<div id="chart" style="width: 1300px; height: 500px; float:center; margin-left: auto; margin-right: auto;"> </div>

@@ -219,19 +219,23 @@ class TeamSeason(Model):
 	topSwimmers = {}
 
 	def getPrevious(self, yearsBack=1):
+		if yearsBack == 0:
+			return self
 		try:
 			return TeamSeason.get(TeamSeason.team==self.team, TeamSeason.gender==self.gender,
 						   TeamSeason.division==self.division, TeamSeason.season==self.season-yearsBack)
 		except TeamSeason.DoesNotExist:
 			return
 
-	def getTaperStats(self, weeks=12):
-		lastSeason = self.getPrevious()
-		print lastSeason.id
+	def getTaperStats(self, weeks=12, yearsback=1, toptime=True):
+		lastSeason = self.getPrevious(yearsBack=yearsback)
 		# underestimate taper by using later weeks
 		for stats in TeamStats.select().where(TeamStats.teamseasonid==lastSeason.id, TeamStats.week >= weeks)\
 				.limit(1).order_by(TeamStats.week):
-			return stats.toptaper, stats.toptaperstd
+			if toptime:
+				return stats.toptaper, stats.toptaperstd
+			else:
+				return stats.mediantaper, stats.mediantaperstd
 
 	def getWinnats(self, previous=0):
 		for stats in TeamStats.select(TeamStats.winnats, TeamStats.week).where(TeamStats.winnats.is_null(False),
@@ -371,6 +375,58 @@ class TeamSeason(Model):
 
 		if event=='400 Yard Freestyle Relay':
 			pass
+
+	def getTaperSwims(self, numTimes=3):
+		teamSwims = set()
+		# grab the taper from the swimmers, assumes different events
+		for swimmer in Swimmer.select().where(Swimmer.teamid==self.id):
+			for swim in swimmer.getTaperSwims(num=numTimes).values():
+				teamSwims.add(swim)
+		return teamSwims
+
+	def findTaperStats(self, weeks=10, topTime=True, averageTime=True):
+		newDate = week2date(week=weeks, season=self.season)
+		taperSwims = self.getTaperSwims()
+		dropsTop = []
+		dropsAvg = []
+
+		for taperSwim in taperSwims:
+			# now find the top untapered swims before that date
+			if topTime:
+				for earlySwim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
+					Swim.event==taperSwim.event, Swim.date < newDate):
+					if earlySwim.min:
+						dropPer = 100 * (earlySwim.min - taperSwim.time) / taperSwim.time
+						dropsTop.append(dropPer)
+			# use average time
+			if averageTime:
+				for earlySwim in Swim.select(fn.avg(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
+					Swim.event==taperSwim.event, Swim.date < newDate):
+					if earlySwim.avg:
+						dropPer = 100 * (earlySwim.avg - taperSwim.time) / taperSwim.time
+						dropsAvg.append(dropPer)
+
+		stdDropTop = np.std(dropsTop)
+		meanDropTop = np.mean(dropsTop)
+		stdDropAvg = np.std(dropsAvg)
+		meanDropAvg = np.mean(dropsAvg)
+
+		newStats = {'week': weeks, 'date': newDate, 'teamseasonid': self.id,
+						'toptaper': meanDropTop, 'toptaperstd': stdDropTop, 'mediantaper': meanDropAvg,
+					'mediantaperstd': stdDropAvg}
+
+		print newStats
+		try:
+			stats = TeamStats.get(TeamStats.teamseasonid==self.id, TeamStats.week==weeks)
+			# it exists so update it
+			stats.toptaper = meanDropTop
+			stats.toptaperstd = stdDropTop
+			stats.mediantaper = meanDropAvg
+			stats.mediantaperstd = stdDropAvg
+			stats.date = newDate
+			stats.save()
+		except TeamStats.DoesNotExist:
+			TeamStats.insert_many([newStats]).execute()
 
 	class Meta:
 		database = db
@@ -1505,6 +1561,7 @@ if __name__ == '__main__':
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
 	'''
+	'''
 	misses = []
 	flatMisses = []
 	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Sophomore').order_by(fn.Random()).limit(200):
@@ -1518,20 +1575,12 @@ if __name__ == '__main__':
 				flatMisses.append(abs(times[event].time*.99 - futureTimes[event].time) / futureTimes[event].time)
 	print 'knn', np.mean(misses), np.std(misses)
 	print 'flat', np.mean(flatMisses), np.std(flatMisses)
-
-
-	#team = TeamSeason.get(team='Carleton', season=2017)
-	#print team.season, team.gender
-	#print team.getTaperStats(7)
 	'''
-	event = '500 Yard Freestyle'
-	division = 'D3'
-	gender = 'Men'
-	frozen = getSkewDist(gender, division, event)
-	for i in range(1, 10):
-		time = round(frozen.ppf(float(i)/10))
-		print i, swimTime(time), round(Swim(event=event, division=division, gender=gender, time=time).getPPTs())
-	'''
+
+	for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
+		for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
+			team.findTaperStats(weeks=week)
+
 
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
