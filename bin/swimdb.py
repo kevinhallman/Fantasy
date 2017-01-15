@@ -685,6 +685,10 @@ class Swim(Model):
 		cdf = getSkewCDF(self.gender, self.division, self.event)
 		#cdf = getSkewCDF(self.gender, 'D1', self.event)
 		percent = 1 - cdf(self.time)
+		if percent==0 or percent==None:
+			print self.time, self.event, self.id
+			self.powerpoints = 0
+			return self.powerpoints
 		percentileScore = (1 - percent) * 500
 		powerScore = 1 / percent
 		if zscore:
@@ -1587,15 +1591,16 @@ if __name__ == '__main__':
 	#for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
 	#	for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 	#		team.findTaperStats(weeks=week)
-	#for swimmer in Swimmer.select().where(Swimmer.season==2016):
-	#	swimmer.getPPTs()
+	for swimmer in Swimmer.select().where(Swimmer.season==2017):
+		swimmer.getPPTs()
+	'''
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:
 			TeamStats.get(teamseasonid=team.id, week=18)
 		except TeamStats.DoesNotExist:
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
-
+	'''
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
 

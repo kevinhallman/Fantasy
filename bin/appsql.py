@@ -800,6 +800,10 @@ class Swimmerstats():
 		form = web.input(gender=None, division=None, name=None, num=20, season=None)
 		setGenDiv(form.gender, form.division)
 
+		form.season = 2017
+		if not form.season:
+			return render.swimmerstats()
+		'''
 		swimmers = []
 		for swimmer in Swimmer.select(Swimmer.name, TeamSeason).join(TeamSeason).where(
 				Swimmer.gender==form.gender, TeamSeason.division==form.division):
@@ -814,14 +818,23 @@ class Swimmerstats():
 							TeamSeason.division==form.division).get()
 		except Swimmer.DoesNotExist:
 			return render.swimmerstats(swimmers=swimmers, data=None)
-
-		print 'found!'
-		swims = swimmer.topSwims(10)
+		'''
+		swimmers = database.swimmerRank(division=form.division, gender=form.gender, season=form.season, num=5)
 		html = ''
-		for swim in swims:
-			html += '<p>' + swim.event + ' ' + swimTime(swim.time) + ' PPTs:' + str(round(swim.getPPTs(), 1))+ '</p>'
+		for swimmer in swimmers:
+			#print swimmer.name
+			swims = swimmer.getTaperSwims()
+			html += '<p><b>' + swimmer.name + ' - ' + swimmer.team + '</b>'
+			html += '<table>'
+			for swim in swims.values():
+				html += '<tr>'
+				html += '<td>' + swim.event + '</td>'
+				html += '<td>' + swimTime(swim.time) + '</td>'
+				html += '<td>' + str(round(swim.getPPTs())) + ' points </td>'
+			html += '</table>'
+			html += '</p>'
 
-		return render.swimmerstats(swimmers=swimmers, data=html)
+		return render.swimmerstats(data=html)
 
 class Taper():
 	def GET(self):
