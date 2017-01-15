@@ -255,10 +255,12 @@ class Conf():
 		start = Time.time()
 		division = session.division
 		gender = session.gender
-		confList = conferences[division][gender]
+		confDict = conferences[division][gender]
+		confList = sorted(confDict.keys())
+		confList.remove('')
 
 		if form.conference is None:
-			return render.conference(conferences=sorted(confList.keys()), scores=None, teamScores=None,
+			return render.conference(conferences=confList, scores=None, teamScores=None,
 									 finalScores=None, table='', winTable=None)
 
 		season = int(form.season)
@@ -289,7 +291,7 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
+				confMeet = database.conference(teams=confDict[form.conference], topTimes=topTimes, gender=gender,
 											   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
@@ -310,9 +312,8 @@ class Conf():
 			table = ''
 
 		print Time.time() - start
-		return render.conference(conferences=sorted(confList.keys()), scores=showMeet(scores),
-								 teamScores=showTeamScores(teamScores), finalScores=showScores(scores),
-								 table=table, winTable=showWinTable(winProb))
+		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
+							finalScores=showScores(scores), table=table, winTable=showWinTable(winProb))
 
 class ConfJSON():
 	def GET(self):
@@ -797,34 +798,26 @@ class Powerscore():
 
 class Swimmerstats():
 	def GET(self):
-		form = web.input(gender=None, division=None, name=None, num=20, season=None)
+		form = web.input(gender=None, division=None, name=None, num=20, season=None, conference=None)
 		setGenDiv(form.gender, form.division)
+		division = session.division
+		gender = session.gender
+		confList = sorted(conferences[division][gender].keys())
+		confList.remove('')
 
 		form.season = 2017
 		if not form.season:
-			return render.swimmerstats()
-		'''
-		swimmers = []
-		for swimmer in Swimmer.select(Swimmer.name, TeamSeason).join(TeamSeason).where(
-				Swimmer.gender==form.gender, TeamSeason.division==form.division):
-			swimmers.append(swimmer.name)
-		swimmers.sort()
-		if not form.name:
-			return render.swimmerstats(swimmers=swimmers, data=None)
+			return render.swimmerstats(conferences=confList)
 
-		try:
-			print form.name
-			swimmer = Swimmer.select().join(TeamSeason).where(Swimmer.name==form.name, Swimmer.gender==form.gender,
-							TeamSeason.division==form.division).get()
-		except Swimmer.DoesNotExist:
-			return render.swimmerstats(swimmers=swimmers, data=None)
-		'''
-		swimmers = database.swimmerRank(division=form.division, gender=form.gender, season=form.season, num=5)
+		if form.conference=='All':
+			form.conference = None
+
+		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
+										conference=form.conference)
 		html = ''
-		for swimmer in swimmers:
-			#print swimmer.name
+		for idx, swimmer in enumerate(swimmers):
 			swims = swimmer.getTaperSwims()
-			html += '<p><b>' + swimmer.name + ' - ' + swimmer.team + '</b>'
+			html += '<p><b>' + str(idx+1) + '. ' + swimmer.name + ' - ' + swimmer.team + '</b>'
 			html += '<table>'
 			for swim in swims.values():
 				html += '<tr>'
@@ -834,7 +827,7 @@ class Swimmerstats():
 			html += '</table>'
 			html += '</p>'
 
-		return render.swimmerstats(data=html)
+		return render.swimmerstats(data=html, conferences=confList)
 
 class Taper():
 	def GET(self):

@@ -1,12 +1,21 @@
-$def with(data)
+$def with(data, conferences)
 
 <h1>
 Top Swimmers
 </h1>
 
 <p>
-Top 5 swimmers in the nation as ranked by their top swims in their top three events.
+Top 5 swimmers as ranked by their top swims in their top three events.
 </p>
+
+<form name=confForm method="GET">
+	Conference: <select name="conference">
+		<option>All</option>
+		$for name in conferences:
+			<option>$name</option>
+	</select>
+	<input type="submit" value="Show">
+</form>
 
 $if data:
 	$:data
