@@ -1562,7 +1562,7 @@ if __name__ == '__main__':
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
-			migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
+			#migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
 			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
