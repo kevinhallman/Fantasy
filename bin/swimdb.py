@@ -236,6 +236,7 @@ class TeamSeason(Model):
 				return stats.toptaper, stats.toptaperstd
 			else:
 				return stats.mediantaper, stats.mediantaperstd
+		return None, None
 
 	def getWinnats(self, previous=0):
 		for stats in TeamStats.select(TeamStats.winnats, TeamStats.week).where(TeamStats.winnats.is_null(False),
@@ -454,6 +455,7 @@ class Swimmer(Model):
 	team = CharField()
 	gender = CharField()
 	year = CharField()
+	ppts = IntegerField()
 	eventppts = CharField(null=True)
 	teamid = ForeignKeyField(TeamSeason, null=True)
 	taperSwims = {}
@@ -630,10 +632,16 @@ class Swimmer(Model):
 		return taperSwims
 
 	def getPPTs(self):
+		if self.ppts:
+			return self.ppts
+
 		totalPPts = 0
 		taperSwims = self.getTaperSwims()
 		for event in taperSwims:
 			totalPPts += taperSwims[event].getPPTs()
+
+		self.ppts = totalPPts
+		self.save()
 
 		return totalPPts
 
@@ -1551,16 +1559,15 @@ class Timedist(Model):
 		database = db
 
 if __name__ == '__main__':
-	'''
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
-			migrator.add_column('swimmer', 'eventppts', Swimmer.eventppts),
+			#migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
 			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
 		)
-	'''
+
 	'''
 	misses = []
 	flatMisses = []
@@ -1577,10 +1584,17 @@ if __name__ == '__main__':
 	print 'flat', np.mean(flatMisses), np.std(flatMisses)
 	'''
 
-	for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
-		for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
-			team.findTaperStats(weeks=week)
-
+	#for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
+	#	for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
+	#		team.findTaperStats(weeks=week)
+	#for swimmer in Swimmer.select().where(Swimmer.season==2016):
+	#	swimmer.getPPTs()
+	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
+		try:
+			TeamStats.get(teamseasonid=team.id, week=18)
+		except TeamStats.DoesNotExist:
+			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
+				team.findTaperStats(weeks=week)
 
 	#db.drop_tables([Timedist])
 	#db.create_tables([Timedist])
