@@ -20,6 +20,7 @@ patsy==0.4.1
 peewee==2.4.5
 pexpect==4.0.1
 ptyprocess==0.5
+psycopg2==2.5.4
 pyparsing==2.0.3
 python-dateutil==2.2
 pytz==2014.9
