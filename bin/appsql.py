@@ -64,36 +64,45 @@ def connection_processor(handler):
 
 def getConfs():
 	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
-	allTeams = {'Men': {'D1': [], 'D2': [], 'D3': []}, 'Women': {'D1': [], 'D2': [], 'D3': []}}
+	allTeams = {'Men': {'D1': set(), 'D2': set(), 'D3': set()}, 'Women': {'D1': set(), 'D2': set(), 'D3': set()}}
 	for newTeam in TeamSeason.select(TeamSeason.team, TeamSeason.conference, TeamSeason.division,
 									 TeamSeason.gender).distinct(TeamSeason.team):
 		if newTeam.conference not in confs[newTeam.division][newTeam.gender]:
 			confs[newTeam.division][newTeam.gender][newTeam.conference] = set()
 
-		confs[newTeam.division][newTeam.gender][newTeam.conference].add(newTeam.team)
-		allTeams[newTeam.gender][newTeam.division].append(newTeam.team)
+		confs[newTeam.division][newTeam.gender][newTeam.conference].add(newTeam.team.strip())
+		allTeams[newTeam.gender][newTeam.division].add(newTeam.team.strip())
 
-		for division in ['D1', 'D2', 'D3']:
-			allTeams['Men'][division].sort()
-			allTeams['Women'][division].sort()
+	for division in ['D1', 'D2', 'D3']:
+		allTeams['Men'][division] = list(allTeams['Men'][division])
+		allTeams['Men'][division].sort()
+		allTeams['Women'][division] = list(allTeams['Women'][division])
+		allTeams['Women'][division].sort()
+
 	return confs, allTeams
 
-def getMeetList(gender='Women', division='D1'):
-	newList = {}
+def getMeetList(gender='Women', division='D1', team=None, season=None):
+	if not season:
+		meets = {}
+	else:
+		meets = []
 	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
-			TeamSeason.division==division, TeamSeason.gender==gender):
-		newTeam = teamMeet.team.team
+			TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.team==team):
 		newSeason = teamMeet.team.season
 		newMeet = teamMeet.meet.meet
-		if newTeam not in newList:
-			newList[newTeam] = {}
-		if newSeason not in newList[newTeam]:
-			newList[newTeam][newSeason] = []
-		newList[newTeam][newSeason].append(re.sub('\"', '\\\\\"', newMeet))
-	return newList
+		newMeet.strip()
+
+		if newSeason not in meets and not season:
+			meets[newSeason] = []
+		if not season:
+			meets[newSeason].append(re.sub('\"', '\\\\\"', newMeet))
+		else:
+			meets.append(re.sub('\"', '\\\\\"', newMeet))
+	return meets
 
 web.config.debug = False
 app = web.application(urls, globals())
+wsgiapp = app.wsgifunc()  # allow to be run by gunicorn
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division': 'D1'})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
@@ -129,7 +138,6 @@ class Swimulate():
 
 		gender = session.gender
 		divTeams = allTeams[gender]
-
 		if not form.team1:
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 
@@ -872,52 +880,27 @@ class teamMeets():
 		form = web.input(team=None, division=None, season=None)
 		web.header("Content-Type", "application/json")
 
-		if form.division:
-			division = form.division.strip()
-		else:
+		if not form.team:
 			return
-		meetList = getMeetList(session.gender, division)
-		if form.team in meetList:
-			seasonMeets = meetList[form.team]
-			if form.season and int(form.season) in seasonMeets:
-				meets = seasonMeets[int(form.season)]
-				return json.dumps(meets)
 
-			# on first load, default season
-			return json.dumps(seasonMeets)
-		else:
-			return json.dumps()
+		division = form.division.strip()
+		meetList = getMeetList(session.gender, division, form.team, form.season)
+
+		# return all seasons if none
+		return json.dumps(meetList)
 
 	def POST(self):
 		form = web.input(team=None, division=None, season=None)
 		web.header("Content-Type", "application/json")
 
-		if form.division:
-			division = form.division.strip()
-		else:
+		if not form.team:
 			return
-		meetList = getMeetList(session.gender, division)
-		if form.team in meetList:
-			seasonMeets = meetList[form.team]
-			if form.season and int(form.season) in seasonMeets:
-				meets = seasonMeets[int(form.season)]
-				'''
-				meetScores = []
-				for meet in seasonMeets[int(form.season)]:
-					score = sqlmeets.Meet(meet, teams=form.team, season=form.season).expectedScores(
-						division=form.division)[
-						form.team]
-					meetScores.append([meet, score])
-				meets = []
-				for meet, score in sorted(meetScores, key=lambda score: score[1]):
-					meets.append(meet + ": " + str(score))
-				'''
-				return json.dumps(meets)
 
-			# on first load, default season
-			return json.dumps(seasonMeets)
-		else:
-			return
+		division = form.division.strip()
+		meetList = getMeetList(session.gender, division, form.team, form.season)
+
+		# return all seasons if none
+		return json.dumps(meetList)
 
 class getConfs():
 	def GET(self):
@@ -1116,9 +1099,6 @@ def showTopSwimmers(swimmers):
 		topSwims = swimmer.getTaperSwims()
 		swimStr =''
 		for event in topSwims:
-			#print topSwims[event].getPPTs()
-			#print int(topSwims[event].getPPTs())
-			#print str(int(topSwims[event].getPPTs()))
 			swimStr += event + ': <b>' + swimTime(topSwims[event].time)\
 					   + ' (' + str(int(topSwims[event].getPPTs())) + ')</b> - '
 		html += '<td>' + swimStr + '</td>'
@@ -1255,7 +1235,6 @@ def JSONScores(scores):
 	for event in scores:
 		scoresLabel[event] = {}
 		for swimmer in scores[event]:
-			#print swimmer
 			if len(swimmer) == 5:
 				(name, team, event, time, score) = swimmer
 				meet = None
