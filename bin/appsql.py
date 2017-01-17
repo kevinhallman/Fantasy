@@ -78,19 +78,18 @@ def getConfs():
 			allTeams['Women'][division].sort()
 	return confs, allTeams
 
-def getMeetList():
-	newList = {'Men': {'D1': {}, 'D2': {}, 'D3': {}}, 'Women': {'D1': {}, 'D2': {}, 'D3': {}}}
-	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason):
+def getMeetList(gender='Women', division='D1'):
+	newList = {}
+	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
+			TeamSeason.division==division, TeamSeason.gender==gender):
 		newTeam = teamMeet.team.team
-		gender = teamMeet.team.gender
 		newSeason = teamMeet.team.season
 		newMeet = teamMeet.meet.meet
-		newDiv = teamMeet.team.division
-		if newTeam not in newList[gender][newDiv]:
-			newList[gender][newDiv][newTeam] = {}
-		if newSeason not in newList[gender][newDiv][newTeam]:
-			newList[gender][newDiv][newTeam][newSeason] = []
-		newList[gender][newDiv][newTeam][newSeason].append(re.sub('\"', '\\\\\"', newMeet))
+		if newTeam not in newList:
+			newList[newTeam] = {}
+		if newSeason not in newList[newTeam]:
+			newList[newTeam][newSeason] = []
+		newList[newTeam][newSeason].append(re.sub('\"', '\\\\\"', newMeet))
 	return newList
 
 web.config.debug = False
@@ -101,7 +100,6 @@ render = web.template.render('templates/', base="layout", globals={'context': se
 app.add_processor(connection_processor)
 
 database = sqlmeets.SwimDatabase(database=db)
-meetList = getMeetList()
 (conferences, allTeams) = getConfs()
 
 # appends the gender and division to the URL and allows them to be changed via there as well
@@ -878,8 +876,9 @@ class teamMeets():
 			division = form.division.strip()
 		else:
 			return
-		if form.team in meetList[session.gender][division]:
-			seasonMeets = meetList[session.gender][division][form.team]
+		meetList = getMeetList(session.gender, division)
+		if form.team in meetList:
+			seasonMeets = meetList[form.team]
 			if form.season and int(form.season) in seasonMeets:
 				meets = seasonMeets[int(form.season)]
 				return json.dumps(meets)
@@ -897,8 +896,9 @@ class teamMeets():
 			division = form.division.strip()
 		else:
 			return
-		if form.team in meetList[session.gender][division]:
-			seasonMeets = meetList[session.gender][division][form.team]
+		meetList = getMeetList(session.gender, division)
+		if form.team in meetList:
+			seasonMeets = meetList[form.team]
 			if form.season and int(form.season) in seasonMeets:
 				meets = seasonMeets[int(form.season)]
 				'''
