@@ -623,7 +623,7 @@ class Swimmer(Model):
 			self.id):
 			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
 				continue
-			points = swim.getPPTs()
+			points = swim.getPPTs(save=False)
 			heapq.heappush(times, (points, swim))
 
 		for (points, swim) in heapq.nlargest(num, times):  # take three best times
@@ -676,7 +676,7 @@ class Swim(Model):
 	pastTimes = []
 	taperTime = None
 
-	def getPPTs(self, zscore=True):
+	def getPPTs(self, zscore=True, save=False):
 		if self.powerpoints:
 			return self.powerpoints
 
@@ -688,6 +688,8 @@ class Swim(Model):
 		if percent==0 or percent==None:
 			print self.time, self.event, self.id
 			self.powerpoints = 0
+			if save:
+				self.save()
 			return self.powerpoints
 		percentileScore = (1 - percent) * 500
 		powerScore = 1 / percent
@@ -698,6 +700,8 @@ class Swim(Model):
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
+		if save:
+			self.save()
 		return round(self.powerpoints, 3)
 
 	def expectedPoints(self, numSwimmers=6, losses=0, percent=None):
@@ -1569,7 +1573,7 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
 			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
-			#migrator.add_column('swim', 'swimmer_id', Swim.swimmer)
+			migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
 
 	'''
@@ -1591,8 +1595,8 @@ if __name__ == '__main__':
 	#for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
 	#	for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 	#		team.findTaperStats(weeks=week)
-	for swimmer in Swimmer.select().where(Swimmer.season==2017):
-		swimmer.getPPTs()
+	#for swim in Swim.select().where(Swim.season==2017):
+	#	swim.getPPTs()
 	'''
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:
