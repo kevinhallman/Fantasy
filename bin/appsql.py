@@ -287,8 +287,11 @@ class Conf():
 			else:
 				topTimes = False
 			if form.conference == 'Nationals':
-				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
-											   season=season, divisions=division, date=swimdate)
+				if topTimes:  # haven't set up new conf to handle avg times yet
+					confMeet = database.confNew(season, gender, form.conference, division, dateStr=swimdate)
+				else:
+					confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
+										   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -297,8 +300,11 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				confMeet = database.conference(teams=confDict[form.conference], topTimes=topTimes, gender=gender,
-											   season=season, divisions=division, date=swimdate)
+				if topTimes:
+					confMeet = database.confNew(season, gender, form.conference)
+				else:
+					confMeet = database.conference(teams=confDict[form.conference], topTimes=topTimes, gender=gender,
+										   season=season, divisions=division, date=swimdate)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -307,7 +313,7 @@ class Conf():
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
 			print Time.time() - start
-			winProb = confMeet.scoreMonteCarlo(runs=100)
+			#winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
@@ -319,7 +325,7 @@ class Conf():
 
 		print Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
-							finalScores=showScores(scores), table=table, winTable=showWinTable(winProb))
+							finalScores=showScores(scores), table=table, winTable='')#showWinTable(winProb))
 
 class ConfJSON():
 	def GET(self):
@@ -349,23 +355,29 @@ class ConfJSON():
 		else:
 			topTimes = False
 		if form.conference == 'Nationals':
-			confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
+			if topTimes:  # haven't set up new conf to handle avg times yet
+				confMeet = database.confNew(season, gender, form.conference, division, dateStr=swimdate)
+			else:
+				confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
 										   season=season, divisions=division, date=swimdate)
 			scores = confMeet.scoreString(25)
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
-			confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
+			if topTimes:  # haven't set up new conf to handle avg times yet
+				confMeet = database.confNew(season, gender, form.conference, division, dateStr=swimdate)
+			else:
+				confMeet = database.conference(teams=confList[form.conference], topTimes=topTimes, gender=gender,
 										   season=season, divisions=division, date=swimdate)
 			scores = confMeet.scoreString()
 			teamScores = confMeet.scoreReport()
-		winProb = confMeet.scoreMonteCarlo(runs=100)
+		#winProb = confMeet.scoreMonteCarlo(runs=100)
 
 		labeledScores = JSONScores(scores)
 
 		response = {}
 		response['individual results'] = labeledScores
 		response['team scores'] = teamScores
-		response['win probability'] = winProb
+		response['win probability'] = '' #winProb
 
 		return json.dumps(response)
 

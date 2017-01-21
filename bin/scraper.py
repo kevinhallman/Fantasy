@@ -53,6 +53,7 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 	RStroke='6'
 	if RelInd=='rbRelay':
 		RDistance = Distance
+		Distance = '50'
 	else:
 		RDistance = '200'
 	DateType = 'rbNamedDateRange'
@@ -67,13 +68,13 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 			split[1]='0' + split[1]
 		if int(split[0]) < 10:
 			split[0] = '0'+split[0]
-		SD = split[2]+'-'+split[0]+'-'+split[1]
+		SD = split[2] + '-' + split[0] + '-' + split[1]
 		split = EndDate.split('/')
 		if int(split[1]) < 10:
-			split[1] = '0'+split[1]
+			split[1] = '0' + split[1]
 		if int(split[0]) < 10:
-			split[0] = '0'+split[0]
-		ED = split[2]+'-'+split[0]+'-'+split[1]
+			split[0] = '0' + split[0]
+		ED = split[2] + '-' + split[0] + '-' + split[1]
 		SDValid = SD+'-00-00-00'
 		EDValid = ED+'-00-00-00'
 	dateDict = {'17 DI': '42', '17 DII': '43', '17 DIII': '44', '16 DI': '37', '16 DII': '38', '16 DIII': '39',
@@ -172,6 +173,9 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 		'__ASYNCPOST': 'true',
 		'ctl00$ctl82$btnSearch': 'Search'
 	}
+	#for part in payload:
+	#	if not '__' in part and payload[part]!='':
+	#		print part, payload[part]
 	headers = {'Host': "www.usaswimming.org",
 			   'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:48.0) Gecko/20100101 Firefox/48.0",
 			   'Accept':"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -281,7 +285,9 @@ def getConfs(confFile='./data/conferences.txt'):
 def topTimesLoop():
 	confDiv = getConfs()
 	genders = ['m', 'f']
+	#genders = ['f']
 	divisions = ['DIII', 'DII', 'DI']
+	#divisions = ['DI']
 	distances = {}
 	distances['FL'] = [100, 200]
 	distances['BK'] = [100, 200]
@@ -290,12 +296,11 @@ def topTimesLoop():
 	distances['MED-R'] = [200, 400]
 	distances['FR-R'] = [200, 400, 800]
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
-	strokes = ['FR', 'FL', 'BR', 'BK', 'IM', 'FR-R', 'MED-R']
 	# conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
 	conferences = ['']
 	years = ['17']  # ['15','14','13','12','11']
 
-	directory = 'data'
+	directory = 'data/2017'
 	for year in years:
 		for division in divisions:
 			if division == 'DI':
