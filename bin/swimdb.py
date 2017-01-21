@@ -667,7 +667,7 @@ class Swim(Model):
 	division = CharField()
 	relay = BooleanField()
 	year = CharField()
-	powerpoints = None
+	powerpoints = IntegerField()
 	place = None
 	score = None
 	scoreTeam = None
