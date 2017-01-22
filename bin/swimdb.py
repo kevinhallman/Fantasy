@@ -308,7 +308,7 @@ class TeamSeason(Model):
 			events = eventsDualS
 		else:
 			events = eventsChamp
-		topMeet = self.topTimes(events=events, date=simDate, meetForm=True)
+		topMeet = self.topTimes(events=events, dateStr=simDate)
 
 		topMeet.topEvents(teamMax=17, indMax=3)
 		if dual:
@@ -328,47 +328,32 @@ class TeamSeason(Model):
 
 		return heapq.nlargest(num, swimmers)
 
-	def topTimes(self, events=None, topTimes=True, meetForm=False, date=None):
-		if not events:
-			events = allEvents
+	def topTimes(self, dateStr=None, events=None):
+		if not dateStr:
+			meetDate = date.today()
+			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
 
-		topMeet = TempMeet(events=events)
-		swimmers = {}
-
-		select = Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason) \
-				.where(TeamSeason.gender==self.gender, TeamSeason.team==self.team, TeamSeason.division==self.division,
-			   	TeamSeason.season==self.season, Swim.event << list(events))
-
-		if topTimes:
-			if date:
-				qwery = select.select(Swim.name, Swim.event, fn.Min(Swim.time), Swimmer.team, Swimmer.year).group_by(
-					Swim.name, Swim.event, Swimmer.team, Swimmer.year).where(Swim.date < date)
+		newMeet = TempMeet()
+		for swim in Swim.raw("SELECT event, time, rank, name, meet, team FROM "
+				"(SELECT swim.name, time, event, meet, swim.team, rank() "
+				"OVER (PARTITION BY swim.name, event ORDER BY time) "
+				"FROM (swim "
+				"INNER JOIN swimmer sw "
+				"ON swim.swimmer_id=sw.id "
+				"INNER JOIN teamseason ts "
+				"ON sw.teamid_id=ts.id and ts.id=%s) "
+				"WHERE swim.date < %s) AS a "
+				"WHERE a.rank=1", self.id, dateStr):
+			swim.gender = self.gender
+			swim.season = self.season
+			swim.division = self.division
+			if events:
+				if swim.event in events:
+					newMeet.addSwim(swim)
 			else:
-				qwery = select.select(Swim.name, Swim.event, fn.Min(Swim.time), Swimmer.team, Swimmer.year).group_by(Swim.name,
-					Swim.event, Swimmer.team, Swimmer.year)
-		else:  # mean time for the season
-			qwery = select.select(Swim.name, Swim.event, fn.Avg(Swim.time), Swimmer.team, Swimmer.year).group_by(Swim.name,
-				Swim.event, Swimmer.team, Swimmer.year)
+				newMeet.addSwim(swim)
 
-		for swim in qwery:
-			if topTimes:
-				time = swim.min
-			else:
-				time = swim.avg
-			newSwim = Swim(name=swim.name, event=swim.event, time=time, gender=self.gender, team=self.team,
-							division=self.division, season=swim.season, year=swim.swimmer.year, swimmer=swim.swimmer)
-			if meetForm:
-				topMeet.addSwim(newSwim)
-			else:
-				if not swim.name in swimmers:
-						swimmers[swim.name] = {}
-				swimmers[swim.name][swim.event] = newSwim
-
-		if meetForm:
-			topMeet.place()
-			return topMeet
-
-		return swimmers
+		return newMeet
 
 	def addUpRelay(self, event):
 		if event not in {'400 Yard Medley Relay', '400 Yard Freestyle Relay', '800 Yard Freestyle Relay'}:
@@ -933,8 +918,8 @@ class TempMeet:
 		if not swim.getScoreTeam() in self.teams:
 			self.teams.append(swim.getScoreTeam())
 		if self.name and not self.date or not self.season:  # without a name, its a dummy meet
-			self.date=swim.date
-			self.season=swim.season
+			self.date = swim.date
+			self.season= swim.season
 
 		if not swim.event in self.eventSwims:
 			self.eventSwims[swim.event] = []
@@ -1070,19 +1055,12 @@ class TempMeet:
 		return drops
 
 	'''
-	adds top relays using same method in database
-	'''
-	def addTopRelays(self, number, team, database):
-		relays = [event for event in self.events if re.search('Relay',event)]
-		return database.topRelays(relays, team, self)
-
-	'''
 	creates the best lineup for the given team against another set lineup
 	no two person swapping instabilities
 	->must implement relay creation and switching
 	'''
 	def lineup(self, team, debug=False, splits=False, ppts=False):
-		team=str(team)
+		team = str(team)
 
 		drops = self.topEvents(30, 3, 4)
 		self.place()
@@ -1427,6 +1405,32 @@ class TempMeet:
 		if len(self.scores)<1 or len(self.scores[0])<1: return None
 		return self.scores[0][0]
 
+	# update stored win probabilities
+	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False):
+		weeksOut = 16 - weeksIn
+		date = week2date(weeksIn, season)
+		if nextYear:
+			weeksOut = '-1'
+			weeksIn = '-1'
+		self.scoreMonteCarlo(weeksOut=weeksOut)
+		teamProb = self.getWinProb()
+		for team in teamProb:
+			teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
+			try:
+				stats = TeamStats.get(teamseasonid=teamSeason.id, week=weeksIn)
+				if nats:
+					stats.winnats = teamProb[team]
+				else:
+					stats.winconf = teamProb[team]
+				print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
+				print stats.save()
+			except TeamStats.DoesNotExist:
+				print 'New:', team, season, teamProb[team], weeksIn, date
+				if nats:
+					TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winnats=teamProb[team], date=date)
+				else:
+					TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
+
 	'''
 	lists swimmers by team and by points scored
 	'''
@@ -1573,7 +1577,7 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
 			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
-			migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
+			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
 
 	'''
@@ -1597,6 +1601,8 @@ if __name__ == '__main__':
 	#		team.findTaperStats(weeks=week)
 	#for swim in Swim.select().where(Swim.season==2017):
 	#	swim.getPPTs()
+
+	TeamSeason.get(team='Carleton').topTimes().printout()
 	'''
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:

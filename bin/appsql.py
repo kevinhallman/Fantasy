@@ -62,6 +62,7 @@ def connection_processor(handler):
 		if not db.is_closed():
 			db.close()
 
+# retrieves all conference affiliations
 def getConfs():
 	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
 	allTeams = {'Men': {'D1': set(), 'D2': set(), 'D3': set()}, 'Women': {'D1': set(), 'D2': set(), 'D3': set()}}
@@ -81,6 +82,7 @@ def getConfs():
 
 	return confs, allTeams
 
+# gets the list of meets swum by a team in a given season
 def getMeetList(gender='Women', division='D1', team=None, season=None):
 	if not season:
 		meets = {}
@@ -97,9 +99,11 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 		if not season:
 			meets[newSeason].append(re.sub('\"', '\\\\\"', newMeet))
 		else:
-			meets.append(re.sub('\"', '\\\\\"', newMeet))
+			if int(season)==int(newSeason):
+				meets.append(re.sub('\"', '\\\\\"', newMeet))
 	return meets
 
+# set up web configuration
 web.config.debug = False
 app = web.application(urls, globals())
 wsgiapp = app.wsgifunc()  # allow to be run by gunicorn
@@ -156,7 +160,7 @@ class Swimulate():
 			elif "season" in key:
 				formMeets[num][3] = form[key]
 
-		#use topDual if no meet?
+		# use topDual if no meet?
 		remove = set()
 		optimizeTeams = {}
 		for num in formMeets:
@@ -169,8 +173,6 @@ class Swimulate():
 		for tm in remove:
 			del(formMeets[tm])
 
-		#print optimizeTeams
-
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 		
@@ -178,7 +180,7 @@ class Swimulate():
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
-				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
+				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender, division=form.division)
 			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
@@ -287,11 +289,7 @@ class Conf():
 			else:
 				topTimes = False
 			if form.conference == 'Nationals':
-				if topTimes:  # haven't set up new conf to handle avg times yet
-					confMeet = database.confNew(season, gender, form.conference, division, dateStr=swimdate)
-				else:
-					confMeet = database.conference(teams=allTeams[gender][division], topTimes=topTimes, gender=gender,
-										   season=season, divisions=division, date=swimdate)
+				confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -300,11 +298,7 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				if topTimes:
-					confMeet = database.confNew(season, gender, form.conference)
-				else:
-					confMeet = database.conference(teams=confDict[form.conference], topTimes=topTimes, gender=gender,
-										   season=season, divisions=division, date=swimdate)
+				confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -944,7 +938,9 @@ def showMeet(scores):
 		for swim in scores[event]:
 			html += '<tr>'
 			for part in swim:
-				html += '<td>'+str(part)+'</td>'
+				if 'Yard' in part:  # skip events
+					continue
+				html += '<td>' + str(part) + '</td>'
 			html += '</tr>'
 	html += '</table></br>'
 	return html
