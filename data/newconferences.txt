@@ -1010,14 +1010,14 @@ D3	Men	11	Michigan Intercollegiate	Olivet
 D3	Men	11	Michigan Intercollegiate	Alma College
 D3	Men	11	Michigan Intercollegiate	Calvin
 D3	Men	11	Michigan Intercollegiate	Hope College
-D3	Men	11	New England Intercoll.	Bridgewater St.
-D3	Men	11	New England Intercoll.	Colby-Sawyer
-D3	Men	11	New England Intercoll.	SJCME
-D3	Men	11	New England Intercoll.	Norwich
-D3	Men	11	New England Intercoll.	Regis
-D3	Men	11	New England Intercoll.	Gordon
-D3	Men	11	New England Intercoll.	Keene St.
-D3	Men	11	New England Intercoll.	Elms
+D3	Men	11	NEISDA	Bridgewater St.
+D3	Men	11	NEISDA	Colby-Sawyer
+D3	Men	11	NEISDA	SJCME
+D3	Men	11	NEISDA	Norwich
+D3	Men	11	NEISDA	Regis
+D3	Men	11	NEISDA	Gordon
+D3	Men	11	NEISDA	Keene St.
+D3	Men	11	NEISDA	Elms
 D3	Men	11	North Coast Athletic	Ohio Wesleyan
 D3	Men	11	North Coast Athletic	Wittenberg
 D3	Men	11	North Coast Athletic	DePauw
@@ -1080,7 +1080,7 @@ D3	Men	11	Skyline	MSMC
 D3	Men	11	Skyline	Purchase College
 D3	Men	11	Skyline	Old Westbury
 D3	Men	11	Skyline	USMMA
-D3	Men	11	Little East	UM Dartmouth
+D3	Men	11	NEISDA	UM Dartmouth
 D3	Men	11	College of Illinois/Wisc	Carthage
 D3	Men	11	College of Illinois/Wisc	Carroll
 D3	Men	11	College of Illinois/Wisc	Augustana
@@ -1128,7 +1128,7 @@ D3	Men	11	Middle Atlantic	Lebanon Valley
 D3	Men	11	Middle Atlantic	Lycoming
 D3	Men	11	Middle Atlantic	Messiah
 D3	Men	11	Middle Atlantic	Hood
-D3	Men	11	Commonwealth Coast	RWU
+D3	Men	11	NEISDA	RWU
 D3	Men	11	Landmark	Catholic UA
 D3	Men	11	Landmark	Susquehanna
 D3	Men	11	Landmark	Scranton
@@ -1206,14 +1206,14 @@ D3	Men	13	Michigan Intercollegiate	Olivet
 D3	Men	13	Michigan Intercollegiate	Alma College
 D3	Men	13	Michigan Intercollegiate	Calvin
 D3	Men	13	Michigan Intercollegiate	Hope College
-D3	Men	13	New England Intercoll.	Bridgewater St.
-D3	Men	13	New England Intercoll.	Norwich
-D3	Men	13	New England Intercoll.	SJCME
-D3	Men	13	New England Intercoll.	Colby-Sawyer
-D3	Men	13	New England Intercoll.	Regis
-D3	Men	13	New England Intercoll.	Gordon
-D3	Men	13	New England Intercoll.	Keene St.
-D3	Men	13	New England Intercoll.	Elms
+D3	Men	13	NEISDA	Bridgewater St.
+D3	Men	13	NEISDA	Norwich
+D3	Men	13	NEISDA	SJCME
+D3	Men	13	NEISDA	Colby-Sawyer
+D3	Men	13	NEISDA	Regis
+D3	Men	13	NEISDA	Gordon
+D3	Men	13	NEISDA	Keene St.
+D3	Men	13	NEISDA	Elms
 D3	Men	13	North Coast Athletic	Ohio Wesleyan
 D3	Men	13	North Coast Athletic	Wittenberg
 D3	Men	13	North Coast Athletic	DePauw
@@ -1284,7 +1284,7 @@ D3	Men	13	Skyline	SUNY Maritime
 D3	Men	13	Skyline	Old Westbury
 D3	Men	13	Skyline	Purchase College
 D3	Men	13	Skyline	USMMA
-D3	Men	13	Little East	UM Dartmouth
+D3	Men	13	NEISDA	UM Dartmouth
 D3	Men	13	College of Illinois/Wisc	Carthage
 D3	Men	13	College of Illinois/Wisc	Rose-Hulman
 D3	Men	13	College of Illinois/Wisc	Augustana
@@ -1325,7 +1325,7 @@ D3	Men	13	Middle Atlantic	Lebanon Valley
 D3	Men	13	Middle Atlantic	Lycoming
 D3	Men	13	Middle Atlantic	Messiah
 D3	Men	13	Middle Atlantic	Hood
-D3	Men	13	Commonwealth Coast	RWU
+D3	Men	13	NEISDA	RWU
 D3	Men	13	Landmark	Catholic UA
 D3	Men	13	Landmark	Susquehanna
 D3	Men	13	Landmark	Scranton
@@ -1403,14 +1403,14 @@ D3	Men	12	Michigan Intercollegiate	Olivet
 D3	Men	12	Michigan Intercollegiate	Alma College
 D3	Men	12	Michigan Intercollegiate	Calvin
 D3	Men	12	Michigan Intercollegiate	Hope College
-D3	Men	12	New England Intercoll.	Bridgewater St.
-D3	Men	12	New England Intercoll.	Norwich
-D3	Men	12	New England Intercoll.	SJCME
-D3	Men	12	New England Intercoll.	Colby-Sawyer
-D3	Men	12	New England Intercoll.	Regis
-D3	Men	12	New England Intercoll.	Gordon
-D3	Men	12	New England Intercoll.	Keene St.
-D3	Men	12	New England Intercoll.	Elms
+D3	Men	12	NEISDA	Bridgewater St.
+D3	Men	12	NEISDA	Norwich
+D3	Men	12	NEISDA	SJCME
+D3	Men	12	NEISDA	Colby-Sawyer
+D3	Men	12	NEISDA	Regis
+D3	Men	12	NEISDA	Gordon
+D3	Men	12	NEISDA	Keene St.
+D3	Men	12	NEISDA	Elms
 D3	Men	12	North Coast Athletic	Ohio Wesleyan
 D3	Men	12	North Coast Athletic	Wittenberg
 D3	Men	12	North Coast Athletic	DePauw
@@ -1483,7 +1483,7 @@ D3	Men	12	Skyline	SUNY Maritime
 D3	Men	12	Skyline	Old Westbury
 D3	Men	12	Skyline	Purchase College
 D3	Men	12	Skyline	USMMA
-D3	Men	12	Little East	UM Dartmouth
+D3	Men	12	NEISDA	UM Dartmouth
 D3	Men	12	College of Illinois/Wisc	Carthage
 D3	Men	12	College of Illinois/Wisc	Carroll
 D3	Men	12	College of Illinois/Wisc	Augustana
@@ -1523,7 +1523,7 @@ D3	Men	12	Middle Atlantic	Lebanon Valley
 D3	Men	12	Middle Atlantic	Lycoming
 D3	Men	12	Middle Atlantic	Messiah
 D3	Men	12	Middle Atlantic	Hood
-D3	Men	12	Commonwealth Coast	RWU
+D3	Men	12	NEISDA	RWU
 D3	Men	12	Landmark	Catholic UA
 D3	Men	12	Landmark	Susquehanna
 D3	Men	12	Landmark	Scranton
@@ -1605,14 +1605,14 @@ D3	Men	15	Michigan Intercollegiate	Olivet
 D3	Men	15	Michigan Intercollegiate	Alma College
 D3	Men	15	Michigan Intercollegiate	Calvin
 D3	Men	15	Michigan Intercollegiate	Hope College
-D3	Men	15	New England Intercoll.	Bridgewater St.
-D3	Men	15	New England Intercoll.	Norwich
-D3	Men	15	New England Intercoll.	SJCME
-D3	Men	15	New England Intercoll.	Colby-Sawyer
-D3	Men	15	New England Intercoll.	Regis
-D3	Men	15	New England Intercoll.	Gordon
-D3	Men	15	New England Intercoll.	Keene St.
-D3	Men	15	New England Intercoll.	Elms
+D3	Men	15	NEISDA	Bridgewater St.
+D3	Men	15	NEISDA	Norwich
+D3	Men	15	NEISDA	SJCME
+D3	Men	15	NEISDA	Colby-Sawyer
+D3	Men	15	NEISDA	Regis
+D3	Men	15	NEISDA	Gordon
+D3	Men	15	NEISDA	Keene St.
+D3	Men	15	NEISDA	Elms
 D3	Men	15	North Coast Athletic	Ohio Wesleyan
 D3	Men	15	North Coast Athletic	Wittenberg
 D3	Men	15	North Coast Athletic	DePauw
@@ -1675,7 +1675,7 @@ D3	Men	15	North Eastern Athletic	SUNY Cobleskill
 D3	Men	15	North Eastern Athletic	Cazenovia
 D3	Men	15	North Eastern Athletic	Gallaudet
 D3	Men	15	North Eastern Athletic	Wells
-D3	Men	15	Great Northeast Athletic	Husson
+D3	Men	15	NEISDA	Husson
 D3	Men	15	Bluegrass Mountain	Johns Hopkins
 D3	Men	15	Southern Collegiate	Trinity U.
 D3	Men	15	Southern Collegiate	Austin College
@@ -1688,7 +1688,7 @@ D3	Men	15	Skyline	Old Westbury
 D3	Men	15	Skyline	Purchase College
 D3	Men	15	Skyline	MSMC
 D3	Men	15	Skyline	SUNY Maritime
-D3	Men	15	Little East	UM Dartmouth
+D3	Men	15	NEISDA	UM Dartmouth
 D3	Men	15	College of Illinois/Wisc	Carthage
 D3	Men	15	College of Illinois/Wisc	Rose-Hulman
 D3	Men	15	College of Illinois/Wisc	Augustana
@@ -1737,7 +1737,7 @@ D3	Men	15	Middle Atlantic	Lycoming
 D3	Men	15	Middle Atlantic	Messiah
 D3	Men	15	Middle Atlantic	Hood
 D3	Men	15	Middle Atlantic	FDU-Florham
-D3	Men	15	Commonwealth Coast	RWU
+D3	Men	15	NEISDA	RWU
 D3	Men	15	Landmark	Catholic UA
 D3	Men	15	Landmark	Susquehanna
 D3	Men	15	Landmark	Goucher
@@ -1820,14 +1820,14 @@ D3	Men	14	Michigan Intercollegiate	Olivet
 D3	Men	14	Michigan Intercollegiate	Alma College
 D3	Men	14	Michigan Intercollegiate	Calvin
 D3	Men	14	Michigan Intercollegiate	Hope College
-D3	Men	14	New England Intercoll.	Bridgewater St.
-D3	Men	14	New England Intercoll.	Norwich
-D3	Men	14	New England Intercoll.	SJCME
-D3	Men	14	New England Intercoll.	Colby-Sawyer
-D3	Men	14	New England Intercoll.	Regis
-D3	Men	14	New England Intercoll.	Gordon
-D3	Men	14	New England Intercoll.	Keene St.
-D3	Men	14	New England Intercoll.	Elms
+D3	Men	14	NEISDA	Bridgewater St.
+D3	Men	14	NEISDA	Norwich
+D3	Men	14	NEISDA	SJCME
+D3	Men	14	NEISDA	Colby-Sawyer
+D3	Men	14	NEISDA	Regis
+D3	Men	14	NEISDA	Gordon
+D3	Men	14	NEISDA	Keene St.
+D3	Men	14	NEISDA	Elms
 D3	Men	14	North Coast Athletic	Ohio Wesleyan
 D3	Men	14	North Coast Athletic	Wittenberg
 D3	Men	14	North Coast Athletic	DePauw
@@ -1890,7 +1890,7 @@ D3	Men	14	North Eastern Athletic	SUNY Cobleskill
 D3	Men	14	North Eastern Athletic	Cazenovia
 D3	Men	14	North Eastern Athletic	Gallaudet
 D3	Men	14	North Eastern Athletic	Wells
-D3	Men	14	Great Northeast Athletic	Husson
+D3	Men	14	NEISDA	Husson
 D3	Men	14	Bluegrass Mountain	Johns Hopkins
 D3	Men	14	Southern Collegiate	Trinity U.
 D3	Men	14	Southern Collegiate	Austin College
@@ -1901,7 +1901,7 @@ D3	Men	14	Skyline	SUNY Maritime
 D3	Men	14	Skyline	Old Westbury
 D3	Men	14	Skyline	Purchase College
 D3	Men	14	Skyline	USMMA
-D3	Men	14	Little East	UM Dartmouth
+D3	Men	14	NEISDA	UM Dartmouth
 D3	Men	14	College of Illinois/Wisc	Carthage
 D3	Men	14	College of Illinois/Wisc	Rose-Hulman
 D3	Men	14	College of Illinois/Wisc	Augustana
@@ -1943,7 +1943,7 @@ D3	Men	14	Middle Atlantic	Lebanon Valley
 D3	Men	14	Middle Atlantic	Lycoming
 D3	Men	14	Middle Atlantic	Messiah
 D3	Men	14	Middle Atlantic	Hood
-D3	Men	14	Commonwealth Coast	RWU
+D3	Men	14	NEISDA	RWU
 D3	Men	14	Landmark	Catholic UA
 D3	Men	14	Landmark	Susquehanna
 D3	Men	14	Landmark	Scranton
@@ -2027,14 +2027,14 @@ D3	Men	17	Michigan Intercollegiate	Olivet
 D3	Men	17	Michigan Intercollegiate	Alma College
 D3	Men	17	Michigan Intercollegiate	Calvin
 D3	Men	17	Michigan Intercollegiate	Hope College
-D3	Men	17	New England Intercoll.	Bridgewater St.
-D3	Men	17	New England Intercoll.	Colby-Sawyer
-D3	Men	17	New England Intercoll.	SJCME
-D3	Men	17	New England Intercoll.	Norwich
-D3	Men	17	New England Intercoll.	Regis
-D3	Men	17	New England Intercoll.	Gordon
-D3	Men	17	New England Intercoll.	Keene St.
-D3	Men	17	New England Intercoll.	Elms
+D3	Men	17	NEISDA	Bridgewater St.
+D3	Men	17	NEISDA	Colby-Sawyer
+D3	Men	17	NEISDA	SJCME
+D3	Men	17	NEISDA	Norwich
+D3	Men	17	NEISDA	Regis
+D3	Men	17	NEISDA	Gordon
+D3	Men	17	NEISDA	Keene St.
+D3	Men	17	NEISDA	Elms
 D3	Men	17	North Coast Athletic	Ohio Wesleyan
 D3	Men	17	North Coast Athletic	Wittenberg
 D3	Men	17	North Coast Athletic	DePauw
@@ -2096,7 +2096,7 @@ D3	Men	17	North Eastern Athletic	SUNY Cobleskill
 D3	Men	17	North Eastern Athletic	Cazenovia
 D3	Men	17	North Eastern Athletic	Gallaudet
 D3	Men	17	North Eastern Athletic	Wells
-D3	Men	17	Great Northeast Athletic	Husson
+D3	Men	17	NEISDA	Husson
 D3	Men	17	Bluegrass Mountain	Johns Hopkins
 D3	Men	17	Southern Collegiate	Ozarks
 D3	Men	17	Southern Collegiate	Southwestern
@@ -2112,7 +2112,7 @@ D3	Men	17	Skyline	Sarah Lawrence
 D3	Men	17	Skyline	Purchase College
 D3	Men	17	Skyline	MSMC
 D3	Men	17	Skyline	SUNY Maritime
-D3	Men	17	Little East	UM Dartmouth
+D3	Men	17	NEISDA	UM Dartmouth
 D3	Men	17	College of Illinois/Wisc	Carthage
 D3	Men	17	College of Illinois/Wisc	Rose-Hulman
 D3	Men	17	College of Illinois/Wisc	Augustana
@@ -2160,7 +2160,7 @@ D3	Men	17	Middle Atlantic	Lebanon Valley
 D3	Men	17	Middle Atlantic	Lycoming
 D3	Men	17	Middle Atlantic	Messiah
 D3	Men	17	Middle Atlantic	Hood
-D3	Men	17	Commonwealth Coast	RWU
+D3	Men	17	NEISDA	RWU
 D3	Men	17	Landmark	Catholic UA
 D3	Men	17	Landmark	Susquehanna
 D3	Men	17	Landmark	Scranton
@@ -2245,14 +2245,14 @@ D3	Men	16	Michigan Intercollegiate	Olivet
 D3	Men	16	Michigan Intercollegiate	Alma College
 D3	Men	16	Michigan Intercollegiate	Calvin
 D3	Men	16	Michigan Intercollegiate	Hope College
-D3	Men	16	New England Intercoll.	Bridgewater St.
-D3	Men	16	New England Intercoll.	Colby-Sawyer
-D3	Men	16	New England Intercoll.	SJCME
-D3	Men	16	New England Intercoll.	Norwich
-D3	Men	16	New England Intercoll.	Regis
-D3	Men	16	New England Intercoll.	Gordon
-D3	Men	16	New England Intercoll.	Keene St.
-D3	Men	16	New England Intercoll.	Elms
+D3	Men	16	NEISDA	Bridgewater St.
+D3	Men	16	NEISDA	Colby-Sawyer
+D3	Men	16	NEISDA	SJCME
+D3	Men	16	NEISDA	Norwich
+D3	Men	16	NEISDA	Regis
+D3	Men	16	NEISDA	Gordon
+D3	Men	16	NEISDA	Keene St.
+D3	Men	16	NEISDA	Elms
 D3	Men	16	North Coast Athletic	Ohio Wesleyan
 D3	Men	16	North Coast Athletic	Wittenberg
 D3	Men	16	North Coast Athletic	DePauw
@@ -2314,7 +2314,7 @@ D3	Men	16	New England	Springfield
 D3	Men	16	North Eastern Athletic	SUNY Cobleskill
 D3	Men	16	North Eastern Athletic	Gallaudet
 D3	Men	16	North Eastern Athletic	Wells
-D3	Men	16	Great Northeast Athletic	Husson
+D3	Men	16	NEISDA	Husson
 D3	Men	16	Bluegrass Mountain	Johns Hopkins
 D3	Men	16	Southern Collegiate	Southwestern
 D3	Men	16	Southern Collegiate	McMurry
@@ -2328,7 +2328,7 @@ D3	Men	16	Skyline	Sarah Lawrence
 D3	Men	16	Skyline	Purchase College
 D3	Men	16	Skyline	MSMC
 D3	Men	16	Skyline	SUNY Maritime
-D3	Men	16	Little East	UM Dartmouth
+D3	Men	16	NEISDA	UM Dartmouth
 D3	Men	16	College of Illinois/Wisc	Carthage
 D3	Men	16	College of Illinois/Wisc	Rose-Hulman
 D3	Men	16	College of Illinois/Wisc	Augustana
@@ -2375,7 +2375,7 @@ D3	Men	16	Middle Atlantic	Lebanon Valley
 D3	Men	16	Middle Atlantic	Lycoming
 D3	Men	16	Middle Atlantic	Messiah
 D3	Men	16	Middle Atlantic	Hood
-D3	Men	16	Commonwealth Coast	RWU
+D3	Men	16	NEISDA	RWU
 D3	Men	16	Landmark	Catholic UA
 D3	Men	16	Landmark	Susquehanna
 D3	Men	16	Landmark	Goucher
@@ -2457,15 +2457,15 @@ D3	Women	11	Michigan Intercollegiate	Olivet
 D3	Women	11	Michigan Intercollegiate	Alma College
 D3	Women	11	Michigan Intercollegiate	Calvin
 D3	Women	11	Michigan Intercollegiate	Hope College
-D3	Women	11	New England Intercoll.	Norwich
-D3	Women	11	New England Intercoll.	Bridgewater St.
-D3	Women	11	New England Intercoll.	Colby-Sawyer
-D3	Women	11	New England Intercoll.	SJCME
-D3	Women	11	New England Intercoll.	Westfield State
-D3	Women	11	New England Intercoll.	Regis
-D3	Women	11	New England Intercoll.	Gordon
-D3	Women	11	New England Intercoll.	Keene St.
-D3	Women	11	New England Intercoll.	Elms
+D3	Women	11	NEISDA	Norwich
+D3	Women	11	NEISDA	Bridgewater St.
+D3	Women	11	NEISDA	Colby-Sawyer
+D3	Women	11	NEISDA	SJCME
+D3	Women	11	NEISDA	Westfield State
+D3	Women	11	NEISDA	Regis
+D3	Women	11	NEISDA	Gordon
+D3	Women	11	NEISDA	Keene St.
+D3	Women	11	NEISDA	Elms
 D3	Women	11	North Coast Athletic	Ohio Wesleyan
 D3	Women	11	North Coast Athletic	Wittenberg
 D3	Women	11	North Coast Athletic	DePauw
@@ -2534,9 +2534,9 @@ D3	Women	11	New England	Wellesley
 D3	Women	11	North Eastern Athletic	Cazenovia
 D3	Women	11	North Eastern Athletic	Gallaudet
 D3	Women	11	North Eastern Athletic	Wells
-D3	Women	11	Great Northeast Athletic	Saint Joseph CT
-D3	Women	11	Great Northeast Athletic	Simmons
-D3	Women	11	Great Northeast Athletic	Husson
+D3	Women	11	NEISDA	Saint Joseph CT
+D3	Women	11	NEISDA	Simmons
+D3	Women	11	NEISDA	Husson
 D3	Women	11	Bluegrass Mountain	Johns Hopkins
 D3	Women	11	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	11	Southern Collegiate	Trinity U.
@@ -2549,10 +2549,10 @@ D3	Women	11	Skyline	Purchase College
 D3	Women	11	Skyline	MSMC
 D3	Women	11	Skyline	St. Joseph's LI
 D3	Women	11	Skyline	USMMA
-D3	Women	11	Little East	Plymouth State
-D3	Women	11	Little East	E. Connecticut
-D3	Women	11	Little East	WestConn
-D3	Women	11	Little East	UM Dartmouth
+D3	Women	11	NEISDA	Plymouth State
+D3	Women	11	NEISDA	E. Connecticut
+D3	Women	11	NEISDA	WestConn
+D3	Women	11	NEISDA	UM Dartmouth
 D3	Women	11	College of Illinois/Wisc	Carthage
 D3	Women	11	College of Illinois/Wisc	Rose-Hulman
 D3	Women	11	College of Illinois/Wisc	Augustana
@@ -2597,9 +2597,9 @@ D3	Women	11	Middle Atlantic	Lebanon Valley
 D3	Women	11	Middle Atlantic	Lycoming
 D3	Women	11	Middle Atlantic	Messiah
 D3	Women	11	Middle Atlantic	Hood
-D3	Women	11	Commonwealth Coast	Western NE
-D3	Women	11	Commonwealth Coast	UNE
-D3	Women	11	Commonwealth Coast	RWU
+D3	Women	11	NEISDA	Western NE
+D3	Women	11	NEISDA	UNE
+D3	Women	11	NEISDA	RWU
 D3	Women	11	Landmark	Catholic UA
 D3	Women	11	Landmark	Susquehanna
 D3	Women	11	Landmark	Scranton
@@ -2681,15 +2681,15 @@ D3	Women	13	Michigan Intercollegiate	Olivet
 D3	Women	13	Michigan Intercollegiate	Alma College
 D3	Women	13	Michigan Intercollegiate	Calvin
 D3	Women	13	Michigan Intercollegiate	Hope College
-D3	Women	13	New England Intercoll.	Norwich
-D3	Women	13	New England Intercoll.	Bridgewater St.
-D3	Women	13	New England Intercoll.	Colby-Sawyer
-D3	Women	13	New England Intercoll.	SJCME
-D3	Women	13	New England Intercoll.	Westfield State
-D3	Women	13	New England Intercoll.	Regis
-D3	Women	13	New England Intercoll.	Gordon
-D3	Women	13	New England Intercoll.	Keene St.
-D3	Women	13	New England Intercoll.	Elms
+D3	Women	13	NEISDA	Norwich
+D3	Women	13	NEISDA	Bridgewater St.
+D3	Women	13	NEISDA	Colby-Sawyer
+D3	Women	13	NEISDA	SJCME
+D3	Women	13	NEISDA	Westfield State
+D3	Women	13	NEISDA	Regis
+D3	Women	13	NEISDA	Gordon
+D3	Women	13	NEISDA	Keene St.
+D3	Women	13	NEISDA	Elms
 D3	Women	13	North Coast Athletic	Ohio Wesleyan
 D3	Women	13	North Coast Athletic	Wittenberg
 D3	Women	13	North Coast Athletic	DePauw
@@ -2758,8 +2758,8 @@ D3	Women	13	New England	Springfield
 D3	Women	13	New England	Wellesley
 D3	Women	13	North Eastern Athletic	Cazenovia
 D3	Women	13	North Eastern Athletic	Gallaudet
-D3	Women	13	Great Northeast Athletic	Simmons
-D3	Women	13	Great Northeast Athletic	Husson
+D3	Women	13	NEISDA	Simmons
+D3	Women	13	NEISDA	Husson
 D3	Women	13	Bluegrass Mountain	Johns Hopkins
 D3	Women	13	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	13	Southern Collegiate	Trinity U.
@@ -2772,10 +2772,10 @@ D3	Women	13	Skyline	Old Westbury
 D3	Women	13	Skyline	Purchase College
 D3	Women	13	Skyline	MSMC
 D3	Women	13	Skyline	SUNY Maritime
-D3	Women	13	Little East	E. Connecticut
-D3	Women	13	Little East	Plymouth State
-D3	Women	13	Little East	WestConn
-D3	Women	13	Little East	UM Dartmouth
+D3	Women	13	NEISDA	E. Connecticut
+D3	Women	13	NEISDA	Plymouth State
+D3	Women	13	NEISDA	WestConn
+D3	Women	13	NEISDA	UM Dartmouth
 D3	Women	13	College of Illinois/Wisc	Carthage
 D3	Women	13	College of Illinois/Wisc	Carroll
 D3	Women	13	College of Illinois/Wisc	Augustana
@@ -2822,9 +2822,9 @@ D3	Women	13	Middle Atlantic	Lebanon Valley
 D3	Women	13	Middle Atlantic	Lycoming
 D3	Women	13	Middle Atlantic	Messiah
 D3	Women	13	Middle Atlantic	Hood
-D3	Women	13	Commonwealth Coast	Western NE
-D3	Women	13	Commonwealth Coast	RWU
-D3	Women	13	Commonwealth Coast	UNE
+D3	Women	13	NEISDA	Western NE
+D3	Women	13	NEISDA	RWU
+D3	Women	13	NEISDA	UNE
 D3	Women	13	Landmark	Catholic UA
 D3	Women	13	Landmark	Susquehanna
 D3	Women	13	Landmark	Scranton
@@ -2907,15 +2907,15 @@ D3	Women	12	Michigan Intercollegiate	Olivet
 D3	Women	12	Michigan Intercollegiate	Alma College
 D3	Women	12	Michigan Intercollegiate	Calvin
 D3	Women	12	Michigan Intercollegiate	Hope College
-D3	Women	12	New England Intercoll.	Norwich
-D3	Women	12	New England Intercoll.	Bridgewater St.
-D3	Women	12	New England Intercoll.	Colby-Sawyer
-D3	Women	12	New England Intercoll.	SJCME
-D3	Women	12	New England Intercoll.	Westfield State
-D3	Women	12	New England Intercoll.	Regis
-D3	Women	12	New England Intercoll.	Gordon
-D3	Women	12	New England Intercoll.	Keene St.
-D3	Women	12	New England Intercoll.	Elms
+D3	Women	12	NEISDA	Norwich
+D3	Women	12	NEISDA	Bridgewater St.
+D3	Women	12	NEISDA	Colby-Sawyer
+D3	Women	12	NEISDA	SJCME
+D3	Women	12	NEISDA	Westfield State
+D3	Women	12	NEISDA	Regis
+D3	Women	12	NEISDA	Gordon
+D3	Women	12	NEISDA	Keene St.
+D3	Women	12	NEISDA	Elms
 D3	Women	12	North Coast Athletic	Ohio Wesleyan
 D3	Women	12	North Coast Athletic	Wittenberg
 D3	Women	12	North Coast Athletic	DePauw
@@ -2985,9 +2985,9 @@ D3	Women	12	New England	Wellesley
 D3	Women	12	North Eastern Athletic	SUNY Cobleskill
 D3	Women	12	North Eastern Athletic	Cazenovia
 D3	Women	12	North Eastern Athletic	Gallaudet
-D3	Women	12	Great Northeast Athletic	Saint Joseph CT
-D3	Women	12	Great Northeast Athletic	Simmons
-D3	Women	12	Great Northeast Athletic	Husson
+D3	Women	12	NEISDA	Saint Joseph CT
+D3	Women	12	NEISDA	Simmons
+D3	Women	12	NEISDA	Husson
 D3	Women	12	Bluegrass Mountain	Johns Hopkins
 D3	Women	12	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	12	Southern Collegiate	Trinity U.
@@ -3001,10 +3001,10 @@ D3	Women	12	Skyline	Old Westbury
 D3	Women	12	Skyline	Purchase College
 D3	Women	12	Skyline	MSMC
 D3	Women	12	Skyline	SUNY Maritime
-D3	Women	12	Little East	Plymouth State
-D3	Women	12	Little East	E. Connecticut
-D3	Women	12	Little East	WestConn
-D3	Women	12	Little East	UM Dartmouth
+D3	Women	12	NEISDA	Plymouth State
+D3	Women	12	NEISDA	E. Connecticut
+D3	Women	12	NEISDA	WestConn
+D3	Women	12	NEISDA	UM Dartmouth
 D3	Women	12	College of Illinois/Wisc	Carthage
 D3	Women	12	College of Illinois/Wisc	Rose-Hulman
 D3	Women	12	College of Illinois/Wisc	Augustana
@@ -3052,9 +3052,9 @@ D3	Women	12	Middle Atlantic	Lebanon Valley
 D3	Women	12	Middle Atlantic	Lycoming
 D3	Women	12	Middle Atlantic	Messiah
 D3	Women	12	Middle Atlantic	Hood
-D3	Women	12	Commonwealth Coast	Western NE
-D3	Women	12	Commonwealth Coast	UNE
-D3	Women	12	Commonwealth Coast	RWU
+D3	Women	12	NEISDA	Western NE
+D3	Women	12	NEISDA	UNE
+D3	Women	12	NEISDA	RWU
 D3	Women	12	Landmark	Catholic UA
 D3	Women	12	Landmark	Susquehanna
 D3	Women	12	Landmark	Scranton
@@ -3141,15 +3141,15 @@ D3	Women	15	Michigan Intercollegiate	Olivet
 D3	Women	15	Michigan Intercollegiate	Alma College
 D3	Women	15	Michigan Intercollegiate	Calvin
 D3	Women	15	Michigan Intercollegiate	Hope College
-D3	Women	15	New England Intercoll.	Norwich
-D3	Women	15	New England Intercoll.	Bridgewater St.
-D3	Women	15	New England Intercoll.	Colby-Sawyer
-D3	Women	15	New England Intercoll.	SJCME
-D3	Women	15	New England Intercoll.	Westfield State
-D3	Women	15	New England Intercoll.	Regis
-D3	Women	15	New England Intercoll.	Gordon
-D3	Women	15	New England Intercoll.	Keene St.
-D3	Women	15	New England Intercoll.	Elms
+D3	Women	15	NEISDA	Norwich
+D3	Women	15	NEISDA	Bridgewater St.
+D3	Women	15	NEISDA	Colby-Sawyer
+D3	Women	15	NEISDA	SJCME
+D3	Women	15	NEISDA	Westfield State
+D3	Women	15	NEISDA	Regis
+D3	Women	15	NEISDA	Gordon
+D3	Women	15	NEISDA	Keene St.
+D3	Women	15	NEISDA	Elms
 D3	Women	15	North Coast Athletic	Ohio Wesleyan
 D3	Women	15	North Coast Athletic	Wittenberg
 D3	Women	15	North Coast Athletic	DePauw
@@ -3223,9 +3223,9 @@ D3	Women	15	North Eastern Athletic	Cazenovia
 D3	Women	15	North Eastern Athletic	Gallaudet
 D3	Women	15	North Eastern Athletic	Wells
 D3	Women	15	North Eastern Athletic	Cedar Crest
-D3	Women	15	Great Northeast Athletic	Saint Joseph CT
-D3	Women	15	Great Northeast Athletic	Simmons
-D3	Women	15	Great Northeast Athletic	Husson
+D3	Women	15	NEISDA	Saint Joseph CT
+D3	Women	15	NEISDA	Simmons
+D3	Women	15	NEISDA	Husson
 D3	Women	15	Bluegrass Mountain	Johns Hopkins
 D3	Women	15	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	15	Southern Collegiate	Trinity U.
@@ -3241,11 +3241,11 @@ D3	Women	15	Skyline	Purchase College
 D3	Women	15	Skyline	MSMC
 D3	Women	15	Skyline	St. Joseph's LI
 D3	Women	15	Skyline	SUNY Maritime
-D3	Women	15	Little East	Rhode Island Col
-D3	Women	15	Little East	E. Connecticut
-D3	Women	15	Little East	Plymouth State
-D3	Women	15	Little East	WestConn
-D3	Women	15	Little East	UM Dartmouth
+D3	Women	15	NEISDA	Rhode Island Col
+D3	Women	15	NEISDA	E. Connecticut
+D3	Women	15	NEISDA	Plymouth State
+D3	Women	15	NEISDA	WestConn
+D3	Women	15	NEISDA	UM Dartmouth
 D3	Women	15	College of Illinois/Wisc	Carthage
 D3	Women	15	College of Illinois/Wisc	Carroll
 D3	Women	15	College of Illinois/Wisc	Augustana
@@ -3298,9 +3298,9 @@ D3	Women	15	Middle Atlantic	Lebanon Valley
 D3	Women	15	Middle Atlantic	Lycoming
 D3	Women	15	Middle Atlantic	Messiah
 D3	Women	15	Middle Atlantic	Hood
-D3	Women	15	Commonwealth Coast	Western NE
-D3	Women	15	Commonwealth Coast	RWU
-D3	Women	15	Commonwealth Coast	UNE
+D3	Women	15	NEISDA	Western NE
+D3	Women	15	NEISDA	RWU
+D3	Women	15	NEISDA	UNE
 D3	Women	15	Landmark	Catholic UA
 D3	Women	15	Landmark	Susquehanna
 D3	Women	15	Landmark	Scranton
@@ -3387,15 +3387,15 @@ D3	Women	14	Michigan Intercollegiate	Olivet
 D3	Women	14	Michigan Intercollegiate	Alma College
 D3	Women	14	Michigan Intercollegiate	Calvin
 D3	Women	14	Michigan Intercollegiate	Hope College
-D3	Women	14	New England Intercoll.	Norwich
-D3	Women	14	New England Intercoll.	Bridgewater St.
-D3	Women	14	New England Intercoll.	Colby-Sawyer
-D3	Women	14	New England Intercoll.	SJCME
-D3	Women	14	New England Intercoll.	Westfield State
-D3	Women	14	New England Intercoll.	Regis
-D3	Women	14	New England Intercoll.	Gordon
-D3	Women	14	New England Intercoll.	Keene St.
-D3	Women	14	New England Intercoll.	Elms
+D3	Women	14	NEISDA	Norwich
+D3	Women	14	NEISDA	Bridgewater St.
+D3	Women	14	NEISDA	Colby-Sawyer
+D3	Women	14	NEISDA	SJCME
+D3	Women	14	NEISDA	Westfield State
+D3	Women	14	NEISDA	Regis
+D3	Women	14	NEISDA	Gordon
+D3	Women	14	NEISDA	Keene St.
+D3	Women	14	NEISDA	Elms
 D3	Women	14	North Coast Athletic	Ohio Wesleyan
 D3	Women	14	North Coast Athletic	Wittenberg
 D3	Women	14	North Coast Athletic	DePauw
@@ -3468,9 +3468,9 @@ D3	Women	14	North Eastern Athletic	Cazenovia
 D3	Women	14	North Eastern Athletic	Gallaudet
 D3	Women	14	North Eastern Athletic	Wells
 D3	Women	14	North Eastern Athletic	Cedar Crest
-D3	Women	14	Great Northeast Athletic	Saint Joseph CT
-D3	Women	14	Great Northeast Athletic	Simmons
-D3	Women	14	Great Northeast Athletic	Husson
+D3	Women	14	NEISDA	Saint Joseph CT
+D3	Women	14	NEISDA	Simmons
+D3	Women	14	NEISDA	Husson
 D3	Women	14	Bluegrass Mountain	Johns Hopkins
 D3	Women	14	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	14	Southern Collegiate	Trinity U.
@@ -3484,11 +3484,11 @@ D3	Women	14	Skyline	Purchase College
 D3	Women	14	Skyline	MSMC
 D3	Women	14	Skyline	St. Joseph's LI
 D3	Women	14	Skyline	SUNY Maritime
-D3	Women	14	Little East	Plymouth State
-D3	Women	14	Little East	Rhode Island Col
-D3	Women	14	Little East	E. Connecticut
-D3	Women	14	Little East	WestConn
-D3	Women	14	Little East	UM Dartmouth
+D3	Women	14	NEISDA	Plymouth State
+D3	Women	14	NEISDA	Rhode Island Col
+D3	Women	14	NEISDA	E. Connecticut
+D3	Women	14	NEISDA	WestConn
+D3	Women	14	NEISDA	UM Dartmouth
 D3	Women	14	College of Illinois/Wisc	Carthage
 D3	Women	14	College of Illinois/Wisc	Rose-Hulman
 D3	Women	14	College of Illinois/Wisc	Augustana
@@ -3537,9 +3537,9 @@ D3	Women	14	Middle Atlantic	Lebanon Valley
 D3	Women	14	Middle Atlantic	Lycoming
 D3	Women	14	Middle Atlantic	Messiah
 D3	Women	14	Middle Atlantic	Hood
-D3	Women	14	Commonwealth Coast	Western NE
-D3	Women	14	Commonwealth Coast	RWU
-D3	Women	14	Commonwealth Coast	UNE
+D3	Women	14	NEISDA	Western NE
+D3	Women	14	NEISDA	RWU
+D3	Women	14	NEISDA	UNE
 D3	Women	14	Landmark	Catholic UA
 D3	Women	14	Landmark	Susquehanna
 D3	Women	14	Landmark	Scranton
@@ -3628,15 +3628,15 @@ D3	Women	17	Michigan Intercollegiate	Olivet
 D3	Women	17	Michigan Intercollegiate	Alma College
 D3	Women	17	Michigan Intercollegiate	Calvin
 D3	Women	17	Michigan Intercollegiate	Hope College
-D3	Women	17	New England Intercoll.	Norwich
-D3	Women	17	New England Intercoll.	Bridgewater St.
-D3	Women	17	New England Intercoll.	Colby-Sawyer
-D3	Women	17	New England Intercoll.	SJCME
-D3	Women	17	New England Intercoll.	Westfield State
-D3	Women	17	New England Intercoll.	Regis
-D3	Women	17	New England Intercoll.	Gordon
-D3	Women	17	New England Intercoll.	Keene St.
-D3	Women	17	New England Intercoll.	Elms
+D3	Women	17	NEISDA	Norwich
+D3	Women	17	NEISDA	Bridgewater St.
+D3	Women	17	NEISDA	Colby-Sawyer
+D3	Women	17	NEISDA	SJCME
+D3	Women	17	NEISDA	Westfield State
+D3	Women	17	NEISDA	Regis
+D3	Women	17	NEISDA	Gordon
+D3	Women	17	NEISDA	Keene St.
+D3	Women	17	NEISDA	Elms
 D3	Women	17	North Coast Athletic	Ohio Wesleyan
 D3	Women	17	North Coast Athletic	Wittenberg
 D3	Women	17	North Coast Athletic	DePauw
@@ -3707,9 +3707,9 @@ D3	Women	17	North Eastern Athletic	Cazenovia
 D3	Women	17	North Eastern Athletic	Gallaudet
 D3	Women	17	North Eastern Athletic	Wells
 D3	Women	17	North Eastern Athletic	Cedar Crest
-D3	Women	17	Great Northeast Athletic	Saint Joseph CT
-D3	Women	17	Great Northeast Athletic	Simmons
-D3	Women	17	Great Northeast Athletic	Husson
+D3	Women	17	NEISDA	Saint Joseph CT
+D3	Women	17	NEISDA	Simmons
+D3	Women	17	NEISDA	Husson
 D3	Women	17	Bluegrass Mountain	Johns Hopkins
 D3	Women	17	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	17	Southern Collegiate	Ozarks
@@ -3727,11 +3727,11 @@ D3	Women	17	Skyline	Purchase College
 D3	Women	17	Skyline	MSMC
 D3	Women	17	Skyline	St. Joseph's LI
 D3	Women	17	Skyline	SUNY Maritime
-D3	Women	17	Little East	Plymouth State
-D3	Women	17	Little East	Rhode Island Col
-D3	Women	17	Little East	E. Connecticut
-D3	Women	17	Little East	WestConn
-D3	Women	17	Little East	UM Dartmouth
+D3	Women	17	NEISDA	Plymouth State
+D3	Women	17	NEISDA	Rhode Island Col
+D3	Women	17	NEISDA	E. Connecticut
+D3	Women	17	NEISDA	WestConn
+D3	Women	17	NEISDA	UM Dartmouth
 D3	Women	17	College of Illinois/Wisc	Carthage
 D3	Women	17	College of Illinois/Wisc	Carroll
 D3	Women	17	College of Illinois/Wisc	Augustana
@@ -3783,9 +3783,9 @@ D3	Women	17	Middle Atlantic	Lycoming
 D3	Women	17	Middle Atlantic	Messiah
 D3	Women	17	Middle Atlantic	Hood
 D3	Women	17	Middle Atlantic	FDU-Florham
-D3	Women	17	Commonwealth Coast	Western NE
-D3	Women	17	Commonwealth Coast	RWU
-D3	Women	17	Commonwealth Coast	UNE
+D3	Women	17	NEISDA	Western NE
+D3	Women	17	NEISDA	RWU
+D3	Women	17	NEISDA	UNE
 D3	Women	17	Landmark	Catholic UA
 D3	Women	17	Landmark	Susquehanna
 D3	Women	17	Landmark	Scranton
@@ -3875,15 +3875,15 @@ D3	Women	16	Michigan Intercollegiate	Olivet
 D3	Women	16	Michigan Intercollegiate	Alma College
 D3	Women	16	Michigan Intercollegiate	Calvin
 D3	Women	16	Michigan Intercollegiate	Hope College
-D3	Women	16	New England Intercoll.	Westfield State
-D3	Women	16	New England Intercoll.	Bridgewater St.
-D3	Women	16	New England Intercoll.	Norwich
-D3	Women	16	New England Intercoll.	SJCME
-D3	Women	16	New England Intercoll.	Colby-Sawyer
-D3	Women	16	New England Intercoll.	Regis
-D3	Women	16	New England Intercoll.	Gordon
-D3	Women	16	New England Intercoll.	Keene St.
-D3	Women	16	New England Intercoll.	Elms
+D3	Women	16	NEISDA	Westfield State
+D3	Women	16	NEISDA	Bridgewater St.
+D3	Women	16	NEISDA	Norwich
+D3	Women	16	NEISDA	SJCME
+D3	Women	16	NEISDA	Colby-Sawyer
+D3	Women	16	NEISDA	Regis
+D3	Women	16	NEISDA	Gordon
+D3	Women	16	NEISDA	Keene St.
+D3	Women	16	NEISDA	Elms
 D3	Women	16	North Coast Athletic	Ohio Wesleyan
 D3	Women	16	North Coast Athletic	Wittenberg
 D3	Women	16	North Coast Athletic	DePauw
@@ -3957,9 +3957,9 @@ D3	Women	16	North Eastern Athletic	Cazenovia
 D3	Women	16	North Eastern Athletic	Gallaudet
 D3	Women	16	North Eastern Athletic	Wells
 D3	Women	16	North Eastern Athletic	Cedar Crest
-D3	Women	16	Great Northeast Athletic	Saint Joseph CT
-D3	Women	16	Great Northeast Athletic	Simmons
-D3	Women	16	Great Northeast Athletic	Husson
+D3	Women	16	NEISDA	Saint Joseph CT
+D3	Women	16	NEISDA	Simmons
+D3	Women	16	NEISDA	Husson
 D3	Women	16	Bluegrass Mountain	Johns Hopkins
 D3	Women	16	Upper Midwest Athletic	Minnesota-Morris
 D3	Women	16	Southern Collegiate	Austin College
@@ -3977,11 +3977,11 @@ D3	Women	16	Skyline	Purchase College
 D3	Women	16	Skyline	MSMC
 D3	Women	16	Skyline	St. Joseph's LI
 D3	Women	16	Skyline	SUNY Maritime
-D3	Women	16	Little East	Plymouth State
-D3	Women	16	Little East	Rhode Island Col
-D3	Women	16	Little East	E. Connecticut
-D3	Women	16	Little East	WestConn
-D3	Women	16	Little East	UM Dartmouth
+D3	Women	16	NEISDA	Plymouth State
+D3	Women	16	NEISDA	Rhode Island Col
+D3	Women	16	NEISDA	E. Connecticut
+D3	Women	16	NEISDA	WestConn
+D3	Women	16	NEISDA	UM Dartmouth
 D3	Women	16	College of Illinois/Wisc	Carthage
 D3	Women	16	College of Illinois/Wisc	Rose-Hulman
 D3	Women	16	College of Illinois/Wisc	Augustana
@@ -4034,9 +4034,9 @@ D3	Women	16	Middle Atlantic	Lebanon Valley
 D3	Women	16	Middle Atlantic	Lycoming
 D3	Women	16	Middle Atlantic	Messiah
 D3	Women	16	Middle Atlantic	Hood
-D3	Women	16	Commonwealth Coast	Western NE
-D3	Women	16	Commonwealth Coast	RWU
-D3	Women	16	Commonwealth Coast	UNE
+D3	Women	16	NEISDA	Western NE
+D3	Women	16	NEISDA	RWU
+D3	Women	16	NEISDA	UNE
 D3	Women	16	Landmark	Catholic UA
 D3	Women	16	Landmark	Susquehanna
 D3	Women	16	Landmark	Scranton

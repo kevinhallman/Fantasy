@@ -262,14 +262,21 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 	targetTeam = TeamSeason.get(id=targetSwimmer.teamid)
 	print targetTeam.team
 	for swim in Swim.select().where(Swim.swimmer==sourceSwimmer):
-		print swim.id
 		swim.team = targetTeam.team
 		swim.division = targetTeam.division
 		swim.conference = targetTeam.conference
 		swim.season = targetTeam.season
-		swim.swimmer = targetSwimmer
+		swim.swimmer = targetSwimmer.id
 		swim.name = targetSwimmer.name
-		swim.save()
+		try:
+			print swim.name, swim.event, swim.time, swim.date
+			Swim.get(name=swim.name, event=swim.event, date=swim.date)
+			# should mean the swims already exist
+			print 'delete', swim.id
+			Swim.delete().where(Swim.id==swim.id).execute()
+		except Swim.DoesNotExist:
+			print 'move', swim.id
+			swim.save()
 
 	Swimmer.delete().where(Swimmer.id==sourceSwimmerId).execute()
 
@@ -326,12 +333,18 @@ def fixConfs():
 		try:
 			conf = newConfs[team.division][team.gender][str(team.season)][team.team]
 			if conf != team.conference:
-				print 'nope', team.id, team.team, team.conference, conf
+				print team.id, team.team, team.conference, conf
 				team.conference = conf
 				team.save()
+
+				# now fix the swims
+				for swim in Swim.select().join(Swimmer).join(TeamSeason).where(TeamSeason.id==team.id):
+					if swim.conference != conf:
+						swim.conference = conf
+						swim.save()
+						print 'fixed swim'
 		except:
 			pass
-			#print 'huh', team.id, team.team, team.division, team.gender, team.season
 
 def fixDupTeams():
 	confTeams = getNewConfs()
@@ -419,12 +432,13 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
-	deleteDupImprovement()
+	#safeLoad()
+	#deleteDupImprovement()
 	fixConfs()
-	fixDivision()
+	#fixDivision()
 	#fixDupTeams()
-	#mergeSwimmers(285999, 294793)
+	mergeSwimmers(317545, 305145)
+	mergeSwimmers(317788, 305344)
 	#mergeTeams(6785, 8453)
 	#fixRelays()
 	# fixConfs()
