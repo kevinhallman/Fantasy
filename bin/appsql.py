@@ -138,40 +138,46 @@ class Home():
 class Swimulate():
 	def GET(self):
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False, gender=None, division=None)
-		setGenDiv(form.gender, form.division)
+		#setGenDiv(form.gender, form.division)
 
 		gender = session.gender
 		divTeams = allTeams[gender]
 		if not form.team1:
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 
+		# assemble the data for each team from the form
 		keys = form.keys()
-		
 		formMeets = {}
 		for key in keys:
-			if key in ['gender', 'division']: continue
-			num = int(key[-1])
+			if key in ['gender', 'division']:  # don't load in the session division or gender
+				continue
+			num = int(key[-1])  # last position
 			if not num in formMeets:
-				formMeets[num] = [None, None, None, None]
-			if "team" in key:
-				formMeets[num][0] = form[key]
-			elif "meet" in key:
-				formMeets[num][1] = form[key]
-			elif "season" in key:
-				formMeets[num][3] = form[key]
+				formMeets[num] = {}
+			if 'team' in key:
+				formMeets[num]['team'] = form[key]
+			elif 'meet' in key:
+				formMeets[num]['meet'] = form[key]
+			elif 'season' in key:
+				formMeets[num]['season'] = form[key]
+			elif 'division' in key:
+				formMeets[num]['division'] = form[key]
 
 		# use topDual if no meet?
 		remove = set()
 		optimizeTeams = {}
 		for num in formMeets:
-			tm = formMeets[num]
-			if not tm[0] or not tm[1]:
+			team = formMeets[num]
+			if not team['team'] or not team['meet']:
 				remove.add(num)
-			elif tm[1] == 'Create Lineup':
-				optimizeTeams[tm[0]] = int(tm[3])
+			elif team['meet'] == 'Create Lineup':
+				newTeam = {'season': int(team['season']), 'division':team['division']}
+				optimizeTeams[team['team']] = newTeam
 				remove.add(num)
-		for tm in remove:
-			del(formMeets[tm])
+
+		# get rid of optimize teams and teams without any meet specified
+		for num in remove:
+			del(formMeets[num])
 
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
@@ -180,7 +186,7 @@ class Swimulate():
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
-				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender, division=form.division)
+				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
 			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
