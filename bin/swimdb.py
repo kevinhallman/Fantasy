@@ -1416,22 +1416,24 @@ class TempMeet:
 		teamProb = self.getWinProb()
 		print teamProb
 		for team in teamProb:
-			teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
 			try:
-				stats = TeamStats.get(teamseasonid=teamSeason.id, week=weeksIn)
-				if nats:
-					stats.winnats = teamProb[team]
-				else:
-					stats.winconf = teamProb[team]
-				print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
-				print stats.save()
-			except TeamStats.DoesNotExist:
-				print 'New:', team, season, teamProb[team], weeksIn, date
-				if nats:
-					TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winnats=teamProb[team], date=date)
-				else:
-					TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
-
+				teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
+				try:
+					stats = TeamStats.get(teamseasonid=teamSeason.id, week=weeksIn)
+					if nats:
+						stats.winnats = teamProb[team]
+					else:
+						stats.winconf = teamProb[team]
+					print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
+					print stats.save()
+				except TeamStats.DoesNotExist:
+					print 'New:', team, season, teamProb[team], weeksIn, date
+					if nats:
+						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winnats=teamProb[team], date=date)
+					else:
+						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
+			except TeamSeason.DoesNotExist:
+				print 'wrong', team, division, gender, season
 	'''
 	lists swimmers by team and by points scored
 	'''
