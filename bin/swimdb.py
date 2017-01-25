@@ -334,8 +334,8 @@ class TeamSeason(Model):
 			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
 
 		newMeet = TempMeet()
-		for swim in Swim.raw("SELECT event, time, rank, name, meet, team FROM "
-				"(SELECT swim.name, time, event, meet, swim.team, rank() "
+		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year FROM "
+				"(SELECT swim.name, time, event, meet, swim.team, sw.year rank() "
 				"OVER (PARTITION BY swim.name, event ORDER BY time) "
 				"FROM (swim "
 				"INNER JOIN swimmer sw "
