@@ -335,7 +335,7 @@ class TeamSeason(Model):
 
 		newMeet = TempMeet()
 		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year FROM "
-				"(SELECT swim.name, time, event, meet, swim.team, sw.year rank() "
+				"(SELECT swim.name, time, event, meet, swim.team, sw.year, rank() "
 				"OVER (PARTITION BY swim.name, event ORDER BY time) "
 				"FROM (swim "
 				"INNER JOIN swimmer sw "
@@ -1414,6 +1414,7 @@ class TempMeet:
 			weeksIn = '-1'
 		self.scoreMonteCarlo(weeksOut=weeksOut)
 		teamProb = self.getWinProb()
+		print teamProb
 		for team in teamProb:
 			teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
 			try:
