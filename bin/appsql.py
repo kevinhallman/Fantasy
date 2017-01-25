@@ -1052,7 +1052,7 @@ def showRank(topTeams):
 	for idx, team in enumerate(topTeams):
 		html += '<tr>'
 		html += '<td>' + str(idx+1) + '</td>'
-		genDiv = '?Gender=' + team.gender + '&Division=' + team.division
+		genDiv = '?gender=' + team.gender + '&division=' + team.division
 		html += '<td> <a href=/teamstats/' + str.replace(str(team.team), ' ', '+')+genDiv+'>' + team.team + '</a></td>'
 		winNats = team.getWinnats() * 100
 		if winNats == '': winNatsDelta = ''
