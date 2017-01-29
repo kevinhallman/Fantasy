@@ -758,7 +758,7 @@ class Swim(Model):
 
 	def printScore(self, br='\t', gender=True):
 		time = swimTime(self.getScoreTime())
-		if gender:
+		if gender and self.gender:
 			genderStr = br + self.gender
 		else:
 			genderStr = ''
@@ -991,9 +991,11 @@ class TempMeet:
 		if debug: print self
 		while not self.isEmpty():
 			for event in events:
+				if 'Relay' in event:  # shouldn't need to drop any relays
+					continue
 				drop = True  # just allow us to enter the loop
 				while drop and not self.eventSwims[event] == []:  # we need to loop on an event until we find
-				# someone who is actually in it
+					# someone who is actually in it
 					drop = False
 					# print self.eventSwims[event]
 
@@ -1434,6 +1436,7 @@ class TempMeet:
 						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
 			except TeamSeason.DoesNotExist:
 				print 'wrong', team, division, gender, season
+
 	'''
 	lists swimmers by team and by points scored
 	'''

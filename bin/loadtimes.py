@@ -430,9 +430,9 @@ def uniqueSwimmers():
 if __name__ == '__main__':
 	start = Time.time()
 	#uniqueSwimmers()
-	#deleteDups()
+	deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
+	#safeLoad()
 	#deleteDupImprovement()
 	fixConfs()
 	#fixDivision()
