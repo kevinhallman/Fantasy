@@ -181,7 +181,7 @@ class Swimulate():
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 		
 		else:
-			print formMeets.values()
+			#print formMeets.values()
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
@@ -244,7 +244,7 @@ class SwimulateJSON():
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return {}
 
-		print formMeets.values()
+		#print formMeets.values()
 		newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 		if optimizeTeams:
@@ -335,7 +335,7 @@ class Conf():
 
 class ConfJSON():
 	def GET(self):
-		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None)
+		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None, heats=None)
 		web.header("Content-Type", "application/json")
 		division = form.division
 		gender = form.gender
