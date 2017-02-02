@@ -40,7 +40,7 @@ def getNewConfs():
 load in new swim times
 can load in to all SQL tables if params are true
 '''
-def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=17):
+def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=15):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
@@ -51,18 +51,18 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	root = 'data/2017'
+	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
+		match = re.search('(\D+)(\d+)([mf]).*', swimFileName)
 		if not match:
 			continue
 		div, year, gender = match.groups()
 
 		if not (int(year) == loadyear):
 			continue
-		if not 'new' in swimFileName:
-			continue
+		#if not 'new' in swimFileName:
+		#	continue
 
 		confTeams = getNewConfs()
 
@@ -170,10 +170,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							swims.append(newSwim)
 
 						# incremental load
-						#if len(swims) > 1000:
-						#	print 'Swims: ', len(swims)
-						#	print Swim.insert_many(swims).execute()
-						#	swims = []
+						if len(swims) > 1000:
+							print 'Swims: ', len(swims)
+							print Swim.insert_many(swims).execute()
+							swims = []
 
 
 	db.connect()
@@ -194,16 +194,16 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 		print 'Team Meets:', len(teamMeets)
 		TeamMeet.insert_many(teamMeets).execute()
 
-	if loadSwims and len(swims) > 0:
-		print 'Swims: ', len(swims)
-		Swim.insert_many(swims).execute()
+	#if loadSwims and len(swims) > 0:
+	#	print 'Swims: ', len(swims)
+	#	Swim.insert_many(swims).execute()
 
 		#for i in range(len(swims) / 100):
 		#	print i
 		#	with db.transaction():
 		#		print swims[i*100:(i+1)*100]
 		#		Swim.insert_many(swims[i*100:(i+1)*100]).execute()
-		print 'Done!'
+		#print 'Done!'
 
 def deleteDups():
 	# cleanup for duplicate swims
@@ -430,9 +430,9 @@ def uniqueSwimmers():
 if __name__ == '__main__':
 	start = Time.time()
 	#uniqueSwimmers()
-	deleteDups()
+	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad()
+	safeLoad()
 	#deleteDupImprovement()
 	fixConfs()
 	#fixDivision()

@@ -956,6 +956,7 @@ class TempMeet:
 	top swimmers are decided by highest scoring event right now
 	'''
 	def topEvents(self, teamMax=17, indMax=3, totalMax=4, adjEvents=False, debug=False):
+		print debug
 		self.place()
 		conference = TempMeet()
 		indSwims = {}

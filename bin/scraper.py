@@ -298,9 +298,9 @@ def topTimesLoop():
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	# conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
 	conferences = ['']
-	years = ['17']  # ['15','14','13','12','11']
+	years = ['15']  # ['15','14','13','12','11']
 
-	directory = 'data/2017'
+	directory = 'data/2015'
 	for year in years:
 		for division in divisions:
 			if division == 'DI':
@@ -321,17 +321,17 @@ def topTimesLoop():
 							oldTimes.add(line)
 
 				# move last load's new times into old file
-				if os.path.exists(filePath):
-					with open(oldFilePath, 'a') as outfile:
-						with open(filePath, 'r') as infile:
-							for line in infile:
-								if line not in oldTimes:
-									outfile.write(line)
-									oldTimes.add(line)
-					os.remove(filePath)
+				#if os.path.exists(filePath):
+				#	with open(oldFilePath, 'a') as outfile:
+				#		with open(filePath, 'r') as infile:
+				#			for line in infile:
+				#				if line not in oldTimes:
+				#					outfile.write(line)
+				#					oldTimes.add(line)
+				#	os.remove(filePath)
 
 
-				with open(filePath, 'w+') as meetFile:
+				with open(filePath, 'w+', 1) as meetFile:
 					for conference in conferences:
 						if conference == '':
 							confName = 'all'
