@@ -39,6 +39,7 @@ urls = ('/', 'Home',
 	'/preseasonJSON', 'SeasonRankingsJSON',
 	'/teamstats/(.+)', 'TeamStats',
 	'/powerscore', 'Powerscore',
+	'/powerscoreJSON', 'PowerscoreJSON',
 	'/swimmer', 'Swimmerstats',
 	'/taper', 'Taper'
 )
@@ -812,6 +813,21 @@ class Powerscore():
 		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
 		points = swim.getPPTs()
 		return render.powerpoints(events=eventOrderInd, points=points, table=None)
+
+class PowerscoreJSON():
+	def GET(self):
+		form = web.input(gender=None, division=None, hundreths=None, event=None)
+		setGenDiv(form.gender, form.division)
+
+		if not form.event or not int(form.hundreths) > 0:  # empty
+			return {}
+
+		time = int(form.hundreths) / 100.0
+
+		# return the points
+		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
+		points = swim.getPPTs()
+		return json.dumps(points)
 
 class Swimmerstats():
 	def GET(self):
