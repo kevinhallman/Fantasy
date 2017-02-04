@@ -173,9 +173,7 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 		'__ASYNCPOST': 'true',
 		'ctl00$ctl82$btnSearch': 'Search'
 	}
-	#for part in payload:
-	#	if not '__' in part and payload[part]!='':
-	#		print part, payload[part]
+
 	headers = {'Host': "www.usaswimming.org",
 			   'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:48.0) Gecko/20100101 Firefox/48.0",
 			   'Accept':"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -238,22 +236,22 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 	elif RelInd=='rbRelay':
 		while place>0:
 			place = r.find('ctl82_dgRelaySearchResults_lblSwimTimeFormatted', place+1, responseEnd)  # find time
-			#print 'loop', place
+			# print 'loop', place
 			if place == -1:  # reached end
 				break
 			time = r[r.find('>', place) + 1: r.find('<', place+4)]
 			for tagNum in range(1, 6):
 				place = r.find('<td', place + 3)
-				#print place
+				# print place
 				start = r.find('>', place + 3) + 1
 				end = r.find('<', place + 3)
-				#print tagNum, r[start: end]
+				# print tagNum, r[start: end]
 				if tagNum == 1:
 					time = r[start: end]
 				elif tagNum == 2:
-					team = r[start: end]
+					team = r[startd: end]
 					nameEnd = r.find('</td>', place)
-					#print r[start: ]
+					# print r[start: ]
 					name = r[start: nameEnd]
 					name = name.replace('<br>', ' ')
 				elif tagNum == 3:
@@ -298,9 +296,9 @@ def topTimesLoop():
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	# conferences = conferenceMap  #[106,102,83,103,115,100] #119=UAA,106=North Central,28=Pac 12,1=Big Ten, 100=MIAC
 	conferences = ['']
-	years = ['15']  # ['15','14','13','12','11']
+	years = ['17']  # ['15','14','13','12','11']
 
-	directory = 'data/2015'
+	directory = 'data/2017'
 	for year in years:
 		for division in divisions:
 			if division == 'DI':
@@ -321,14 +319,14 @@ def topTimesLoop():
 							oldTimes.add(line)
 
 				# move last load's new times into old file
-				#if os.path.exists(filePath):
-				#	with open(oldFilePath, 'a') as outfile:
-				#		with open(filePath, 'r') as infile:
-				#			for line in infile:
-				#				if line not in oldTimes:
-				#					outfile.write(line)
-				#					oldTimes.add(line)
-				#	os.remove(filePath)
+				if os.path.exists(filePath):
+					with open(oldFilePath, 'a') as outfile:
+						with open(filePath, 'r') as infile:
+							for line in infile:
+								if line not in oldTimes:
+									outfile.write(line)
+									oldTimes.add(line)
+					os.remove(filePath)
 
 
 				with open(filePath, 'w+', 1) as meetFile:

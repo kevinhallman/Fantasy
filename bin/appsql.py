@@ -11,7 +11,7 @@ from swimdb import swimTime
 #from guppy import hpy
 from math import isnan
 
-from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist
+from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist, db
 from operator import itemgetter
 import time as Time
 
@@ -42,17 +42,6 @@ urls = ('/', 'Home',
 	'/swimmer', 'Swimmerstats',
 	'/taper', 'Taper'
 )
-
-urlparse.uses_netloc.append("postgres")
-if "DATABASE_URL" in os.environ:  # production
-	url = urlparse.urlparse(os.environ["DATABASE_URL"])
-	db = PostgresqlDatabase(database=url.path[1:],
-    	user=url.username,
-    	password=url.password,
-    	host=url.hostname,
-    	port=url.port)
-else:
-	db = PostgresqlDatabase('swimdb', user='hallmank')
 
 def connection_processor(handler):
 	db.connect()

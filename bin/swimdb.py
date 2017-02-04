@@ -956,7 +956,6 @@ class TempMeet:
 	top swimmers are decided by highest scoring event right now
 	'''
 	def topEvents(self, teamMax=17, indMax=3, totalMax=4, adjEvents=False, debug=False):
-		print debug
 		self.place()
 		conference = TempMeet()
 		indSwims = {}
@@ -992,11 +991,10 @@ class TempMeet:
 		if debug: print self
 		while not self.isEmpty():
 			for event in events:
-				if 'Relay' in event:  # shouldn't need to drop any relays
+				if 'Relay' in event:  # shouldn't
 					continue
 				drop = True  # just allow us to enter the loop
 				while drop and not self.eventSwims[event] == []:  # we need to loop on an event until we find
-					# someone who is actually in it
 					drop = False
 					# print self.eventSwims[event]
 
