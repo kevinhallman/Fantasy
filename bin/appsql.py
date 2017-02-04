@@ -95,6 +95,7 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 # set up web configuration
 web.config.debug = False
 app = web.application(urls, globals())
+wsgiapp = app.wsgifunc()
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division': 'D1'})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 

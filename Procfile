@@ -1,1 +1,1 @@
-web: python bin/appsql.py $PORT
+web: gunicorn bin.appsql:wsgiapp
