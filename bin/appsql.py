@@ -822,7 +822,7 @@ class PowerscoreJSON():
 		if not form.event or not int(form.hundredths) > 0:  # empty
 			return {}
 
-		time = int(form.hundreths) / 100.0
+		time = int(form.hundredths) / 100.0
 
 		# return the points
 		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
