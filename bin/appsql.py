@@ -95,7 +95,6 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 # set up web configuration
 web.config.debug = False
 app = web.application(urls, globals())
-wsgiapp = app.wsgifunc()  # allow to be run by gunicorn
 session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'gender': 'Women', 'division': 'D1'})
 render = web.template.render('templates/', base="layout", globals={'context': session})
 
@@ -737,6 +736,7 @@ class TeamStats():
 		setGenDiv(form.gender, form.division)
 		if not team:
 			return render.teamstats(None, None, None, None, None, None, None, None, None)
+		print team, form.gender, form.season
 
 		try:
 			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
@@ -747,6 +747,7 @@ class TeamStats():
 		# team speed
 		winNats = round(teamseason.getWinnats(), 3) * 100
 		winConf = round(teamseason.getWinconf(), 3) * 100
+		print winNats, winConf
 
 		# team development
 		try:
@@ -757,6 +758,7 @@ class TeamStats():
 			attrition = None
 			imp = None
 		inviteStr = teamseason.getStrength()
+		print attrition, imp, inviteStr
 
 		# top swimmers
 		topSwimmers = teamseason.getTopSwimmers(17)
@@ -766,7 +768,7 @@ class TeamStats():
 			(medtaper, stdtaper) = teamseason.getTaperStats(weeks=8)
 		else:
 			(medtaper, stdtaper) = 0, 0
-		#print medtaper, stdtaper
+		print medtaper, stdtaper
 
 		conf = teamseason.conference
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
