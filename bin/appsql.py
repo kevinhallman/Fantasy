@@ -816,10 +816,10 @@ class Powerscore():
 
 class PowerscoreJSON():
 	def GET(self):
-		form = web.input(gender=None, division=None, hundreths=None, event=None)
+		form = web.input(gender=None, division=None, hundredths=None, event=None)
 		setGenDiv(form.gender, form.division)
 
-		if not form.event or not int(form.hundreths) > 0:  # empty
+		if not form.event or not int(form.hundredths) > 0:  # empty
 			return {}
 
 		time = int(form.hundreths) / 100.0
