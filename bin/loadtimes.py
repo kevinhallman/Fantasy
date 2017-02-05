@@ -54,7 +54,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf]).*', swimFileName)
+		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
 			continue
 		div, year, gender = match.groups()
@@ -219,13 +219,13 @@ def deleteDups():
         'WHERE t.rnum > 1)').execute()
     '''
 
-def safeLoad():
+def safeLoad(year=17):
 	print 'loading teams...'
-	load(loadTeams=True)
+	load(loadTeams=True, loadyear=year)
 	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True)
+	load(loadMeets=True, loadSwimmers=True, loadyear=year)
 	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True)
+	load(loadTeamMeets=True, loadSwims=True, loadyear=year)
 
 def mergeTeams(sourceTeamId, targetTeamId):
 	sourceTeam = TeamSeason.get(id=sourceTeamId)
