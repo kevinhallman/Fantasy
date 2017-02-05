@@ -249,7 +249,7 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 				if tagNum == 1:
 					time = r[start: end]
 				elif tagNum == 2:
-					team = r[startd: end]
+					team = r[start: end]
 					nameEnd = r.find('</td>', place)
 					# print r[start: ]
 					name = r[start: nameEnd]

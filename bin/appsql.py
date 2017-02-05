@@ -41,7 +41,9 @@ urls = ('/', 'Home',
 	'/powerscore', 'Powerscore',
 	'/powerscoreJSON', 'PowerscoreJSON',
 	'/swimmer', 'Swimmerstats',
-	'/taper', 'Taper'
+	'/swimmerJSON', 'SwimmerstatsJSON',
+	'/taper', 'Taper',
+	'/taperJSON', 'TaperJSON'
 )
 
 def connection_processor(handler):
@@ -862,6 +864,34 @@ class Swimmerstats():
 
 		return render.swimmerstats(data=html, conferences=confList)
 
+class SwimmerstatsJSON():
+	def GET(self):
+		form = web.input(gender=None, division=None, name=None, num=20, season=None, conference=None)
+		setGenDiv(form.gender, form.division)
+		division = session.division
+		gender = session.gender
+		confList = sorted(conferences[division][gender].keys())
+		confList.remove('')
+
+		form.season = 2017
+		if not form.season:
+			return
+
+		if form.conference=='All':
+			form.conference = None
+
+		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
+										conference=form.conference)
+		swimmersJSON = {}
+
+		for idx, swimmer in enumerate(swimmers):
+			swimmersJSON[swimmer.name] = {'team': swimmer.team, 'rank': idx + 1, 'swims': {}}
+			swims = swimmer.getTaperSwims()
+			for swim in swims.values():
+				swimmersJSON[swimmer.name]['swims'][swim.event] = {'time': swim.time, 'powerpoints': str(round(swim.getPPTs()))}
+
+		return json.dumps(swimmersJSON)
+
 class Taper():
 	def GET(self):
 		form = web.input(conference=None, season=None, gender=None, division=None, toptime=None)
@@ -894,13 +924,48 @@ class Taper():
 						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
 						if taper < 0 or taper > 100 or isnan(taper):
 							taper = ''
-						#if taperstd < 0 or taperstd > 100 or isnan(taperstd):
-						#	taperstd = ''
 						tapers[team][week] = taper
 				except TeamSeason.DoesNotExist:
 					pass
 		table = googleLine(tapers, 'Week')
 		return render.taper(conferences=sorted(confList.keys()), table=table)
+
+class TaperJSON():
+	def GET(self):
+		form = web.input(conference=None, season=None, gender=None, division=None, toptime=None)
+		setGenDiv(form.gender, form.division)
+		division = session.division
+		gender = session.gender
+		confList = conferences[division][gender]
+
+		if form.toptime == 'Top Time':
+			toptime = True
+		else:
+			toptime = False  # use average times
+
+		if form.season in {'2016', '2015'}:
+			seasons = {int(form.season)}
+		else:
+			seasons = {2016}
+
+		if not form.conference or not (form.conference in confList):
+			return render.taper(conferences=sorted(confList.keys()), table=None)
+
+		tapers = {}
+		teams = confList[form.conference]
+		for team in teams:
+			tapers[team] = {}
+			for season in seasons:
+				try:
+					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
+					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
+						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
+						if taper < 0 or taper > 100 or isnan(taper):
+							taper = ''
+						tapers[team][week] = taper
+				except TeamSeason.DoesNotExist:
+					pass
+		return json.dumps(tapers)
 
 class teamMeets():
 	def GET(self):
@@ -1192,6 +1257,12 @@ def googleLine(teams, xaxis='Season'):
 				score = 0
 			line += ",{0}".format(score)
 		line += "],"
+
+		# deal with trailing commas (browsers don't like) add a zer
+		if line[-3:] == ',],':
+			line = line[:-3]
+			line += ',0],'
+
 		table.append(line)
 	return table
 
