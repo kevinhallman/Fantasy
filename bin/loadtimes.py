@@ -54,7 +54,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
+		match = re.search('(\D+)(\d+)([mf]).*', swimFileName)
 		if not match:
 			continue
 		div, year, gender = match.groups()
