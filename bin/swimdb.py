@@ -229,6 +229,9 @@ class TeamSeason(Model):
 
 	def getTaperStats(self, weeks=12, yearsback=1, toptime=True):
 		lastSeason = self.getPrevious(yearsBack=yearsback)
+
+		if not lastSeason:
+			return None, None
 		# underestimate taper by using later weeks
 		for stats in TeamStats.select().where(TeamStats.teamseasonid==lastSeason.id, TeamStats.week >= weeks)\
 				.limit(1).order_by(TeamStats.week):

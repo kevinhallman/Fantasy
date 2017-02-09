@@ -38,6 +38,7 @@ urls = ('/', 'Home',
 	'/preseason', 'SeasonRankings',
 	'/preseasonJSON', 'SeasonRankingsJSON',
 	'/teamstats/(.+)', 'TeamStats',
+	'/teamstatsJSON/(.+)', 'TeamStats',
 	'/powerscore', 'Powerscore',
 	'/powerscoreJSON', 'PowerscoreJSON',
 	'/swimmer', 'Swimmerstats',
@@ -777,6 +778,51 @@ class TeamStats():
 		conf = teamseason.conference
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
 
+class TeamStatsJSON():
+	def GET(self, team=None):
+		form = web.input(gender=None, division=None, season=2017)
+		season = form.season
+		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
+		setGenDiv(form.gender, form.division)
+		stats = {}
+		if not team:
+			return
+
+		try:
+			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
+										TeamSeason.season==season, TeamSeason.gender==session.gender)
+		except TeamSeason.DoesNotExist:
+			return
+
+		# team speed
+		winNats = round(teamseason.getWinnats(), 3) * 100
+		winConf = round(teamseason.getWinconf(), 3) * 100
+
+		# team development
+		try:
+			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
+			attrition = round(stats.attrition, 3)
+			imp = round(stats.improvement, 3)
+		except Team.DoesNotExist:
+			attrition = None
+			imp = None
+		inviteStr = teamseason.getStrength()
+
+		# top swimmers
+		topSwimmers = teamseason.getTopSwimmers(17)
+		swimTable = showTopSwimmers(topSwimmers)
+
+		if teamseason.getTaperStats(weeks=8):
+			(medtaper, stdtaper) = teamseason.getTaperStats(weeks=8)
+		else:
+			(medtaper, stdtaper) = 0, 0
+		print medtaper, stdtaper
+
+		conf = teamseason.conference
+		stats[team] = {'winnats': winNats, 'winconf': winConf, 'medtaper': medtaper, 'stdtaper': stdtaper,
+					   'strength': inviteStr, 'attrition': attrition, 'improvement': imp, 'topswimmers': topSwimmers}
+		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
+
 class Powerscore():
 	def GET(self):
 		form = web.input(gender=None, division=None, min=None, event=None, sec=None, hun=None, table=None,
@@ -888,7 +934,8 @@ class SwimmerstatsJSON():
 			swimmersJSON[swimmer.name] = {'team': swimmer.team, 'rank': idx + 1, 'swims': {}}
 			swims = swimmer.getTaperSwims()
 			for swim in swims.values():
-				swimmersJSON[swimmer.name]['swims'][swim.event] = {'time': swim.time, 'powerpoints': str(round(swim.getPPTs()))}
+				swimmersJSON[swimmer.name]['swims'][swim.event] = {'time': swimTime(swim.time), 'powerpoints': str(
+					round(swim.getPPTs()))}
 
 		return json.dumps(swimmersJSON)
 

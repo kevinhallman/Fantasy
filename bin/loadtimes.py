@@ -342,7 +342,7 @@ def fixConfs():
 					if swim.conference != conf:
 						swim.conference = conf
 						swim.save()
-						print 'fixed swim'
+						#print 'fixed swim'
 		except:
 			pass
 
@@ -432,7 +432,7 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
+	#safeLoad()
 	#deleteDupImprovement()
 	fixConfs()
 	#fixDivision()

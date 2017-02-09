@@ -986,17 +986,17 @@ D2	Women	16	Rocky Mountain Athletic	Colorado Mesa
 D2	Women	16	Rocky Mountain Athletic	WSCU
 D2	Women	16	Rocky Mountain Athletic	CSU-Pueblo
 D2	Women	16	Rocky Mountain Athletic	Oklahoma Baptist
-D3	Men	11	Heartland Collegiate	Franklin
-D3	Men	11	New Jersey Athletic	Ramapo
-D3	Men	11	New Jersey Athletic	Montclair St.
-D3	Men	11	New Jersey Athletic	WPUNJ
-D3	Men	11	New Jersey Athletic	Rowan
-D3	Men	11	New Jersey Athletic	TCNJ
+D3	Men	11	Liberal Arts	Franklin
+D3	Men	11	Metro	Ramapo
+D3	Men	11	Metro	Montclair St.
+D3	Men	11	Metro	WPUNJ
+D3	Men	11	Metro	Rowan
+D3	Men	11	Metro	TCNJ
 D3	Men	11	Southern Athletic Associa	Rhodes
 D3	Men	11	Southern Athletic Associa	Hendrix
 D3	Men	11	Southern Athletic Associa	Centre College
 D3	Men	11	Southern Athletic Associa	Sewanee
-D3	Men	11	Iowa Intercollegiate	Luther
+D3	Men	11	Liberal Arts	Luther
 D3	Men	11	University Athletic	Case Western
 D3	Men	11	University Athletic	Wash U. MO
 D3	Men	11	University Athletic	Chicago
@@ -1180,18 +1180,18 @@ D3	Men	11	Centennial	Dickinson
 D3	Men	11	Liberal Arts	Principia
 D3	Men	11	Liberal Arts	Coe
 D3	Men	11	Liberal Arts	Loras
-D3	Men	13	Heartland Collegiate	Franklin
-D3	Men	13	New Jersey Athletic	Ramapo
-D3	Men	13	New Jersey Athletic	Montclair St.
-D3	Men	13	New Jersey Athletic	WPUNJ
-D3	Men	13	New Jersey Athletic	Rowan
-D3	Men	13	New Jersey Athletic	TCNJ
+D3	Men	13	Liberal Arts	Franklin
+D3	Men	13	Metro	Ramapo
+D3	Men	13	Metro	Montclair St.
+D3	Men	13	Metro	WPUNJ
+D3	Men	13	Metro	Rowan
+D3	Men	13	Metro	TCNJ
 D3	Men	13	Southern Athletic Associa	Hendrix
 D3	Men	13	Southern Athletic Associa	Rhodes
 D3	Men	13	Southern Athletic Associa	Sewanee
 D3	Men	13	Southern Athletic Associa	Centre College
 D3	Men	13	Southern Athletic Associa	BSC
-D3	Men	13	Iowa Intercollegiate	Luther
+D3	Men	13	Liberal Arts	Luther
 D3	Men	13	University Athletic	Case Western
 D3	Men	13	University Athletic	Wash U. MO
 D3	Men	13	University Athletic	Chicago
@@ -1379,17 +1379,17 @@ D3	Men	13	Liberal Arts	Principia
 D3	Men	13	Liberal Arts	Coe
 D3	Men	13	Liberal Arts	Simpson
 D3	Men	13	Liberal Arts	Loras
-D3	Men	12	Heartland Collegiate	Franklin
-D3	Men	12	New Jersey Athletic	Ramapo
-D3	Men	12	New Jersey Athletic	Montclair St.
-D3	Men	12	New Jersey Athletic	WPUNJ
-D3	Men	12	New Jersey Athletic	Rowan
-D3	Men	12	New Jersey Athletic	TCNJ
+D3	Men	12	Liberal Arts	Franklin
+D3	Men	12	Metro	Ramapo
+D3	Men	12	Metro	Montclair St.
+D3	Men	12	Metro	WPUNJ
+D3	Men	12	Metro	Rowan
+D3	Men	12	Metro	TCNJ
 D3	Men	12	Southern Athletic Associa	Rhodes
 D3	Men	12	Southern Athletic Associa	Hendrix
 D3	Men	12	Southern Athletic Associa	Centre College
 D3	Men	12	Southern Athletic Associa	Sewanee
-D3	Men	12	Iowa Intercollegiate	Luther
+D3	Men	12	Liberal Arts	Luther
 D3	Men	12	University Athletic	Case Western
 D3	Men	12	University Athletic	Wash U. MO
 D3	Men	12	University Athletic	Chicago
@@ -1577,20 +1577,20 @@ D3	Men	12	Liberal Arts	Principia
 D3	Men	12	Liberal Arts	Coe
 D3	Men	12	Liberal Arts	Simpson
 D3	Men	12	Liberal Arts	Loras
-D3	Men	15	Heartland Collegiate	Franklin
-D3	Men	15	New Jersey Athletic	Ramapo
-D3	Men	15	New Jersey Athletic	Montclair St.
-D3	Men	15	New Jersey Athletic	WPUNJ
-D3	Men	15	New Jersey Athletic	Rowan
-D3	Men	15	New Jersey Athletic	TCNJ
+D3	Men	15	Liberal Arts	Franklin
+D3	Men	15	Metro	Ramapo
+D3	Men	15	Metro	Montclair St.
+D3	Men	15	Metro	WPUNJ
+D3	Men	15	Metro	Rowan
+D3	Men	15	Metro	TCNJ
 D3	Men	15	Southern Athletic Associa	Hendrix
 D3	Men	15	Southern Athletic Associa	Centre College
 D3	Men	15	Southern Athletic Associa	Rhodes
 D3	Men	15	Southern Athletic Associa	Berry
 D3	Men	15	Southern Athletic Associa	Sewanee
 D3	Men	15	Southern Athletic Associa	BSC
-D3	Men	15	Iowa Intercollegiate	Luther
-D3	Men	15	Iowa Intercollegiate	Neb Wesleyan
+D3	Men	15	Liberal Arts	Luther
+D3	Men	15	Liberal Arts	Neb Wesleyan
 D3	Men	15	University Athletic	Case Western
 D3	Men	15	University Athletic	Rochester
 D3	Men	15	University Athletic	Emory
@@ -1793,19 +1793,19 @@ D3	Men	15	Liberal Arts	Principia
 D3	Men	15	Liberal Arts	Coe
 D3	Men	15	Liberal Arts	Simpson
 D3	Men	15	Liberal Arts	Loras
-D3	Men	14	Heartland Collegiate	Franklin
-D3	Men	14	New Jersey Athletic	Ramapo
-D3	Men	14	New Jersey Athletic	Montclair St.
-D3	Men	14	New Jersey Athletic	WPUNJ
-D3	Men	14	New Jersey Athletic	Rowan
-D3	Men	14	New Jersey Athletic	TCNJ
+D3	Men	14	Liberal Arts	Franklin
+D3	Men	14	Metro	Ramapo
+D3	Men	14	Metro	Montclair St.
+D3	Men	14	Metro	WPUNJ
+D3	Men	14	Metro	Rowan
+D3	Men	14	Metro	TCNJ
 D3	Men	14	Southern Athletic Associa	Hendrix
 D3	Men	14	Southern Athletic Associa	Centre College
 D3	Men	14	Southern Athletic Associa	Rhodes
 D3	Men	14	Southern Athletic Associa	Berry
 D3	Men	14	Southern Athletic Associa	Sewanee
 D3	Men	14	Southern Athletic Associa	BSC
-D3	Men	14	Iowa Intercollegiate	Luther
+D3	Men	14	Liberal Arts	Luther
 D3	Men	14	University Athletic	Case Western
 D3	Men	14	University Athletic	Rochester
 D3	Men	14	University Athletic	Chicago
@@ -1999,20 +1999,20 @@ D3	Men	14	Liberal Arts	Principia
 D3	Men	14	Liberal Arts	Coe
 D3	Men	14	Liberal Arts	Simpson
 D3	Men	14	Liberal Arts	Loras
-D3	Men	17	Heartland Collegiate	Franklin
-D3	Men	17	New Jersey Athletic	Ramapo
-D3	Men	17	New Jersey Athletic	Montclair St.
-D3	Men	17	New Jersey Athletic	WPUNJ
-D3	Men	17	New Jersey Athletic	Rowan
-D3	Men	17	New Jersey Athletic	TCNJ
+D3	Men	17	Liberal Arts	Franklin
+D3	Men	17	Metro	Ramapo
+D3	Men	17	Metro	Montclair St.
+D3	Men	17	Metro	WPUNJ
+D3	Men	17	Metro	Rowan
+D3	Men	17	Metro	TCNJ
 D3	Men	17	Southern Athletic Associa	Hendrix
 D3	Men	17	Southern Athletic Associa	Centre College
 D3	Men	17	Southern Athletic Associa	Rhodes
 D3	Men	17	Southern Athletic Associa	Berry
 D3	Men	17	Southern Athletic Associa	Sewanee
 D3	Men	17	Southern Athletic Associa	BSC
-D3	Men	17	Iowa Intercollegiate	Luther
-D3	Men	17	Iowa Intercollegiate	Neb Wesleyan
+D3	Men	17	Liberal Arts	Luther
+D3	Men	17	Liberal Arts	Neb Wesleyan
 D3	Men	17	University Athletic	Case Western
 D3	Men	17	University Athletic	Rochester
 D3	Men	17	University Athletic	Emory
@@ -2217,20 +2217,20 @@ D3	Men	17	Liberal Arts	Principia
 D3	Men	17	Liberal Arts	Coe
 D3	Men	17	Liberal Arts	Simpson
 D3	Men	17	Liberal Arts	Loras
-D3	Men	16	Heartland Collegiate	Franklin
-D3	Men	16	New Jersey Athletic	Ramapo
-D3	Men	16	New Jersey Athletic	Montclair St.
-D3	Men	16	New Jersey Athletic	WPUNJ
-D3	Men	16	New Jersey Athletic	Rowan
-D3	Men	16	New Jersey Athletic	TCNJ
+D3	Men	16	Liberal Arts	Franklin
+D3	Men	16	Metro	Ramapo
+D3	Men	16	Metro	Montclair St.
+D3	Men	16	Metro	WPUNJ
+D3	Men	16	Metro	Rowan
+D3	Men	16	Metro	TCNJ
 D3	Men	16	Southern Athletic Associa	Hendrix
 D3	Men	16	Southern Athletic Associa	Centre College
 D3	Men	16	Southern Athletic Associa	Rhodes
 D3	Men	16	Southern Athletic Associa	Berry
 D3	Men	16	Southern Athletic Associa	Sewanee
 D3	Men	16	Southern Athletic Associa	BSC
-D3	Men	16	Iowa Intercollegiate	Luther
-D3	Men	16	Iowa Intercollegiate	Neb Wesleyan
+D3	Men	16	Liberal Arts	Luther
+D3	Men	16	Liberal Arts	Neb Wesleyan
 D3	Men	16	University Athletic	Case Western
 D3	Men	16	University Athletic	Rochester
 D3	Men	16	University Athletic	Chicago
@@ -2433,17 +2433,17 @@ D3	Men	16	Liberal Arts	Principia
 D3	Men	16	Liberal Arts	Coe
 D3	Men	16	Liberal Arts	Simpson
 D3	Men	16	Liberal Arts	Loras
-D3	Women	11	Heartland Collegiate	Franklin
-D3	Women	11	New Jersey Athletic	Ramapo
-D3	Women	11	New Jersey Athletic	Montclair St.
-D3	Women	11	New Jersey Athletic	WPUNJ
-D3	Women	11	New Jersey Athletic	Rowan
-D3	Women	11	New Jersey Athletic	TCNJ
+D3	Women	11	Liberal Arts	Franklin
+D3	Women	11	Metro	Ramapo
+D3	Women	11	Metro	Montclair St.
+D3	Women	11	Metro	WPUNJ
+D3	Women	11	Metro	Rowan
+D3	Women	11	Metro	TCNJ
 D3	Women	11	Southern Athletic Associa	Rhodes
 D3	Women	11	Southern Athletic Associa	Hendrix
 D3	Women	11	Southern Athletic Associa	Centre College
 D3	Women	11	Southern Athletic Associa	Sewanee
-D3	Women	11	Iowa Intercollegiate	Luther
+D3	Women	11	Liberal Arts	Luther
 D3	Women	11	University Athletic	Case Western
 D3	Women	11	University Athletic	Wash U. MO
 D3	Women	11	University Athletic	Chicago
@@ -2655,18 +2655,18 @@ D3	Women	11	Centennial	Dickinson
 D3	Women	11	Liberal Arts	Principia
 D3	Women	11	Liberal Arts	Coe
 D3	Women	11	Liberal Arts	Loras
-D3	Women	13	Heartland Collegiate	Franklin
-D3	Women	13	New Jersey Athletic	Ramapo
-D3	Women	13	New Jersey Athletic	Montclair St.
-D3	Women	13	New Jersey Athletic	WPUNJ
-D3	Women	13	New Jersey Athletic	Rowan
-D3	Women	13	New Jersey Athletic	TCNJ
+D3	Women	13	Liberal Arts	Franklin
+D3	Women	13	Metro	Ramapo
+D3	Women	13	Metro	Montclair St.
+D3	Women	13	Metro	WPUNJ
+D3	Women	13	Metro	Rowan
+D3	Women	13	Metro	TCNJ
 D3	Women	13	Southern Athletic Associa	Hendrix
 D3	Women	13	Southern Athletic Associa	Rhodes
 D3	Women	13	Southern Athletic Associa	Sewanee
 D3	Women	13	Southern Athletic Associa	Centre College
 D3	Women	13	Southern Athletic Associa	BSC
-D3	Women	13	Iowa Intercollegiate	Luther
+D3	Women	13	Liberal Arts	Luther
 D3	Women	13	University Athletic	Case Western
 D3	Women	13	University Athletic	Rochester
 D3	Women	13	University Athletic	Chicago
@@ -2883,17 +2883,17 @@ D3	Women	13	Liberal Arts	Principia
 D3	Women	13	Liberal Arts	Coe
 D3	Women	13	Liberal Arts	Loras
 D3	Women	13	Liberal Arts	Simpson
-D3	Women	12	Heartland Collegiate	Franklin
-D3	Women	12	New Jersey Athletic	Ramapo
-D3	Women	12	New Jersey Athletic	Montclair St.
-D3	Women	12	New Jersey Athletic	WPUNJ
-D3	Women	12	New Jersey Athletic	Rowan
-D3	Women	12	New Jersey Athletic	TCNJ
+D3	Women	12	Liberal Arts	Franklin
+D3	Women	12	Metro	Ramapo
+D3	Women	12	Metro	Montclair St.
+D3	Women	12	Metro	WPUNJ
+D3	Women	12	Metro	Rowan
+D3	Women	12	Metro	TCNJ
 D3	Women	12	Southern Athletic Associa	Rhodes
 D3	Women	12	Southern Athletic Associa	Hendrix
 D3	Women	12	Southern Athletic Associa	Centre College
 D3	Women	12	Southern Athletic Associa	Sewanee
-D3	Women	12	Iowa Intercollegiate	Luther
+D3	Women	12	Liberal Arts	Luther
 D3	Women	12	University Athletic	Case Western
 D3	Women	12	University Athletic	Wash U. MO
 D3	Women	12	University Athletic	Chicago
@@ -3113,20 +3113,20 @@ D3	Women	12	Liberal Arts	Principia
 D3	Women	12	Liberal Arts	Coe
 D3	Women	12	Liberal Arts	Simpson
 D3	Women	12	Liberal Arts	Loras
-D3	Women	15	Heartland Collegiate	Franklin
-D3	Women	15	New Jersey Athletic	Ramapo
-D3	Women	15	New Jersey Athletic	Montclair St.
-D3	Women	15	New Jersey Athletic	WPUNJ
-D3	Women	15	New Jersey Athletic	Rowan
-D3	Women	15	New Jersey Athletic	TCNJ
+D3	Women	15	Liberal Arts	Franklin
+D3	Women	15	Metro	Ramapo
+D3	Women	15	Metro	Montclair St.
+D3	Women	15	Metro	WPUNJ
+D3	Women	15	Metro	Rowan
+D3	Women	15	Metro	TCNJ
 D3	Women	15	Southern Athletic Associa	Hendrix
 D3	Women	15	Southern Athletic Associa	Centre College
 D3	Women	15	Southern Athletic Associa	Rhodes
 D3	Women	15	Southern Athletic Associa	Berry
 D3	Women	15	Southern Athletic Associa	Sewanee
 D3	Women	15	Southern Athletic Associa	BSC
-D3	Women	15	Iowa Intercollegiate	Luther
-D3	Women	15	Iowa Intercollegiate	Neb Wesleyan
+D3	Women	15	Liberal Arts	Luther
+D3	Women	15	Liberal Arts	Neb Wesleyan
 D3	Women	15	University Athletic	Case Western
 D3	Women	15	University Athletic	Rochester
 D3	Women	15	University Athletic	Chicago
@@ -3360,19 +3360,19 @@ D3	Women	15	Liberal Arts	Principia
 D3	Women	15	Liberal Arts	Coe
 D3	Women	15	Liberal Arts	Simpson
 D3	Women	15	Liberal Arts	Loras
-D3	Women	14	Heartland Collegiate	Franklin
-D3	Women	14	New Jersey Athletic	Ramapo
-D3	Women	14	New Jersey Athletic	Montclair St.
-D3	Women	14	New Jersey Athletic	WPUNJ
-D3	Women	14	New Jersey Athletic	Rowan
-D3	Women	14	New Jersey Athletic	TCNJ
+D3	Women	14	Liberal Arts	Franklin
+D3	Women	14	Metro	Ramapo
+D3	Women	14	Metro	Montclair St.
+D3	Women	14	Metro	WPUNJ
+D3	Women	14	Metro	Rowan
+D3	Women	14	Metro	TCNJ
 D3	Women	14	Southern Athletic Associa	Hendrix
 D3	Women	14	Southern Athletic Associa	Centre College
 D3	Women	14	Southern Athletic Associa	Rhodes
 D3	Women	14	Southern Athletic Associa	Berry
 D3	Women	14	Southern Athletic Associa	Sewanee
 D3	Women	14	Southern Athletic Associa	BSC
-D3	Women	14	Iowa Intercollegiate	Luther
+D3	Women	14	Liberal Arts	Luther
 D3	Women	14	University Athletic	Case Western
 D3	Women	14	University Athletic	Rochester
 D3	Women	14	University Athletic	Chicago
@@ -3600,20 +3600,20 @@ D3	Women	14	Liberal Arts	Principia
 D3	Women	14	Liberal Arts	Coe
 D3	Women	14	Liberal Arts	Loras
 D3	Women	14	Liberal Arts	Simpson
-D3	Women	17	Heartland Collegiate	Franklin
-D3	Women	17	New Jersey Athletic	Ramapo
-D3	Women	17	New Jersey Athletic	Montclair St.
-D3	Women	17	New Jersey Athletic	WPUNJ
-D3	Women	17	New Jersey Athletic	Rowan
-D3	Women	17	New Jersey Athletic	TCNJ
+D3	Women	17	Liberal Arts	Franklin
+D3	Women	17	Metro	Ramapo
+D3	Women	17	Metro	Montclair St.
+D3	Women	17	Metro	WPUNJ
+D3	Women	17	Metro	Rowan
+D3	Women	17	Metro	TCNJ
 D3	Women	17	Southern Athletic Associa	Hendrix
 D3	Women	17	Southern Athletic Associa	Centre College
 D3	Women	17	Southern Athletic Associa	Rhodes
 D3	Women	17	Southern Athletic Associa	Berry
 D3	Women	17	Southern Athletic Associa	Sewanee
 D3	Women	17	Southern Athletic Associa	BSC
-D3	Women	17	Iowa Intercollegiate	Luther
-D3	Women	17	Iowa Intercollegiate	Neb Wesleyan
+D3	Women	17	Liberal Arts	Luther
+D3	Women	17	Liberal Arts	Neb Wesleyan
 D3	Women	17	University Athletic	Case Western
 D3	Women	17	University Athletic	Rochester
 D3	Women	17	University Athletic	Emory
@@ -3847,20 +3847,20 @@ D3	Women	17	Liberal Arts	Principia
 D3	Women	17	Liberal Arts	Coe
 D3	Women	17	Liberal Arts	Simpson
 D3	Women	17	Liberal Arts	Loras
-D3	Women	16	Heartland Collegiate	Franklin
-D3	Women	16	New Jersey Athletic	Ramapo
-D3	Women	16	New Jersey Athletic	Montclair St.
-D3	Women	16	New Jersey Athletic	WPUNJ
-D3	Women	16	New Jersey Athletic	Rowan
-D3	Women	16	New Jersey Athletic	TCNJ
+D3	Women	16	Liberal Arts	Franklin
+D3	Women	16	Metro	Ramapo
+D3	Women	16	Metro	Montclair St.
+D3	Women	16	Metro	WPUNJ
+D3	Women	16	Metro	Rowan
+D3	Women	16	Metro	TCNJ
 D3	Women	16	Southern Athletic Associa	Hendrix
 D3	Women	16	Southern Athletic Associa	Centre College
 D3	Women	16	Southern Athletic Associa	Rhodes
 D3	Women	16	Southern Athletic Associa	Berry
 D3	Women	16	Southern Athletic Associa	Sewanee
 D3	Women	16	Southern Athletic Associa	BSC
-D3	Women	16	Iowa Intercollegiate	Luther
-D3	Women	16	Iowa Intercollegiate	Neb Wesleyan
+D3	Women	16	Liberal Arts	Luther
+D3	Women	16	Liberal Arts	Neb Wesleyan
 D3	Women	16	University Athletic	Case Western
 D3	Women	16	University Athletic	Rochester
 D3	Women	16	University Athletic	Chicago
