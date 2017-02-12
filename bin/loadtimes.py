@@ -432,7 +432,7 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad()
+	safeLoad()
 	#deleteDupImprovement()
 	fixConfs()
 	#fixDivision()
