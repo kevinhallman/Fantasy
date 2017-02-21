@@ -580,12 +580,13 @@ class RankingsJSON():
 
 		teams = confList[form.conference]
 		for team in teams:
-			scores[team] = {}
 			for season in seasons:
 				try:
 					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
 					strength = teamseason.getStrength(invite=invite)
 					if strength > 0:
+						if not team in scores:
+							scores[team] = {}
 						scores[team][season] = strength
 				except TeamSeason.DoesNotExist:
 					pass
