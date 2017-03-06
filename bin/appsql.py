@@ -13,7 +13,7 @@ from math import isnan
 
 from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist, db
 from clubdb import Clubswim, convert, getSkewDist
-from culbdb import db as clubdb
+from clubdb import db as clubdb
 from clubScraper import eventsSCY
 from operator import itemgetter
 import time as Time
