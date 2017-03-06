@@ -581,11 +581,9 @@ def safeImport(age=17, year=2016):
 	importSwims(loadSwims=True, loadage=age, year=year)
 
 if __name__== '__main__':
-	'''
 	db.drop_tables([Clubswim])
 	db.drop_tables([Clubswimmer])
 	db.drop_tables([Clubteam])
-	'''
 	db.create_tables([Clubteam])
 	db.create_tables([Clubswimmer])
 	db.create_tables([Clubswim])
