@@ -1,0 +1,70 @@
+$def with(events, time, table)
+
+<h1>
+	Age Group Time Converter
+</h1>
+
+<p>
+	Convert times from one course to another or simulate improvement by choosing different ages.
+</p>
+
+<script type="text/javascript">
+\$(document).ready(function() {
+	\$('[type="submit"]').click(function (evt) {
+    	\$(this.form).data('submitted', this.value);
+	});
+});
+</script>
+
+<form method="GET" class="ajax" name="convert">
+	<select name="event">
+		<option>Event</option>
+		$for event in events:
+			<option> $event </option>
+	</select>
+	<br>
+
+	<select name="fromcourse">
+		<option> From Course </option>
+		<option> LCM </option>
+		<option> SCY </option>
+	</select>
+
+	<select name="tocourse">
+		<option> To Course </option>
+		<option> LCM </option>
+		<option> SCY </option>
+	</select>
+	<br>
+
+	From age:
+	<select name="fromage">
+		$for i in range(8, 19)
+			<option> $i </option>
+	</select>
+
+	To age:
+	<select name="toage">
+		$for i in range(8, 19)
+			<option> $i </option>
+	</select>
+	<br>
+
+	<input name="min" type="text" value="0" size="2" maxlength="2"/>:
+	<input name="sec" type="text" value="00" size="2" maxlength="2"/>.
+	<input name="hun" type="text" value="00" size="2" maxlength="2"/>
+	<br>
+	<!--<input id="Calc" type="submit" name="test" value="Calculate">-->
+	<input id="table" type="submit" name="submit" value="Table">
+	<input id="Calc" type="submit" name="submit" value="Calculate">
+</form>
+
+<div id="results">
+
+$if time:
+	Time: $time
+
+$if table:
+	$:table
+
+</div>

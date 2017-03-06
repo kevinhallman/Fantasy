@@ -777,6 +777,8 @@ class Swim(Model):
 
 	def taper(self, weeks, noise=0):
 		taper, taperStd = self.swimmer.teamid.getTaperStats(weeks=weeks)
+		if not taper:
+			taper = .03
 		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
 		self.scoreTime = self.time - self.time * taper / 100.0 + self.time * noise
 
@@ -1282,6 +1284,9 @@ class TempMeet:
 
 	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
 						weeksOut=4):
+		# need to include taper by teams
+		weeksIn = 16 - weeksOut
+		self.taper(weeksIn)
 		# default the sigma if we just know the date
 		if weeksOut == -1:
 			sigma = 0.045
@@ -1303,9 +1308,9 @@ class TempMeet:
 			sigma = 0.0375
 
 		events = self.getEvents(events)
-		#print teamSigma, sigma, weeksOut
+		# print teamSigma, sigma, weeksOut
 
-		for event in self.eventSwims:  # Assign scores to the swims
+		for event in self.eventSwims:  # assign scores to the swims
 			if not event in events and self.eventSwims[event]:  # set score of those not being swum to zero
 				for swim in self.eventSwims[event]:
 					swim.score = 0
@@ -1323,10 +1328,10 @@ class TempMeet:
 						teamNoise = teamTapers[swim.team] * swim.getTaperTime()
 						swim.scoreTime = swim.getTaperTime() + noise + teamNoise
 
-			#place again
+			# place again
 			self.place(events)
 
-			#now score
+			# now score
 			self.assignPoints(dual=dual, heats=heats, heatSize=heatSize, events=events)
 
 			teamScoresDist.append(self.teamScores(events))
@@ -1338,7 +1343,7 @@ class TempMeet:
 				if not team in places:
 					places[team] = []
 				places[team].append(idx)
-		#print places
+		# print places
 
 		probMatrix = {}
 		for team in places:

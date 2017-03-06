@@ -53,7 +53,6 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 	RStroke='6'
 	if RelInd=='rbRelay':
 		RDistance = Distance
-		Distance = '50'
 	else:
 		RDistance = '200'
 	DateType = 'rbNamedDateRange'
@@ -232,7 +231,10 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 				timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
 
 			if timeString not in oldTimes:
-				File.write(timeString)
+				try:
+					File.write(timeString)
+				except UnicodeEncodeError:
+					print 'Error:', timeString
 	elif RelInd=='rbRelay':
 		while place>0:
 			place = r.find('ctl82_dgRelaySearchResults_lblSwimTimeFormatted', place+1, responseEnd)  # find time
@@ -265,26 +267,37 @@ def getTopTimes(File, Conference="", Team='radAllTeam', Date='30', Distance='50'
 			num += 1
 			timeString = meet+'\t'+date+'\t'+name+'\t'+''+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
 			if timeString not in oldTimes:
-				File.write(timeString)
+				try:
+					File.write(timeString)
+				except UnicodeEncodeError:
+					print 'Error:', timeString
 	return num
 
-def getConfs(confFile='./data/conferences.txt'):
-	confDiv = {}
-	with open(confFile,'r') as confs:
-		for line in confs:
+def getNewConfs():
+	confTeams = {}
+	with open('data/newconferences.txt', 'r') as file:
+		for line in file:
 			parts = re.split('\t', line.strip())
 			division = parts[0]
-			conf = parts[1]
-			team = parts[2]
-			if not conf in confDiv:
-				confDiv[conf] = division
-	return confDiv
+			gender = parts[1]
+			year = '20' + parts[2]
+			conf = parts[3]
+			team = parts[4]
+			if not division in confTeams:
+				confTeams[division] = {}
+			if not gender in confTeams[division]:
+				confTeams[division][gender] = {}
+			if not year in confTeams[division][gender]:
+				confTeams[division][gender][year] = {}
+			if not conf in confTeams[division][gender][year]:
+				confTeams[division][gender][year][team] = conf
+	return confTeams
 
 def topTimesLoop():
-	confDiv = getConfs()
-	genders = ['m', 'f']
+	confDiv = getNewConfs()
+	genders = ['f', 'm']
 	#genders = ['f']
-	divisions = ['DIII', 'DII', 'DI']
+	divisions = ['DI', 'DII', 'DIII']
 	#divisions = ['DI']
 	distances = {}
 	distances['FL'] = [100, 200]
@@ -320,16 +333,14 @@ def topTimesLoop():
 
 				# move last load's new times into old file
 				if os.path.exists(filePath):
-					with open(oldFilePath, 'a') as outfile:
-						with open(filePath, 'r') as infile:
+					with open(oldFilePath, 'a+') as infile:
+						with open(filePath, 'r') as outfile:
 							for line in infile:
-								if line not in oldTimes:
-									outfile.write(line)
-									oldTimes.add(line)
+								outfile.write(line)
+								oldTimes.add(line)
 					os.remove(filePath)
 
-
-				with open(filePath, 'w+', 1) as meetFile:
+				with open(filePath, 'w+') as meetFile:
 					for conference in conferences:
 						if conference == '':
 							confName = 'all'
@@ -343,7 +354,7 @@ def topTimesLoop():
 
 								# now find the times and load them into the new file if they aren't in the old
 								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
-											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
+											Stroke=stroke, Gender=gender, Conference=conference, BestAll='best',
 												  Number=7000, oldTimes=oldTimes)
 
 def getConferenceData():
@@ -387,7 +398,7 @@ def getConferenceData():
 								# now find the times and load them into the new file if they aren't in the old
 								print conference
 								print getTopTimes(File=meetFile, Date=year+' '+division, Distance=distance,
-											Stroke=stroke, Gender=gender, Conference=conference, BestAll='all',
+											Stroke=stroke, Gender=gender, Conference=conference, BestAll='best',
 												  Number=7000, oldTimes=set(), printConf=True)
 
 def storeConfs():

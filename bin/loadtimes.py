@@ -1,5 +1,5 @@
 import time as Time
-from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, getConfs, Meet, seasonString, TeamStats, Improvement
+from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, Meet, seasonString, TeamStats, Improvement
 import re
 import os
 import urlparse
