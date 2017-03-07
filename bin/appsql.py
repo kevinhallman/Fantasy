@@ -1108,21 +1108,13 @@ class Timeconvert():
 				fromevent = '400 Free'
 			else:
 				fromevent = '500 Free'
-			if 'M' in form.tocourse:
-				toevent = '400 Free'
-			else:
-				toevent = '500 Free'
 		elif form.event == '1500/1650 Free':
 			if 'M' in form.fromcourse:
 				fromevent = '1500 Free'
 			else:
 				fromevent = '1650 Free'
-			if 'M' in form.tocourse:
-				toevent = '1500 Free'
-			else:
-				toevent = '1650 Free'
 		else:
-			fromevent = toevent = form.event
+			fromevent = form.event
 
 		if time == 0 or form.submit=='Table':  # get table if no time or button hit
 			html = '<table>'
@@ -1132,7 +1124,7 @@ class Timeconvert():
 				time = round(frozen.ppf(float(i)/ 100.0), 2)
 				fromtime = swimTime(time)
 				totime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
-						toCourse=form.tocourse, gender=form.gender, event=toevent, toage=form.toage, time=time))
+						toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
 				html += '<tr><td>' + fromtime + '</td><td>' + totime + '</td></tr>'
 			html += '</table>'
 
@@ -1140,7 +1132,7 @@ class Timeconvert():
 
 		# otherwise return the points
 		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
-					toCourse=form.tocourse, gender=form.gender, event=form.event, toage=form.toage, time=time))
+					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
 		return render.timeconvert(events=events, time=newtime, table=None)
 
 class TimeconvertJSON():

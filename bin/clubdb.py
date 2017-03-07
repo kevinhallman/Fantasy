@@ -118,7 +118,7 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 		toage = age
 
 	# align events
-	if fromCourse=='SCY' and (fromCourse=='SCM' or fromCourse=='LCM'):
+	if fromCourse=='SCY' and (toCourse=='SCM' or toCourse=='LCM'):
 		if event=='500 Free':
 			toevent = '400 Free'
 		elif event=='1650 Free':
