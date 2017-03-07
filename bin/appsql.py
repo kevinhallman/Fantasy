@@ -189,7 +189,6 @@ class Swimulate():
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 		
 		else:
-			#print formMeets.values()
 			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:

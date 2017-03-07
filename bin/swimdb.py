@@ -1283,10 +1283,11 @@ class TempMeet:
 							place += 1
 
 	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
-						weeksOut=4):
+						weeksOut=4, taper=False):
 		# need to include taper by teams
 		weeksIn = 16 - weeksOut
-		self.taper(weeksIn)
+		if taper:
+			self.taper(weeksIn)
 		# default the sigma if we just know the date
 		if weeksOut == -1:
 			sigma = 0.045
@@ -1415,13 +1416,13 @@ class TempMeet:
 		return self.scores[0][0]
 
 	# update stored win probabilities
-	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False):
+	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False, taper=True):
 		weeksOut = 16 - weeksIn
 		date = week2date(weeksIn, season)
 		if nextYear:
 			weeksOut = '-1'
 			weeksIn = '-1'
-		self.scoreMonteCarlo(weeksOut=weeksOut)
+		self.scoreMonteCarlo(weeksOut=weeksOut, taper=taper)
 		teamProb = self.getWinProb()
 		print teamProb
 		for team in teamProb:
