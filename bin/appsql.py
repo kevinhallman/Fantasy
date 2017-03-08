@@ -346,7 +346,6 @@ class ConfJSON():
 		web.header("Content-Type", "application/json")
 		division = form.division
 		gender = form.gender
-		confList = conferences[division][gender]
 
 		if form.conference is None:
 			return {}
@@ -1028,6 +1027,7 @@ class TaperJSON():
 						tapers[team][week] = taper
 				except TeamSeason.DoesNotExist:
 					pass
+		print tapers
 		return json.dumps(tapers)
 
 class Clubppt():
