@@ -990,6 +990,7 @@ class Taper():
 				except TeamSeason.DoesNotExist:
 					pass
 		table = googleLine(tapers, 'Week')
+		print table
 		return render.taper(conferences=sorted(confList.keys()), table=table)
 
 class TaperJSON():
