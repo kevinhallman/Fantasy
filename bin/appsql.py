@@ -1021,6 +1021,7 @@ class TaperJSON():
 				try:
 					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
 					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
+						tapers[team][week] = ''
 						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
 						print team, week, taper
 						if taper < 0 or taper > 100 or isnan(taper):
