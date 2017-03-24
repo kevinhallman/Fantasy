@@ -23,6 +23,7 @@ eventOrderInd = ["50 Yard Freestyle","100 Yard Freestyle","200 Yard Freestyle","
 
 urls = ('/', 'Home',
 	'/home', 'Home',
+	'/static/(.*)', 'Static',
 	'/swimulate', 'Swimulate',
 	'/swimulateJSON', 'SwimulateJSON',
 	'/conference', 'Conf',
@@ -136,6 +137,14 @@ def setGenDiv(gender, division):
 		raise web.seeother(web.http.changequery(gender=session.gender))
 	if division is None:
 		raise web.seeother(web.http.changequery(division=session.division))
+
+class Static():
+	def GET(self, filename):
+		try:
+			f = open('static/' + filename, 'r')
+			return f.read()
+		except:
+			return
 
 class Home():
 	def GET(self):
