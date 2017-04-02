@@ -119,7 +119,10 @@ def getSkewDist(gender, division, event):
 
 '''make time look nice'''
 def swimTime(time):
-	(seconds, point) = re.split("\.", str(time))
+	parts = re.split("\.", str(time))
+	if not len(parts)==2:
+		return time
+	(seconds, point) = parts[0], parts[1]
 	if int(seconds) < 60:
 		time = round(time, 2)
 		time = str(time)

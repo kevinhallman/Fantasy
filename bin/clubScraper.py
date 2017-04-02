@@ -160,7 +160,7 @@ if __name__ == "__main__":
 	driver = init_driver()
 	years = ['2016']#, '2015']  # ['2013', '2012']
 	genders = ['M', 'F']
-	course = 'SCM'
+	course = 'LCM'
 	if course=='SCY':
 		events = eventsSCY
 	elif course=='SCM':
@@ -169,8 +169,10 @@ if __name__ == "__main__":
 		events = eventsLCM
 
 	#events = ['100 Free']
-	zones = ['1', '2', '3', '4']
-	ages = range(12, 18)
+	#zones = ['1', '2', '3', '4']
+	zones = ['All']
+	#ages = range(22, 30)
+	ages = ['22-30']
 
 	for gender in genders:
 		for event in events:
@@ -196,7 +198,7 @@ if __name__ == "__main__":
 						with open(filepath, 'a+') as meetFile:
 							try:
 								lookup(driver, event=event, courseStr=course, gender=gender, year=year, File=meetFile,
-							   		minAge=str(age), maxAge=str(age), zone=zone, oldTimes=oldTimes)
+							   		minAge='22', maxAge='30', zone=None, oldTimes=oldTimes)
 							except:
 								print 'Error'
 							finally:

@@ -1,39 +1,33 @@
 $def with(events)
 
 <h1>
-	Time Converter
+	Age/Time Converter
 </h1>
 
 <p>
-	Convert times from one course to another or simulate improvement by choosing different ages.
+	Convert times from age group to an equivalently ranked time for another age group.
 </p>
 
 <form method="GET" id="convert">
 	<select name="event">
-		<option>Event</option>
 		$for event in events:
 			<option> $event </option>
 	</select>
 	<br>
 
 	<select name="fromcourse">
-		<option> From Course </option>
 		<option> LCM </option>
-		<option> SCM </option>
 		<option> SCY </option>
 	</select>
 
-	<select name="tocourse">
-		<option> To Course </option>
-		<option> LCM </option>
-		<option> SCM </option>
-		<option> SCY </option>
-	</select>
-	<br>
-
-	Age:
 	<select name="fromage">
-		$for i in range(8, 23)
+		<option>From age</option>
+		$for i in range(8, 19)
+			<option> $i </option>
+	</select>
+	<select name="toage">
+		<option>To age</option>
+		$for i in range(8, 19)
 			<option> $i </option>
 	</select>
 	<br>

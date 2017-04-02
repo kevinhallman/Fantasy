@@ -5,7 +5,7 @@ from datetime import date as Date
 import time as Time
 import urlparse
 from playhouse.migrate import *
-from swimdb import toTime, swimTime
+from swimdb import toTime, swimTime, Swim
 from scipy.stats import norm, skewnorm
 #import matplotlib.pyplot as plt
 import numpy as np
@@ -13,13 +13,7 @@ import numpy as np
 from math import log
 from sympy import binomial
 import heapq
-
-allevents = ['1650 Free', '1500 Free', '1000 Free', '800 Free', '500 Free', '400 Free', '200 Free', '100 Free',
-			 '50 Free',
-				'50 Fly', '100 Fly', '200 Fly',
-				'50 Back', '100 Back', '200 Back',
-				'50 Breast', '100 Breast', '200 Breast',
-				'100 IM', '200 IM', '400 IM']
+from events import eventsSCY, allEventsSCY, allevents, eventConvert, SCMfactor, eventtoSCY
 
 #  setup database
 urlparse.uses_netloc.append("postgres")
@@ -70,24 +64,61 @@ def getSkewCDF(gender, age, event, course='LCM', percent=1.0):
 	return frozen
 
 
-def getSkewDist(gender, age, event, course='LCM'):
+def getSkewDist(gender, age, event, course='LCM', getData=False):
 	try:
 		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course)
 	except Clubtimedist.DoesNotExist:
 		dist = saveSkewDist(gender, age, event, course)
-
-	frozen = skewnorm(dist.a, dist.mu, dist.sigma)
-	return frozen
+	if dist:
+		if getData:  # just return the object
+			return dist
+		frozen = skewnorm(dist.a, dist.mu, dist.sigma)
+		return frozen
+	return
 
 
 def saveSkewDist(gender, age, event, course='LCM'):
+		age = int(age)
 		times = []
-		for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
-					Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
-			times.append(swim.time / 100.0)
+
+		if course =='SCM':
+			LCMdist = getSkewDist(gender, age, event, 'LCM', True)
+			SCYdist = getSkewDist(gender, age, eventtoSCY[event], 'SCY', True)
+			a = (LCMdist.a + SCYdist.a)/2 * SCMfactor[gender][event]
+			mu = (LCMdist.mu + SCYdist.mu)/2 * SCMfactor[gender][event]
+			sigma = (LCMdist.sigma + SCYdist.sigma)/2 * SCMfactor[gender][event]
+			newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma)
+			newDist.save()
+			return newDist
+
+
+		if course == 'SCY' and age > 17:  # use college times
+			if age == 19:
+				year = 'Freshman'
+			elif age == 20:
+				year = 'Sophomore'
+			elif age == 21:
+				year = 'Junior'
+			else:
+				year = 'Senior'
+			print 'here', age, year
+			if event not in eventConvert:
+				return
+			for swim in Swim.select(Swim.time).where(Swim.gender==gender, Swim.event==eventConvert[event],
+													 Swim.season==2016, Swim.year==year):
+				times.append(swim.time)
+		else:
+			if age < 23:
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+						Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
+					times.append(swim.time / 100.0)
+			else:
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+						Clubswim.event==event, Clubswimmer.age > 22, Clubswim.course==course):
+					times.append(swim.time / 100.0)
 		print event, age, gender, course, len(times)
 
-		if len(times) < 100:
+		if len(times) < 50:
 			return
 		times = rejectOutliers(times, l=4, r=4)
 
@@ -160,6 +191,41 @@ class Clubteam(Model):  # one per season
 
 	class Meta:
 		database = db
+
+	def topTimes(self, dateStr=None, events=allEventsSCY):
+		if not dateStr:
+			meetDate = Date.today()
+			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
+
+		newMeet = Clubmeet()
+		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year FROM "
+				"(SELECT swim.name, time, event, meet, ts.team, rank() "
+				"OVER (PARTITION BY swim.name, event ORDER BY time) "
+				"FROM (clubswim "
+				"INNER JOIN clubteam ts "
+				"ON team_id=ts.id and ts.id=%s) "
+				"WHERE swim.date < %s) AS a "
+				"WHERE a.rank=1", self.id, dateStr):
+			swim.gender = self.gender
+			swim.season = self.season
+			if events:
+				if swim.event in events:
+					newMeet.addSwim(swim)
+			else:
+				newMeet.addSwim(swim)
+
+		return newMeet
+
+	def topTeamScore(self):
+		events = eventsSCY
+		topMeet = self.topTimes(events=events)
+
+		topMeet.topEvents(teamMax=17, indMax=3)
+		scores = topMeet.expectedScores(swimmers=16, division=self.division)
+
+		if self.team in scores:
+			return scores[self.team]
+		return 0
 
 
 class Clubswimmer(Model):
@@ -460,6 +526,439 @@ class Clubswim(Model):
 
 		return totalScore / len(percents)
 
+
+class Clubmeet:
+	def __init__(self, topSwim=True):
+		self.teams = set()  # teams added as swims are
+		self.topSwim = topSwim
+		self.scores = None
+		self.swims = {}
+		self.season = None
+		self.winMatrix = None
+		self.ageGroups = {'8-': [7, 8], '9-10': [9, 10], '11-12': [11, 12], '13-14': [13, 14], '15-16': [15, 16],
+						  '17-18': [17, 18], '19+': [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]}
+		self.ageGroupMap = {}
+		for age in range(6, 30):
+			if age < 9:
+				self.ageGroupMap[age] = '8-'
+			elif age < 11:
+				self.ageGroupMap[age] = '9-10'
+			elif age < 13:
+				self.ageGroupMap[age] = '11-12'
+			elif age < 15:
+				self.ageGroupMap[age] = '13-14'
+			elif age < 17:
+				self.ageGroupMap[age] = '15-16'
+			elif age < 19:
+				self.ageGroupMap[age] = '17-18'
+			else:
+				self.ageGroupMap[age] = '19+'
+
+	def reset(self, teams=False, times=False):
+		for swim in self.getSwims():
+			if teams:
+				swim.scoreTeam = None
+			if times:
+				swim.scoreTime = None
+
+	def getSwims(self, team='all', relays=True, ind=True):
+		for age in self.swims:
+			for event in self.swims[age]:
+				for swim in self.swims[age][event]:
+					if ind and (swim.team == str(team) or team=='all') and (relays or not swim.relay):
+						yield swim
+
+	def addSwim(self, swim):
+		if not swim.getScoreTeam() in self.teams:
+			self.teams.add(swim.getScoreTeam())
+
+		if swim.swimmer.age not in self.swims:
+			self.swims[swim.swimmer.age] = {}
+		if swim.event not in self.swims[swim.swimmer.age]:
+			self.swims[swim.swimmer.age][swim.event] = []
+		self.swims[swim.swimmer.age][swim.event].append(swim)
+
+	def addSwims(self, swims):
+		for swim in swims:
+			self.addSwim(swim)
+
+	'''
+	decides top events for each swimmer
+	top swimmers are decided by highest scoring event right now
+	'''
+	def topEvents(self, teamMax=17, indMax=3, adjEvents=False, debug=False):
+		self.place()
+		conference = Clubmeet()
+		indSwims = {}
+		teamSwimmers = {}
+		teamDivers = {}
+		drops = []
+		relayEvents = set()
+		events = self.eventSwims.keys()
+		for team in self.teams:
+			teamSwimmers[team] = 0
+			teamDivers[team] = 0
+
+		for event in self.eventSwims:  # we will keep relays as is, but count them towards total swims
+			if re.search('Relay', event):
+				relayEvents.add(event)
+				while not self.eventSwims[event] == []:  # move relays over to new meet
+					relay = self.eventSwims[event].pop()
+					conference.addSwim(relay)
+
+		for event in relayEvents:
+			events.remove(event)
+
+		# pare down
+		self.place()
+		for event in self.eventSwims:
+			if len(self.eventSwims[event]) > 100:
+				self.eventSwims[event] = self.eventSwims[event][:99]  # start with top 100 times
+
+		# now make sure that each person swims their top events
+		preEvent = None
+		nextEvent = None
+		if debug: print self
+		while not self.isEmpty():
+			for event in events:
+				if 'Relay' in event:  # shouldn't
+					continue
+				drop = True  # just allow us to enter the loop
+				while drop and not self.eventSwims[event] == []:  # we need to loop on an event until we find
+					drop = False
+					# print self.eventSwims[event]
+
+					if self.events and type(self.events) == type([]) and event in self.events:
+						if not self.events.index(event) == 0:
+							preEvent = self.events[self.events.index(event)-1]
+						if not self.events.index(event)==len(self.events)-1:
+							nextEvent = self.events[self.events.index(event)+1]
+
+					newSwim = self.eventSwims[event].pop(0)
+
+					if preEvent in conference.eventSwims and not adjEvents:  # check to make sure no adjacent events
+						for swim in conference.eventSwims[preEvent]:
+							if newSwim.name == swim.name and newSwim.getScoreTeam() == swim.getScoreTeam():
+								drops.append(newSwim)
+								drop = True
+								if debug: print 'pre', swim.name, swim.event
+								if debug: print 'pre', newSwim.name, newSwim.event
+								break
+					if nextEvent in conference.eventSwims and not adjEvents:
+						for swim in conference.eventSwims[nextEvent]:
+							if newSwim.name == swim.name and newSwim.getScoreTeam() == swim.getScoreTeam():
+								drop = True
+								drops.append(newSwim)
+								if debug: print 'post', swim.name, swim.event
+								if debug: print 'post', newSwim.name, newSwim.event
+								break
+					if drop:  # already swimming previous or next event
+						continue
+
+					if not newSwim.name+newSwim.getScoreTeam() in indSwims:   # team max events
+						if teamSwimmers[newSwim.getScoreTeam()] < teamMax:
+							indSwims[newSwim.name + newSwim.getScoreTeam()] = 0  # count same person on two teams
+							# differently
+							teamSwimmers[newSwim.getScoreTeam()] += 1
+						else:
+							if debug: print 'team', swim.name, swim.event
+							if debug: print 'team', newSwim.name, newSwim.event
+							drops.append(newSwim)
+							continue # fixed to still add swim when all 18
+
+					if indSwims[newSwim.name + newSwim.getScoreTeam()] < indMax:  # individual max events
+						conference.addSwim(newSwim)
+						indSwims[newSwim.name + newSwim.getScoreTeam()] += 1
+					else:
+						if debug: print 'ind', swim.name, swim.event
+						if debug: print 'ind', newSwim.name, newSwim.event
+						drops.append(newSwim)
+						drop = True  # can't swim any more events
+
+		self.score()
+
+
+		if debug:
+			print teamSwimmers, indSwims, teamMax, indMax
+			for swim in drops:
+				print swim.name, swim.event, swim.getScoreTeam(), swim.time
+		self.eventSwims = conference.eventSwims
+		return drops
+
+	def expectedScores(self, division='D3', swimmers=6, debug=False):
+		self.place()
+		scores = {}
+		teamSwims = {}
+
+		for event in self.eventSwims:
+			teamSwims[event] = {}
+			for swim in self.eventSwims[event]:
+				if not swim.team in scores:
+					scores[swim.team] = 0
+				if not swim.team in teamSwims[event]:
+					teamSwims[event][swim.team] = 0
+				else:
+					teamSwims[event][swim.team] += 1
+
+				losses = teamSwims[event][swim.team]
+				swim.division = division
+				points = swim.expectedPoints(numSwimmers=swimmers, losses=losses)
+				swim.score = points
+				if points:
+					scores[swim.team] += points
+				if debug: print swim.event, swim.time, points, int(round(scores[swim.team])), losses
+
+		for team in scores:
+			scores[team] = int(round(scores[team]))
+
+		return scores
+
+	def place(self, events='', storePlace=False):
+		events = self.getEvents(events)
+		for event in events:
+			if not event in self.eventSwims or len(self.eventSwims[event]) == 0:
+				continue
+			self.eventSwims[event] = sorted(self.eventSwims[event], key=lambda s:s.getScoreTime(), reverse=False)
+			if storePlace:
+				for idx, swim in enumerate(self.eventSwims[event]):
+					swim.place = idx + 1
+
+	def score(self, dual=None, events='', heatSize=8):
+		events = self.getEvents(events)
+		self.place(events)
+		self.assignPoints(heats=self.heats, heatSize=heatSize, dual=dual, events=events)
+
+		return self.teamScores(events)
+
+	'''
+	assigns points to the swims
+	'''
+	def assignPoints(self, heats=2, heatSize=8, dual=None, events=None):
+		if dual is None:
+			if len(self.teams)==2:
+				dual=True
+			else:
+				dual=False
+
+		max = 16
+		if heats == 3:
+			pointsI = [32, 28, 27, 26, 25, 24, 23, 22, 20, 17, 16, 15, 14, 13, 12, 11, 9, 7, 6, 5, 4, 3, 2, 1]
+		elif heats == 2:
+			pointsI = [20, 17, 16, 15, 14, 13, 12, 11, 9, 7, 6, 5, 4, 3, 2, 1]
+		if heatSize == 6:
+			pointsI = [15, 13, 12, 11, 10, 9, 7, 5, 4, 3, 2, 1]
+
+		pointsR = [x*2 for x in pointsI]
+		if dual:
+			max = 3
+			pointsI = [9, 4, 3, 2, 1]
+			pointsR = [11, 4, 2]
+
+		for event in self.eventSwims:  # Assign scores to the swims
+			if not event in events and self.eventSwims[event]:  # set score of those not being swum to zero
+				for swim in self.eventSwims[event]:
+					swim.score = 0
+			else:
+				place = 1
+				teamSwims = {}
+				for swim in self.eventSwims[event]:
+					swim.score = None  # reset score
+					if not 'Relay' in swim.event:  # should use real relay var
+						team = swim.getScoreTeam()
+						if place > len(pointsI) or (team in teamSwims) and teamSwims[team] >= max:
+							swim.score = 0
+						else:
+							swim.score = pointsI[place-1]
+							if not team in teamSwims:
+								teamSwims[team] = 0
+							teamSwims[team] += 1
+							place += 1
+					else:
+						team = swim.getScoreTeam()
+						if place > len(pointsR) or (team in teamSwims) and teamSwims[team] >= max:
+							swim.score = 0
+						else:
+							swim.score = pointsR[place-1]
+							if not team in teamSwims:
+								teamSwims[team] = 0
+							teamSwims[team] += 1
+							place += 1
+
+	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
+						weeksOut=4, taper=False):
+		# need to include taper by teams
+		weeksIn = 16 - weeksOut
+		if taper:
+			self.taper(weeksIn)
+		# default the sigma if we just know the date
+		if weeksOut == -1:
+			sigma = 0.045
+			teamSigma = .02
+		elif weeksOut <= 4:
+			teamSigma = .01
+			sigma = 0.025
+		elif weeksOut <= 8:
+			teamSigma = .015
+			sigma = 0.035
+		elif weeksOut <= 12:
+			teamSigma = 0.015
+			sigma = 0.0425
+		elif weeksOut <= 16:
+			teamSigma = 0.025
+			sigma = 0.045
+		elif weeksOut > 16:
+			teamSigma = .0325
+			sigma = 0.0375
+
+		events = self.getEvents(events)
+		# print teamSigma, sigma, weeksOut
+
+		for event in self.eventSwims:  # assign scores to the swims
+			if not event in events and self.eventSwims[event]:  # set score of those not being swum to zero
+				for swim in self.eventSwims[event]:
+					swim.score = 0
+
+		teamScoresDist = []
+		for iternation in range(runs):  # run runs # of times
+
+			teamTapers = {}  # team noise
+			for team in self.teams:
+				teamTapers[team] = np.random.normal(0, teamSigma)
+			for event in self.eventSwims:  # individual swim noise
+				for swim in self.eventSwims[event]:
+					if swim.time:
+						noise = np.random.normal(0, sigma) * swim.getTaperTime()
+						teamNoise = teamTapers[swim.team] * swim.getTaperTime()
+						swim.scoreTime = swim.getTaperTime() + noise + teamNoise
+
+			# place again
+			self.place(events)
+
+			# now score
+			self.assignPoints(dual=dual, heats=heats, heatSize=heatSize, events=events)
+
+			teamScoresDist.append(self.teamScores(events))
+		self.reset(times=True)  # reset the times to normal
+
+		places = {}  # stores the number of times each team was 1st, 2nd, ect.
+		for score in teamScoresDist:
+			for idx, (team, score) in enumerate(score):
+				if not team in places:
+					places[team] = []
+				places[team].append(idx)
+		# print places
+
+		probMatrix = {}
+		for team in places:
+			probMatrix[team] = [0 for _ in range(len(places))]
+			for place in places[team]:
+				probMatrix[team][place] += 1.0/len(places[team])  # add in each individual result
+
+		winMatrix = {}
+		for team in probMatrix:
+			winMatrix[team] = probMatrix[team][0]
+
+		self.winMatrix = winMatrix
+		return probMatrix
+
+	def getTeamWinProb(self, team):
+		if not self.winMatrix:
+			self.scoreMonteCarlo(dual=False)
+		if not team in self.winMatrix:
+			return None
+		return self.winMatrix[team]
+
+	def getWinProb(self):
+		if not self.winMatrix:
+			self.scoreMonteCarlo(dual=False)
+		return self.winMatrix
+
+	def teamScores(self, events='', sorted=True):
+		events = self.getEvents(events)
+		teams = {}
+
+		for team in self.teams:  # make sure all the teams get some score
+			teams[team] = 0
+
+		for event in events:
+			if not event in self.eventSwims: continue
+			for swim in self.eventSwims[event]:
+				team = swim.getScoreTeam()
+				if not team in teams:
+					teams[team] = 0
+				teams[team] += swim.getScore()
+		self.scores = teams
+
+		if not sorted:
+			return teams
+
+		#now sort
+		scores = []
+		for team in teams:
+			scores.append([team, teams[team]])
+		scores.sort(key=lambda t: t[1], reverse=True)
+
+		return scores
+
+	def getTeamScore(self, team):
+		if not self.scores:
+			self.teamScores()
+		if not team in self.scores:
+			return None
+		return self.scores[team]
+
+	def getScores(self):
+		if not self.scores:
+			return self.teamScores()
+		return self.scores
+
+	def winningTeam(self):
+		if not self.scores: self.teamScores()
+		if len(self.scores)<1 or len(self.scores[0])<1: return None
+		return self.scores[0][0]
+
+	'''
+	lists swimmers by team and by points scored
+	'''
+	def scoreReport(self, repressSwim=False, repressTeam=False):
+		self.score()
+		scores = {}
+		for team in self.teams:
+			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
+		for event in self.eventSwims:
+			for swim in self.eventSwims[event]:
+				if not swim.score:
+					swim.score = 0
+				if swim.relay:
+					name = 'Relays'
+				else:
+					name = swim.name
+				if repressSwim and (swim.score == 0 or not swim.score):
+					continue   # repress zero scores
+
+				team = swim.getScoreTeam()
+				if not name in scores[team]['swimmer']:
+					scores[team]['swimmer'][name] = 0
+				if not event in scores[team]['event']:
+					scores[team]['event'][event] = 0
+				scores[team]['swimmer'][name] += swim.score
+				scores[team]['total'] += swim.score
+				scores[team]['event'][event] += swim.score
+				if swim.year:
+					if not swim.year in scores[team]['year']:
+						scores[team]['year'][swim.year] = 0
+					scores[team]['year'][swim.year] += swim.score
+
+		if repressTeam:
+			zeroTeams = set()
+			for team in scores:
+				if scores[team]['total'] == 0:
+					zeroTeams.add(team)
+			for team in zeroTeams:
+				del(scores[team])
+
+		return scores
+
 '''
 store time distribution data
 '''
@@ -481,7 +980,7 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 	root = 'data/club/' + str(year) + '/' + str(loadage)
 
 	for fileName in os.listdir(root):
-		if 'Club' not in fileName or 'SCM' not in fileName:
+		if 'Club' not in fileName:
 			continue
 		print fileName
 		parts = re.split('_', fileName)
@@ -512,8 +1011,8 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 				except:
 					print line
 					continue
-
-				if not time or not gender in ['Men', 'Women'] or not (int(age)==int(loadage)) \
+				# or not (int(age)==int(loadage))
+				if not time or not gender in ['Men', 'Women']  \
 						or not event in allevents or not re.match("\d\d/\d\d/\d\d$", date):
 					print (not time), (not gender in ['Men', 'Women']), not event in allevents, \
 						not re.match("\d\d/\d\d/\d\d$", date), not (int(age)==int(loadage))
@@ -581,6 +1080,10 @@ def safeImport(age=17, year=2016):
 	importSwims(loadSwims=True, loadage=age, year=year)
 
 if __name__== '__main__':
+	#safeImport(age=19, year=2016)
+	#safeImport(age=20, year=2016)
+	#safeImport(age=21, year=2016)
+	'''
 	db.drop_tables([Clubswim])
 	db.drop_tables([Clubswimmer])
 	db.drop_tables([Clubteam])
@@ -591,10 +1094,10 @@ if __name__== '__main__':
 	'''
 	for event in allevents:
 		for gender in ['Men', 'Women']:
-			for age in range(8, 19):
-				for course in ['SCY', 'LCM', 'SCM']:
-					saveSkewDist(gender=gender, event=event, age=age, course=course)
-	'''
+			for age in range(19, 24):
+				for course in ['SCY', 'LCM']:
+					getSkewDist(gender=gender, event=event, age=age, course=course)
+
 
 
 

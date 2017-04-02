@@ -79,6 +79,42 @@ $def with (content)
 				\$(document).ready(function() {
 					toggleProb();
 				});
+
+				// for time converter
+				$$('form#convert').submit(function(form) {  // catch any form submission event
+					dataURL = $$(this).serialize() + '&gender=' + $$('ul#gender li.active')[0].id + '&division=' +
+										$$('ul#division li.active')[0].id;
+					$$("#loading").show();
+					dataURL += '&submit=' + $$(this).data('submitted'); //we can say which ppt button was pushed
+					newURL = location.pathname + '?' + dataURL;
+
+					$$.getJSON(newURL,
+						function (data) {
+							if (data.length < 2) {
+								$$("#resultstable tr").remove();  //clear old results
+								$$('#results').text(data[0]);
+							}
+							else {
+								$$('#results').text("")
+								$$("#resultstable tr").remove();  //clear old results
+								$$('#resultstable').append('<tr><th>Time</th><th>Converted Time</th></tr>');
+								var tr;
+								for (var i = 0; i < data.length; i++) {
+									tr = $$('<tr/>');
+									tr.append("<td>" + data[i].fromtime + "</td>");
+									tr.append("<td>" + data[i].totime + "</td>");
+									$$('#resultstable').append(tr);
+								}
+							}
+						});
+
+					history.pushState('', 'New URL: '+newURL, newURL);
+					form.preventDefault(); // cancel original event to prevent form submitting
+				});
+
+				\$('[type="submit"]').click(function (evt) {
+					\$(this.form).data('submitted', this.value);
+				});
 			};
 
 			\$(document).ready(function() {

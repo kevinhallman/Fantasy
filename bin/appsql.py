@@ -50,9 +50,8 @@ urls = ('/', 'Home',
 	'/taper', 'Taper',
 	'/taperJSON', 'TaperJSON',
 	'/clubppt', 'Clubppt',
-	'/clubpptJSON', 'ClubpptJSON',
-	'/timeconvert', 'Timeconvert',
-	'/timeconvertJSON', 'TimeconvertJSON'
+	'/(time)convert', 'Timeconvert',
+	'/(age)convert', 'Timeconvert',
 )
 
 
@@ -1095,19 +1094,36 @@ class CLubPowerscoreJSON():
 		points = swim.getPPTs()
 		return json.dumps(points)
 
+
 class Timeconvert():
-	def GET(self):
+	def GET(self, conversion):
 		events = ['50 Free', '100 Free', '200 Free', '400/500 Free', '1500/1650 Free',
 				'50 Fly', '100 Fly', '200 Fly', '50 Back', '100 Back', '200 Back',
 				'50 Breast', '100 Breast', '200 Breast', '200 IM', '400 IM']
 		form = web.input(gender=None, fromage=None, toage=None, event=None, min=None, sec=None, hun=None, table=None,
-						 submit=None, fromcourse=None, tocourse=None)
+						 submit=None, fromcourse=None, tocourse=None, division=None)
+		setGenDiv(form.gender, form.division)
 
-		if not form.event or form.event == 'Event':  # empty
-			return render.timeconvert(events=events, time=None, table=None)
+		if not form.event or form.event == 'Event' or not form.gender:  # empty
+			if conversion=='time':
+				return render.timeconvert(events=events)
+			if conversion=='age':
+				return render.ageconvert(events=events)
+			else:
+				return
+		if not form.tocourse:
+				form.tocourse = form.fromcourse
+		if not form.toage:
+			form.toage = form.fromage
 
 		time = 0
 		try:
+			if form.min=='':
+				form.min = 0
+			if form.sec=='':
+				form.sec = 0
+			if form.hun=='':
+				form.hun = 0
 			time += 60 * int(form.min)
 			time += int(form.sec)
 			time += .01 * int(form.hun)
@@ -1129,38 +1145,25 @@ class Timeconvert():
 			fromevent = form.event
 
 		if time == 0 or form.submit=='Table':  # get table if no time or button hit
-			html = '<table>'
-			html += '<tr><th>Time</th><th>Converted Time</th></tr>'
+			timestable = []
 			frozen = getSkewDist(gender=form.gender, event=fromevent, age=form.fromage, course=form.fromcourse)
 			for i in [.1, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95]:  # percentiles
 				time = round(frozen.ppf(float(i)/ 100.0), 2)
 				fromtime = swimTime(time)
 				totime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
 						toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
-				html += '<tr><td>' + fromtime + '</td><td>' + totime + '</td></tr>'
-			html += '</table>'
+				timestable.append({'fromtime': fromtime, 'totime': totime})
 
-			return render.timeconvert(events=events, time=None, table=html)
+			return json.dumps(timestable)
 
 		# otherwise return the points
+		if not form.tocourse:
+			form.tocourse = form.fromcourse
 		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
 					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
-		return render.timeconvert(events=events, time=newtime, table=None)
+		print newtime
+		return json.dumps([newtime])
 
-class TimeconvertJSON():
-	def GET(self):
-		form = web.input(gender=None, division=None, hundredths=None, event=None)
-		setGenDiv(form.gender, form.division)
-
-		if not form.event or not int(form.hundredths) > 0:  # empty
-			return {}
-
-		time = int(form.hundredths) / 100.0
-
-		# return the points
-		swim = Swim(time=time, event=form.event, gender=form.gender, division=form.division)
-		points = swim.getPPTs()
-		return json.dumps(points)
 
 class teamMeets():
 	def GET(self):
@@ -1188,6 +1191,7 @@ class teamMeets():
 
 		# return all seasons if none
 		return json.dumps(meetList)
+
 
 class getConfs():
 	def GET(self):
