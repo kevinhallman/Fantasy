@@ -427,19 +427,35 @@ def uniqueSwimmers():
 					pass
 			#print targetSwimmer.name, targetSwimmer.id, targetSwimmer.season, targetSwimmer.team, targetSwimmer.gender
 
+def fixMeetNames():
+	for char in ['+', '@', '&']:
+		searchStr = '%' + char + '%'
+		for meet in Meet.select().where(Meet.meet % searchStr):
+			print meet.meet
+			if char == '+':
+				newName = meet.meet.replace('+', ' ')
+			elif char == '@':
+				newName = meet.meet.replace('@', 'at')
+			else:
+				newName = meet.meet.replace('&', 'and')
+
+			print newName
+			Swim.update(meet=newName).where(Swim.meet==meet.meet).execute()
+
+			meet.meet = newName
+			meet.save()
+
+
 if __name__ == '__main__':
 	start = Time.time()
+	fixMeetNames()
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad()
+	#safeLoad()
 	#deleteDupImprovement()
-	fixConfs()
+	#fixConfs()
 	#fixDivision()
-	#fixDupTeams()
-	#mergeSwimmers(301502, 314543)
-	#mergeSwimmers(314612, 301701)
-	#mergeTeams(6785, 8453)
 	#fixRelays()
 	# fixConfs()
 	# migrateImprovement()
