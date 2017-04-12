@@ -154,6 +154,7 @@ class Home():
 class Swimulate():
 	def GET(self):
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False, gender=None, division=None)
+		setGenDiv(form.gender, form.division)
 		gender = session.gender
 		divTeams = allTeams[gender]
 		if not form.team1:
@@ -220,8 +221,8 @@ class Swimulate():
 class SwimulateJSON():
 	def GET(self):
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False, gender=None, division=None)
+		setGenDiv(form.gender, form.division)
 		gender = session.gender
-		divTeams = allTeams[gender]
 		if not form.team1:
 			return {}
 
