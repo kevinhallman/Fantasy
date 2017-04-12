@@ -163,9 +163,12 @@ class Swimulate():
 		keys = form.keys()
 		formMeets = {}
 		for key in keys:
-			if key in ['gender', 'division']:  # don't load in the session division or gender
+			if key in ['gender', 'division', 'submit']:  # don't load in the session division or gender
 				continue
-			num = int(key[-1])  # last position
+			try:
+				num = int(key[-1])  # last position
+			except ValueError:
+				continue
 			if not num in formMeets:
 				formMeets[num] = {}
 			if 'team' in key:
@@ -226,9 +229,12 @@ class SwimulateJSON():
 		keys = form.keys()
 		formMeets = {}
 		for key in keys:
-			if key in ['gender', 'division']:  # don't load in the session division or gender
+			if key in ['gender', 'division', 'sumbit']:  # don't load in the session division or gender
 				continue
-			num = int(key[-1])  # last position
+			try:
+				num = int(key[-1])  # last position
+			except ValueError:
+				continue
 			if not num in formMeets:
 				formMeets[num] = {}
 			if 'team' in key:
