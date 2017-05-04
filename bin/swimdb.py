@@ -368,13 +368,22 @@ class TeamSeason(Model):
 		if event=='400 Yard Freestyle Relay':
 			pass
 
-	def getTaperSwims(self, numTimes=3):
+	def getTaperSwims(self, numTimes=3, structured=False):
 		teamSwims = set()
+		if structured:
+			swimDict = {}
 		# grab the taper from the swimmers, assumes different events
 		for swimmer in Swimmer.select().where(Swimmer.teamid==self.id):
 			for swim in swimmer.getTaperSwims(num=numTimes).values():
 				teamSwims.add(swim)
-		return teamSwims
+				if structured:
+					if swimmer.name not in swimDict:
+						swimDict[swimmer.name] = {}
+					swimDict[swimmer.name][swim.event] = swim
+		if structured:
+			return swimDict
+		else:
+			return teamSwims
 
 	def findTaperStats(self, weeks=10, topTime=True, averageTime=True):
 		newDate = week2date(week=weeks, season=self.season)
@@ -1569,6 +1578,72 @@ class Team(Model):
 	division = CharField()
 	gender = CharField()
 
+	def getAttrition(self, seasons=None, update=False):
+		# print self.id
+		if not seasons:
+			seasons = [2017, 2016, 2015, 2014, 2013, 2012]
+		teamDrops = 0
+		teamSwims = 0
+		for season in seasons:
+			try:
+				# make sure there was a team both years
+				seasonID = TeamSeason.get(TeamSeason.team==self.name, TeamSeason.gender==self.gender,
+										  TeamSeason.season==season).id
+				seasonID2 = TeamSeason.get(TeamSeason.team==self.name, TeamSeason.gender==self.gender,
+										 TeamSeason.season==season + 1).id
+				for swimmer in Swimmer.select(Swimmer.name, Swimmer.teamid, Swimmer.year).where(
+								Swimmer.teamid==seasonID):
+						if swimmer.year=='Senior' or 'relay' in swimmer.name:
+							continue
+						#print 'stay', swimmer.name
+						teamSwims += 1  # total number of swimmers
+						try:
+							Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==season+1,
+										Swimmer.teamid==seasonID2)  # swam the next year
+						except Swimmer.DoesNotExist:
+							#print 'drop', swimmer.name
+							teamDrops += 1
+			except TeamSeason.DoesNotExist:
+				pass
+
+		if teamSwims > 0:
+			dropRate = -float(teamDrops) / float(teamSwims)
+		else:
+			dropRate = 0
+
+		if update:
+			self.attrition = dropRate
+			self.save()
+			print self.id, dropRate
+		return dropRate
+
+	def getImprovement(self, update=False):
+		for team in Improvement.select(fn.avg(Improvement.improvement)).where(Improvement.team==self.name,
+				Improvement.gender==self.gender, Improvement.division==self.division):
+			avgImp = team.avg
+		if not avgImp:
+			avgImp = 0
+		if update:
+			self.improvement = avgImp
+			self.save()
+		return avgImp
+
+	def getStrength(self, update=False):
+		try:
+			team = TeamSeason.get(team=self.name, gender=self.gender, division=self.division, season=2017)
+		except TeamSeason.DoesNotExist:
+			return
+		invite = team.getStrength(invite=True)
+		dual = team.getStrength(invite=False)
+		if not invite: invite = 0
+		if not dual: dual = 0
+		if update:
+			self.strengthdual = dual
+			self.strengthinvite = invite
+			self.conference = team.conference
+			self.save()
+		return invite, dual
+
 	class Meta:
 		database = db
 
@@ -1612,14 +1687,6 @@ if __name__ == '__main__':
 	print 'knn', np.mean(misses), np.std(misses)
 	print 'flat', np.mean(flatMisses), np.std(flatMisses)
 	'''
-
-	#for team in TeamSeason.select().where(TeamSeason.season << [2015, 2016]):
-	#	for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
-	#		team.findTaperStats(weeks=week)
-	#for swim in Swim.select().where(Swim.season==2017):
-	#	swim.getPPTs()
-
-	TeamSeason.get(team='Carleton').topTimes().printout()
 	'''
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:
@@ -1628,7 +1695,11 @@ if __name__ == '__main__':
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
 	'''
-	#db.drop_tables([Timedist])
-	#db.create_tables([Timedist])
+	for team in Team.select():
+		print team.id, team.name, team.gender
+		print team.getStrength(update=True)
+		print team.getAttrition(update=True)
+		print team.getImprovement(update=True)
 
+	#team = Team.get(name='Carleton', gender='Women')
 

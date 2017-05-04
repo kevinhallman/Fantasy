@@ -1120,6 +1120,8 @@ class Timeconvert():
 				return
 		if not form.tocourse:
 				form.tocourse = form.fromcourse
+		if form.fromage=='Open':
+			form.fromage = 23
 		if not form.toage:
 			form.toage = form.fromage
 
