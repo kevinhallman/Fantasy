@@ -1631,8 +1631,12 @@ class Team(Model):
 	def getStrength(self, update=False):
 		try:
 			team = TeamSeason.get(team=self.name, gender=self.gender, division=self.division, season=2017)
-		except TeamSeason.DoesNotExist:
 			return
+		except TeamSeason.DoesNotExist:
+			try:
+				team = TeamSeason.get(team=self.name, gender=self.gender, division=self.division, season=2015)
+			except TeamSeason.DoesNotExist:
+				return
 		invite = team.getStrength(invite=True)
 		dual = team.getStrength(invite=False)
 		if not invite: invite = 0
@@ -1698,8 +1702,8 @@ if __name__ == '__main__':
 	for team in Team.select():
 		print team.id, team.name, team.gender
 		print team.getStrength(update=True)
-		print team.getAttrition(update=True)
-		print team.getImprovement(update=True)
+		#print team.getAttrition(update=True)
+		#print team.getImprovement(update=True)
 
 	#team = Team.get(name='Carleton', gender='Women')
 
