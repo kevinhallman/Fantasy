@@ -140,6 +140,10 @@ def setGenDiv(gender, division):
 class Static():
 	def GET(self, filename):
 		try:
+			if 'css' in filename:
+				web.header("Content-Type", "text/css")
+			elif 'js' in filename:
+				web.header("Content-Type", "text/javascript")
 			f = open('static/' + filename, 'r')
 			return f.read()
 		except:
