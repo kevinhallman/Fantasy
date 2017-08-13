@@ -219,6 +219,8 @@ class TeamSeason(Model):
 	winconf = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
+	improvement = FloatField(null=True)
+	attrition = FloatField(null=True)
 	topSwimmers = {}
 
 	def getPrevious(self, yearsBack=1):
@@ -267,16 +269,22 @@ class TeamSeason(Model):
 		return 0
 
 	# pulls top team strength for that year
-	def getStrength(self, previous=0, invite=True):
+	def getStrength(self, previous=0, invite=True, update=False):
 		if invite:
 			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week).where(TeamStats.strengthinvite.is_null(False),
 					TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
 				if stats.strengthinvite:
+					if update:
+						self.strengthinvite = stats.strengthinvite
+						self.save()
 					return stats.strengthinvite
 		else:
 			for stats in TeamStats.select(TeamStats.strengthdual, TeamStats.week).where(TeamStats.strengthdual.is_null(
 					False), TeamStats.teamseasonid==self.id).limit(1).order_by(TeamStats.week.desc()).offset(previous):
 				if stats.strengthdual:
+					if update:
+						self.strengthdual = stats.strengthdual
+						self.save()
 					return stats.strengthdual
 
 		# no stats yet, so save them off
@@ -297,7 +305,15 @@ class TeamSeason(Model):
 								 date=simDate)
 
 		if invite:
+			if update:
+				self.strengthinvite = scoreInvite
+				self.save()
 			return scoreInvite
+		else:
+			if update:
+				self.strengthdual = scoreDual
+				self.save()
+			return scoreDual
 
 	'''top expected score for the whole team'''
 	def topTeamScore(self, dual=True, weeksIn=None):
@@ -428,6 +444,57 @@ class TeamSeason(Model):
 			stats.save()
 		except TeamStats.DoesNotExist:
 			TeamStats.insert_many([newStats]).execute()
+
+	def getAttrition(self, update=False):
+		# get previous year's team, drop if null
+		preTeam = self.getPrevious(-1)
+		if not preTeam:
+			if update:
+				self.attrition = None
+				self.save()
+			return
+
+		teamDrops = 0
+		teamSwims = 0
+		for swimmer in Swimmer.select(Swimmer.name, Swimmer.teamid, Swimmer.year).where(
+			Swimmer.teamid==self.id):
+			if swimmer.year=='Senior' or 'Relay' in swimmer.name:
+				continue
+			teamSwims += 1  # total number of swimmers
+			try:
+				Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==preTeam.season, Swimmer.teamid==preTeam.id)
+				# print 'stay', swimmer.name
+			except Swimmer.DoesNotExist:
+				# print 'drop', swimmer.name
+				teamDrops += 1
+
+		if teamSwims > 0:
+			dropRate = -float(teamDrops) / float(teamSwims)
+		else:
+			dropRate = 0
+
+		if update:
+			self.attrition = dropRate
+			self.save()
+			print self.id, dropRate
+		return dropRate
+
+	def getImprovement(self, update=False):
+		for teamImp in Improvement.select(fn.avg(Improvement.improvement)).where(Improvement.team==self.team,
+				Improvement.gender==self.gender, Improvement.division==self.division,
+																			  Improvement.toseason==self.season):
+			avgImp = teamImp.avg
+		if not avgImp:
+			avgImp = 0
+		if update:
+			self.improvement = avgImp
+			self.save()
+		return avgImp
+
+	def deltaStrength(self, years=1):
+		pre = self.getPrevious(years)
+		if pre:
+			return self.getStrength(update=False) - pre.getStrength(update=False)
 
 	class Meta:
 		database = db
@@ -1631,7 +1698,6 @@ class Team(Model):
 	def getStrength(self, update=False):
 		try:
 			team = TeamSeason.get(team=self.name, gender=self.gender, division=self.division, season=2017)
-			return
 		except TeamSeason.DoesNotExist:
 			try:
 				team = TeamSeason.get(team=self.name, gender=self.gender, division=self.division, season=2015)
@@ -1666,17 +1732,8 @@ class Timedist(Model):
 	class Meta:
 		database = db
 
-if __name__ == '__main__':
-	migrator = PostgresqlMigrator(db)
-	with db.transaction():
-		migrate(
-			#migrator.add_column('swimmer', 'ppts', Swimmer.eventppts),
-			#migrator.add_column('teamstats', 'mediantaperstd', TeamStats.mediantaperstd)
-			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
-			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
-		)
 
-	'''
+def testTimePre():
 	misses = []
 	flatMisses = []
 	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Sophomore').order_by(fn.Random()).limit(200):
@@ -1690,20 +1747,26 @@ if __name__ == '__main__':
 				flatMisses.append(abs(times[event].time*.99 - futureTimes[event].time) / futureTimes[event].time)
 	print 'knn', np.mean(misses), np.std(misses)
 	print 'flat', np.mean(flatMisses), np.std(flatMisses)
-	'''
-	'''
+
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:
 			TeamStats.get(teamseasonid=team.id, week=18)
 		except TeamStats.DoesNotExist:
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
-	'''
-	for team in Team.select():
-		print team.id, team.name, team.gender
-		print team.getStrength(update=True)
-		#print team.getAttrition(update=True)
-		#print team.getImprovement(update=True)
 
-	#team = Team.get(name='Carleton', gender='Women')
+if __name__ == '__main__':
+	migrator = PostgresqlMigrator(db)
+	with db.transaction():
+		migrate(
+			migrator.add_column('teamseason', 'attrition', TeamSeason.attrition),
+			migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
+			#migrator.adsd_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
+		)
+
+	for team in TeamSeason.select().where(TeamSeason.season>2012, TeamSeason.season<2017):
+		print team.getStrength(update=True)
+		print team.getAttrition(update=True)
+		print team.getImprovement(update=True)
 
