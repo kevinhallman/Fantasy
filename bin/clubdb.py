@@ -9,7 +9,7 @@ from swimdb import toTime, swimTime, Swim
 from scipy.stats import norm, skewnorm
 import numpy as np
 #import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from math import log
 from sympy import binomial
 import heapq
