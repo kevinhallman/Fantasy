@@ -7,12 +7,12 @@ import json
 import os, urlparse
 import numpy
 from peewee import *
-from swimdb import swimTime
 #from guppy import hpy
 from math import isnan
 
-from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, Swimmer, swimTime, getSkewDist, db
-from clubdb import Clubswim, convert, getSkewDist
+from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, swimTime, db
+from swimdb import getSkewDist as getSkewDistCollege
+from clubdb import convert, getSkewDist
 from clubdb import db as clubdb
 #from clubScraper import eventsSCY
 from operator import itemgetter
@@ -626,7 +626,7 @@ class RankingsJSON():
 		return json.dumps(scores)
 
 class Programs():
-	def GET(self):
+	def GET(self):  # program rankings over attrition, improvement, and team strength rankings
 		form = web.input(conference=None, tableOnly=False, gender=None, division=None)
 
 		setGenDiv(form.gender, form.division)
@@ -648,12 +648,16 @@ class Programs():
 
 		for conference in confs:
 			for team in conferences[division][gender][conference]:
-				for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
-															Team.gender==gender, Team.division==division):
+				for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
+					fn.avg(TeamSeason.attrition).alias('attrition'),
+					fn.avg(TeamSeason.improvement).alias('improvement'))\
+					.where(TeamSeason.team==team, TeamSeason.gender==gender,
+						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==division):
 
-					teamRecruits[team] = stats.strengthinvite
-					teamAttrition[team] = stats.attrition
-					teamImprovement[team] = stats.improvement
+					if stats.inv and stats.attrition and stats.improvement:
+						teamRecruits[team] = stats.inv
+						teamAttrition[team] = stats.attrition
+						teamImprovement[team] = stats.improvement
 
 		teamRank = {}
 		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
@@ -689,12 +693,16 @@ class ProgramsJSON():
 
 		for conference in confs:
 			for team in conferences[division][gender][conference]:
-				for stats in Team.select(Team.strengthinvite, Team.attrition, Team.improvement).where(Team.name==team,
-															Team.gender==gender, Team.division==division):
+				for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
+					fn.avg(TeamSeason.attrition).alias('attrition'),
+					fn.avg(TeamSeason.improvement).alias('improvement'))\
+					.where(TeamSeason.team==team, TeamSeason.gender==gender,
+						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==division):
 
-					teamRecruits[team] = stats.strengthinvite
-					teamAttrition[team] = stats.attrition
-					teamImprovement[team] = stats.improvement
+					if stats.inv and stats.attrition and stats.improvement:
+						teamRecruits[team] = stats.inv
+						teamAttrition[team] = stats.attrition
+						teamImprovement[team] = stats.improvement
 
 		teamRank = {}
 		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
@@ -789,14 +797,17 @@ class TeamStats():
 
 		# team development
 		try:
-			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
-			attrition = round(stats.attrition, 3)
-			imp = round(stats.improvement, 3)
-		except Team.DoesNotExist:
+			for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
+					fn.avg(TeamSeason.attrition).alias('attrition'),
+					fn.avg(TeamSeason.improvement).alias('improvement'))\
+					.where(TeamSeason.team==team, TeamSeason.gender==session.gender,
+						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==session.division):
+				attrition = round(stats.attrition, 3)
+				imp = round(stats.improvement, 3)
+		except TeamSeason.DoesNotExist:
 			attrition = None
 			imp = None
 		inviteStr = teamseason.getStrength()
-		print attrition, imp, inviteStr
 
 		# top swimmers
 		topSwimmers = teamseason.getTopSwimmers(17)
@@ -833,10 +844,14 @@ class TeamStatsJSON():
 
 		# team development
 		try:
-			stats = Team.get(Team.name==team, Team.gender==session.gender, Team.division==session.division)
-			attrition = round(stats.attrition, 3)
-			imp = round(stats.improvement, 3)
-		except Team.DoesNotExist:
+			for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
+					fn.avg(TeamSeason.attrition).alias('attrition'),
+					fn.avg(TeamSeason.improvement).alias('improvement'))\
+					.where(TeamSeason.team==team, TeamSeason.gender==session.gender,
+						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==session.division):
+				attrition = round(stats.attrition, 3)
+				imp = round(stats.improvement, 3)
+		except TeamSeason.DoesNotExist:
 			attrition = None
 			imp = None
 		inviteStr = teamseason.getStrength()
@@ -874,7 +889,7 @@ class Powerscore():
 			time = None
 
 		if time == 0 or form.submit=='Table':  # get table if no time or button hit
-			frozen = getSkewDist(form.gender, form. division, form.event)
+			frozen = getSkewDistCollege(form.gender, form. division, form.event)
 			html = '<table>'
 			html += '<tr><th>Time</th><th>Powerpoints</th></tr>'
 			times = set()
@@ -1174,7 +1189,7 @@ class Timeconvert():
 			form.tocourse = form.fromcourse
 		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
 					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
-		print newtime
+
 		return json.dumps([newtime])
 
 

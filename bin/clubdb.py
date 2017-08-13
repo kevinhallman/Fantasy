@@ -7,9 +7,9 @@ import urlparse
 from playhouse.migrate import *
 from swimdb import toTime, swimTime, Swim
 from scipy.stats import norm, skewnorm
-#import matplotlib.pyplot as plt
 import numpy as np
 #import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 from math import log
 from sympy import binomial
 import heapq
@@ -63,8 +63,9 @@ def getSkewCDF(gender, age, event, course='LCM', percent=1.0):
 	frozen = makeCDF(dist.a, dist.mu, dist.sigma, percent)
 	return frozen
 
-
+'''skewnormal distribution of times in an event'''
 def getSkewDist(gender, age, event, course='LCM', getData=False):
+	print gender, age, event, course, getData
 	try:
 		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course)
 	except Clubtimedist.DoesNotExist:
@@ -77,7 +78,7 @@ def getSkewDist(gender, age, event, course='LCM', getData=False):
 	return
 
 
-def saveSkewDist(gender, age, event, course='LCM'):
+def saveSkewDist(gender, age, event, course='LCM', plot=False):
 		age = int(age)
 		times = []
 
@@ -101,7 +102,6 @@ def saveSkewDist(gender, age, event, course='LCM'):
 				year = 'Junior'
 			else:
 				year = 'Senior'
-			print 'here', age, year
 			if event not in eventConvert:
 				return
 			for swim in Swim.select(Swim.time).where(Swim.gender==gender, Swim.event==eventConvert[event],
@@ -114,30 +114,36 @@ def saveSkewDist(gender, age, event, course='LCM'):
 					times.append(swim.time / 100.0)
 			else:
 				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
-						Clubswim.event==event, Clubswimmer.age > 22, Clubswim.course==course):
+						Clubswim.event==event, Clubswimmer.age > 18, Clubswim.course==course):
 					times.append(swim.time / 100.0)
 		print event, age, gender, course, len(times)
 
-		if len(times) < 50:
+		if len(times) == 0:
 			return
-		times = rejectOutliers(times, l=4, r=4)
+
+		if len(times) < 100:  # not enough data, go up and down a year
+			for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+						Clubswim.event==event, Clubswimmer.age==age + 1, Clubswim.course==course):
+					times.append(swim.time / 100.0)
+			for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+						Clubswim.event==event, Clubswimmer.age==age - 1, Clubswim.course==course):
+					times.append(swim.time / 100.0)
+
+		#times = rejectOutliers(times, l=4, r=4)
 
 		# best fit of data
 		(mu, sigma) = norm.fit(times)
-		(a, mu, sigma) = skewnorm.fit(times, max(times)-mu, loc=mu, scale=sigma)
-		#frozen = skewnorm(a, mu, sigma)
+		a = 5
+		(a, mu, sigma) = skewnorm.fit(times, a, loc=mu, scale=sigma)
 
-		# the histogram of the data
-		#n, bins, patches = plt.hist(times, 60, normed=1)
-		#y = skewnorm.pdf(bins, a, mu, sigma)
-
-		#plt.plot(bins, y)
-		#plt.show()
-
-		# save off the new dist
+		if plot:  # the histogram of the data
+			n, bins, patches = plt.hist(times, 60, normed=1)
+			y = skewnorm.pdf(bins, a, mu, sigma)
+			plt.plot(bins, y)
+			plt.show()
+		#else:  # save off the new dist
 		newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma)
 		newDist.save()
-
 		return newDist
 
 
@@ -171,6 +177,7 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 
 	# find percentile rank of course time was done in
 	percent = fromdist.sf(time)
+	#print percent
 
 	# convert using inverse survival function
 	newtime = todist.isf(percent)
@@ -183,13 +190,14 @@ class Clubteam(Model):  # one per season
 	season = IntegerField()
 	team = CharField()
 	gender = CharField()
-	state = CharField()
+	#state = CharField()
 	winnats = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
 	topSwimmers = {}
 
 	class Meta:
+		indexes = ((('season', 'team', 'gender'), True),)
 		database = db
 
 	def topTimes(self, dateStr=None, events=allEventsSCY):
@@ -239,6 +247,7 @@ class Clubswimmer(Model):
 	taperSwims = {}
 
 	class Meta:
+		indexes = ((('name', 'team', 'gender', 'age'), True),)
 		database = db
 
 	def similarSwimmers(self, num=3):
@@ -451,6 +460,7 @@ class Clubswim(Model):
 	taperTime = None
 
 	class Meta:
+		indexes = ((('time', 'event', 'date', 'swimmer', 'team'), True),)
 		database = db
 
 	def getPPTs(self, zscore=True, save=False):
@@ -873,8 +883,9 @@ class Clubmeet:
 			self.scoreMonteCarlo(dual=False)
 		return self.winMatrix
 
-	def teamScores(self, events='', sorted=True):
-		events = self.getEvents(events)
+	def teamScores(self, events=None, sorted=True):
+		if not events:
+			events = allEventsSCY
 		teams = {}
 
 		for team in self.teams:  # make sure all the teams get some score
@@ -1023,13 +1034,13 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 
 
 				if loadTeams:
-					key = team + gender + season + state
+					key = team + gender + season
 					if not key in teamKeys:
 						teamKeys.add(key)
 						try:
-							Clubteam.get(team=team, gender=gender, season=season, state=state)
+							Clubteam.get(team=team, gender=gender, season=season)
 						except Clubteam.DoesNotExist:
-							newTeam = {'team': team, 'gender': gender, 'season': season, 'state': state}
+							newTeam = {'team': team, 'gender': gender, 'season': season}
 							#print newTeam
 							teams.append(newTeam)
 
@@ -1045,7 +1056,7 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 							swimmers.append(newSwimmer)
 
 				if loadSwims:
-					teamID = Clubteam.get(team=team, gender=gender, season=season, state=state).id
+					teamID = Clubteam.get(team=team, gender=gender, season=season).id
 					swimmerID = Clubswimmer.get(gender=gender, name=name, team=team, age=age).id
 					key = time, event, date, swimmerID, teamID
 					if not key in swimKeys:
@@ -1079,7 +1090,22 @@ def safeImport(age=17, year=2016):
 	importSwims(loadSwimmers=True, loadage=age, year=year)
 	importSwims(loadSwims=True, loadage=age, year=year)
 
+def mergeTeams():
+	for team in Clubteam.select():
+		newTeam = Clubteam.get(team=team.team, gender=team.gender, season=team.season)
+		if newTeam.id == team.id:
+			continue
+		try:
+			with db.atomic():
+				print Clubswim.update(team=newTeam.id).where(Clubswim.team==team.id).execute()
+		except IntegrityError:
+			Clubswim.delete().where(Clubswim.team==team.id).execute()
+		print Clubteam.delete().where(Clubteam.id==team.id).execute()
+
+
 if __name__== '__main__':
+	#mergeTeams()
+	#8277 = team_id
 	#safeImport(age=19, year=2016)
 	#safeImport(age=20, year=2016)
 	#safeImport(age=21, year=2016)
@@ -1090,15 +1116,17 @@ if __name__== '__main__':
 	db.create_tables([Clubteam])
 	db.create_tables([Clubswimmer])
 	db.create_tables([Clubswim])
-	db.create_tables([Clubtimedist])
+	#db.create_tables([Clubtimedist])
 	'''
+
 	for event in allevents:
-		for gender in ['Men', 'Women']:
-			for age in range(19, 24):
-				for course in ['SCY', 'LCM']:
-					getSkewDist(gender=gender, event=event, age=age, course=course)
+		for gender in ['Women', 'Men']:
+			for age in ['22-30']:
+				for course in ['LCM']:
+					safeImport(age=age, year=2016)
 
-
+	#saveSkewDist(gender='Women', event='100 Free', age=21, course='LCM', plot=True)
+	#print convert(gender='Men', event='100 Free', age=14, fromCourse='SCY', toCourse='LCM', time=58)
 
 
 
