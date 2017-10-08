@@ -93,3 +93,15 @@ eventtoSCY = {'1500 Free': '1650 Free',
 			   	'200 Breast': '200 Breast',
 				'200 IM': '200 IM',
 			   	'400 IM': '400 IM'}
+
+eventsSCM = ['1500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
+				'50 Fly', '100 Fly', '200 Fly',
+				'50 Back', '100 Back', '200 Back',
+				'50 Breast', '100 Breast', '200 Breast',
+				'100 IM', '200 IM', '400 IM']
+
+eventsLCM = ['1500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
+				'50 Fly', '100 Fly', '200 Fly',
+				'50 Back', '100 Back', '200 Back',
+				'50 Breast', '100 Breast', '200 Breast',
+				'200 IM', '400 IM']

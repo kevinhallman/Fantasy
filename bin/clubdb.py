@@ -14,8 +14,7 @@ import numpy as np
 from math import log
 from sympy import binomial
 import heapq
-from events import eventsSCY, allEventsSCY, allevents, eventConvert, SCMfactor, eventtoSCY
-from clubScraper import eventsLCM
+from events import eventsSCY, allEventsSCY, allevents, eventConvert, SCMfactor, eventtoSCY, eventsLCM
 
 #  setup database
 urlparse.uses_netloc.append("postgres")
