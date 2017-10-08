@@ -123,6 +123,8 @@ app.add_processor(connection_processor)
 database = sqlmeets.SwimDatabase(database=db)
 (conferences, allTeams) = getConfs()
 
+currentSeason = 2017
+
 # appends the gender and division to the URL and allows them to be changed via there as well
 def setGenDiv(gender, division):
 	# modifies the URL if different
@@ -482,7 +484,7 @@ class Improvement():
 		setGenDiv(form.gender, form.division)
 		division = session.division
 		gender = session.gender
-		season = 2015
+		season = 2017
 		confList = conferences[division][gender]
 
 		if form.conference in confList:
@@ -492,7 +494,7 @@ class Improvement():
 		else:
 			return render.improvement(conferences=sorted(confList.keys()), table=None)
 
-		if form.season in {'2016', '2015', '2014', '2013'}:
+		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
@@ -523,7 +525,7 @@ class ImprovementJSON():
 		else:
 			return []
 
-		if form.season in {'2016', '2015', '2014', '2013'}:
+		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
@@ -562,11 +564,11 @@ class Rankings():
 			invite = False
 		else:
 			invite = True
-		if form.season in {'2017', '2016', '2015', '2014', '2013', '2012'}:
+		if form.season in {'2018', '2017', '2016', '2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
 			bar = True
 		else:
-			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
+			seasons = range(2012, currentSeason + 1)
 			bar = False
 		scores = {}
 		if not form.conference or not (form.conference in confList):
@@ -600,12 +602,10 @@ class RankingsJSON():
 			invite = False
 		else:
 			invite = True
-		if form.season in {'2017', '2016', '2015', '2014', '2013', '2012'}:
+		if form.season in {'2018', '2017', '2016', '2015', '2014', '2013', '2012'}:
 			seasons = {int(form.season)}
-			bar = True
 		else:
-			seasons = {2017, 2016, 2015, 2014, 2013, 2012}
-			bar = False
+			seasons = range(2012, currentSeason + 1)
 		scores = {}
 		if not form.conference or not (form.conference in confList):
 			return json.dumps({})
@@ -648,11 +648,12 @@ class Programs():
 
 		for conference in confs:
 			for team in conferences[division][gender][conference]:
+				# get data from teamseason from 2013 to last full season
 				for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
 					fn.avg(TeamSeason.attrition).alias('attrition'),
 					fn.avg(TeamSeason.improvement).alias('improvement'))\
 					.where(TeamSeason.team==team, TeamSeason.gender==gender,
-						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==division):
+						TeamSeason.season>2012, TeamSeason.season<currentSeason, TeamSeason.division==division):
 
 					if stats.inv and stats.attrition and stats.improvement:
 						teamRecruits[team] = stats.inv
@@ -697,7 +698,7 @@ class ProgramsJSON():
 					fn.avg(TeamSeason.attrition).alias('attrition'),
 					fn.avg(TeamSeason.improvement).alias('improvement'))\
 					.where(TeamSeason.team==team, TeamSeason.gender==gender,
-						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==division):
+						TeamSeason.season>2012, TeamSeason.season<2018, TeamSeason.division==division):
 
 					if stats.inv and stats.attrition and stats.improvement:
 						teamRecruits[team] = stats.inv
@@ -733,7 +734,7 @@ class SeasonRankings():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=2017)
+		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		rank = showRank(oldTopTeams)
 		return render.preseason(rank)
@@ -743,7 +744,7 @@ class SeasonRankingsJSON():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		topTeams = database.teamRank(gender=session.gender, division=session.division, season=2017)
+		topTeams = database.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		response = {}
 		for idx, team in enumerate(topTeams):
@@ -776,7 +777,7 @@ class SeasonRankingsJSON():
 
 class TeamStats():
 	def GET(self, team=None):
-		form = web.input(gender=None, division=None, season=2017)
+		form = web.input(gender=None, division=None, season=currentSeason)
 		season = form.season
 		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
 		setGenDiv(form.gender, form.division)
@@ -801,7 +802,7 @@ class TeamStats():
 					fn.avg(TeamSeason.attrition).alias('attrition'),
 					fn.avg(TeamSeason.improvement).alias('improvement'))\
 					.where(TeamSeason.team==team, TeamSeason.gender==session.gender,
-						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==session.division):
+						TeamSeason.season>2012, TeamSeason.season<currentSeason, TeamSeason.division==session.division):
 				attrition = round(stats.attrition, 3)
 				imp = round(stats.improvement, 3)
 		except TeamSeason.DoesNotExist:
@@ -824,7 +825,7 @@ class TeamStats():
 
 class TeamStatsJSON():
 	def GET(self, team=None):
-		form = web.input(gender=None, division=None, season=2017)
+		form = web.input(gender=None, division=None, season=currentSeason)
 		season = form.season
 		team = str.replace(str(team), '+', ' ')  # modify back to spaces in URL
 		setGenDiv(form.gender, form.division)
@@ -848,7 +849,7 @@ class TeamStatsJSON():
 					fn.avg(TeamSeason.attrition).alias('attrition'),
 					fn.avg(TeamSeason.improvement).alias('improvement'))\
 					.where(TeamSeason.team==team, TeamSeason.gender==session.gender,
-						TeamSeason.season>2012, TeamSeason.season<2017, TeamSeason.division==session.division):
+						TeamSeason.season>2012, TeamSeason.season<currentSeason, TeamSeason.division==session.division):
 				attrition = round(stats.attrition, 3)
 				imp = round(stats.improvement, 3)
 		except TeamSeason.DoesNotExist:
@@ -934,7 +935,7 @@ class Swimmerstats():
 		confList = sorted(conferences[division][gender].keys())
 		confList.remove('')
 
-		form.season = 2017
+		form.season = currentSeason
 		if not form.season:
 			return render.swimmerstats(conferences=confList)
 
@@ -967,7 +968,7 @@ class SwimmerstatsJSON():
 		confList = sorted(conferences[division][gender].keys())
 		confList.remove('')
 
-		form.season = 2017
+		form.season = currentSeason
 		if not form.season:
 			return
 
@@ -1126,23 +1127,23 @@ class Timeconvert():
 		events = ['50 Free', '100 Free', '200 Free', '400/500 Free', '1500/1650 Free',
 				'50 Fly', '100 Fly', '200 Fly', '50 Back', '100 Back', '200 Back',
 				'50 Breast', '100 Breast', '200 Breast', '200 IM', '400 IM']
-		form = web.input(gender=None, fromage=None, toage=None, event=None, min=None, sec=None, hun=None, table=None,
+		form = web.input(gender=None, fromage=None, toage=None, event=None, min=None, sec=None, hun=None,
 						 submit=None, fromcourse=None, tocourse=None, division=None)
 		setGenDiv(form.gender, form.division)
 
 		if not form.event or form.event == 'Event' or not form.gender:  # empty
-			if conversion=='time':
+			if conversion in ['time', 'age']:
 				return render.timeconvert(events=events)
-			if conversion=='age':
-				return render.ageconvert(events=events)
 			else:
 				return
 		if not form.tocourse:
-				form.tocourse = form.fromcourse
+			form.tocourse = form.fromcourse
 		if form.fromage=='Open':
 			form.fromage = 23
 		if not form.toage:
 			form.toage = form.fromage
+		if not form.fromage or form.fromcourse=='From Course':
+			return
 
 		time = 0
 		try:
@@ -1156,7 +1157,7 @@ class Timeconvert():
 			time += int(form.sec)
 			time += .01 * int(form.hun)
 		except:
-			time = None
+			return
 
 		# straighten out lcm/scy event conversion
 		if form.event == '400/500 Free':
@@ -1185,8 +1186,6 @@ class Timeconvert():
 			return json.dumps(timestable)
 
 		# otherwise return the points
-		if not form.tocourse:
-			form.tocourse = form.fromcourse
 		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
 					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
 

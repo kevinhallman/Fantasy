@@ -1,5 +1,6 @@
 from peewee import *
 import os
+import sys
 import re
 from datetime import date as Date
 import time as Time
@@ -9,11 +10,12 @@ from swimdb import toTime, swimTime, Swim
 from scipy.stats import norm, skewnorm
 import numpy as np
 #import matplotlib.mlab as mlab
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from math import log
 from sympy import binomial
 import heapq
 from events import eventsSCY, allEventsSCY, allevents, eventConvert, SCMfactor, eventtoSCY
+from clubScraper import eventsLCM
 
 #  setup database
 urlparse.uses_netloc.append("postgres")
@@ -45,7 +47,7 @@ def rejectOutliers(dataX, dataY=None, l=5, r=6):
 
 
 '''used to find the the full CDF of times in a single event and a divsion, gender'''
-def getSkewCDF(gender, age, event, course='LCM', percent=1.0):
+def getSkewCDF(gender, age, event, course='LCM', percent=1.0, year=None):
 	def makeCDF(a, mu, sigma, percent):  # returns a frozen truncated normal CDF
 		def freezeCDF(x):
 			rank = skewnorm.cdf(x, a, mu, sigma)
@@ -56,20 +58,24 @@ def getSkewCDF(gender, age, event, course='LCM', percent=1.0):
 		return freezeCDF
 
 	try:
-		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course)
+		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course, year=year)
 	except Clubtimedist.DoesNotExist:
-		dist = saveSkewDist(gender, age, event, course)
+		dist = saveSkewDist(gender, age, event, course, year=year)
 
 	frozen = makeCDF(dist.a, dist.mu, dist.sigma, percent)
 	return frozen
 
-'''skewnormal distribution of times in an event'''
-def getSkewDist(gender, age, event, course='LCM', getData=False):
-	print gender, age, event, course, getData
+
+def getSkewDist(gender, age, event, course='LCM', getData=False, year=None):
+	print gender, age, event, course, year
 	try:
-		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course)
+		if year:
+			dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course, year=year)
+		else:
+			dist = Clubtimedist.select().where(Clubtimedist.gender==gender, Clubtimedist.age==age,
+				Clubtimedist.event==event, Clubtimedist.course==course, Clubtimedist.year.is_null()).get()
 	except Clubtimedist.DoesNotExist:
-		dist = saveSkewDist(gender, age, event, course)
+		dist = saveSkewDist(gender, age, event, course, year=year)
 	if dist:
 		if getData:  # just return the object
 			return dist
@@ -78,7 +84,7 @@ def getSkewDist(gender, age, event, course='LCM', getData=False):
 	return
 
 
-def saveSkewDist(gender, age, event, course='LCM', plot=False):
+def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None):
 		age = int(age)
 		times = []
 
@@ -88,34 +94,26 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False):
 			a = (LCMdist.a + SCYdist.a)/2 * SCMfactor[gender][event]
 			mu = (LCMdist.mu + SCYdist.mu)/2 * SCMfactor[gender][event]
 			sigma = (LCMdist.sigma + SCYdist.sigma)/2 * SCMfactor[gender][event]
-			newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma)
+			newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma,
+								   year=year)
 			newDist.save()
 			return newDist
 
 
-		if course == 'SCY' and age > 17:  # use college times
-			if age == 19:
-				year = 'Freshman'
-			elif age == 20:
-				year = 'Sophomore'
-			elif age == 21:
-				year = 'Junior'
+		if age < 23:
+			if year:
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).switch(Clubswim).join(Clubteam).where(
+							Clubswimmer.gender==gender, Clubteam.season==year,
+							Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
+					times.append(swim.time / 100.0)
 			else:
-				year = 'Senior'
-			if event not in eventConvert:
-				return
-			for swim in Swim.select(Swim.time).where(Swim.gender==gender, Swim.event==eventConvert[event],
-													 Swim.season==2016, Swim.year==year):
-				times.append(swim.time)
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+							Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
+					times.append(swim.time / 100.0)
 		else:
-			if age < 23:
-				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
-						Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
-					times.append(swim.time / 100.0)
-			else:
-				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
-						Clubswim.event==event, Clubswimmer.age > 18, Clubswim.course==course):
-					times.append(swim.time / 100.0)
+			for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+					Clubswim.event==event, Clubswimmer.age > 20, Clubswim.course==course):
+				times.append(swim.time / 100.0)
 		print event, age, gender, course, len(times)
 
 		if len(times) == 0:
@@ -129,20 +127,20 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False):
 						Clubswim.event==event, Clubswimmer.age==age - 1, Clubswim.course==course):
 					times.append(swim.time / 100.0)
 
-		#times = rejectOutliers(times, l=4, r=4)
+		times = rejectOutliers(times, l=4, r=4)
 
 		# best fit of data
 		(mu, sigma) = norm.fit(times)
 		a = 5
 		(a, mu, sigma) = skewnorm.fit(times, a, loc=mu, scale=sigma)
-
+		print mu, sigma, a
 		if plot:  # the histogram of the data
 			n, bins, patches = plt.hist(times, 60, normed=1)
 			y = skewnorm.pdf(bins, a, mu, sigma)
 			plt.plot(bins, y)
 			plt.show()
-		#else:  # save off the new dist
-		newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma)
+			return
+		newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma, year=year)
 		newDist.save()
 		return newDist
 
@@ -177,7 +175,7 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 
 	# find percentile rank of course time was done in
 	percent = fromdist.sf(time)
-	#print percent
+	print percent
 
 	# convert using inverse survival function
 	newtime = todist.isf(percent)
@@ -977,6 +975,7 @@ class Clubtimedist(Model):
 	event = CharField()
 	gender = CharField()
 	age = IntegerField()
+	year = IntegerField(null=True)
 	course = CharField()
 	mu = FloatField()
 	sigma = FloatField()
@@ -985,8 +984,7 @@ class Clubtimedist(Model):
 	class Meta:
 		database = db
 
-
-def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18, year=2016):
+def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18, year=2016, load_course=None):
 	# 9/1 starting date
 	root = 'data/club/' + str(year) + '/' + str(loadage)
 
@@ -994,8 +992,14 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 		if 'Club' not in fileName:
 			continue
 		print fileName
+
 		parts = re.split('_', fileName)
-		_, season, course, gender, event, _, loadage = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
+		_, season, course, gender, event, zone, loadage = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], \
+													   parts[6]
+
+		if load_course and load_course != course:
+			#print load_course, course
+			continue
 
 		print season, course, gender, event, loadage
 		with open(root + '/' + fileName) as file:
@@ -1005,26 +1009,29 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 			swimKeys = set()
 			swimmerKeys = set()
 			teamKeys = set()
-			#time = None
 
 			for line in file:
 				swimParts = re.split('\t', line)
-				if len(swimParts) < 8:
+				if len(swimParts) < 9:
 					continue
 				try:
-					meetState, name, age, team, gender, event, seconds, timeStr, date = swimParts[0], swimParts[1], \
+					event_course, team, timeStr, date, meet, name, gender, age, standard = \
+						swimParts[0], swimParts[1], \
 					swimParts[2], swimParts[3], swimParts[4], swimParts[5], swimParts[6], swimParts[7], swimParts[8]
 					age = int(age)
-					year, state, meet = meetState[:4], meetState[5:7], meetState[8:]
+					course = event_course[-3:]
 					if timeStr[-1]=='r':
 						timeStr = timeStr[:-1]
 					time = int(toTime(timeStr) * 100)  # time in ms
 				except:
+					print sys.exc_info()
+					print 'parseFail'
 					print line
 					continue
-				# or not (int(age)==int(loadage))
+
 				if not time or not gender in ['Men', 'Women']  \
-						or not event in allevents or not re.match("\d\d/\d\d/\d\d$", date):
+						or not event in allevents or not re.match("\d\d\d\d-\d\d-\d\d", date):
+					print 'checkFail'
 					print (not time), (not gender in ['Men', 'Women']), not event in allevents, \
 						not re.match("\d\d/\d\d/\d\d$", date), not (int(age)==int(loadage))
 					print age, loadage
@@ -1085,10 +1092,10 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 			print 'Swims:', len(swims)
 			print Clubswim.insert_many(swims).execute()
 
-def safeImport(age=17, year=2016):
-	importSwims(loadTeams=True, loadage=age, year=year)
-	importSwims(loadSwimmers=True, loadage=age, year=year)
-	importSwims(loadSwims=True, loadage=age, year=year)
+def safeImport(age=17, year=2016, load_course='SCY'):
+	importSwims(loadTeams=True, loadage=age, year=year, load_course=load_course)
+	importSwims(loadSwimmers=True, loadage=age, year=year, load_course=load_course)
+	importSwims(loadSwims=True, loadage=age, year=year, load_course=load_course)
 
 def mergeTeams():
 	for team in Clubteam.select():
@@ -1102,31 +1109,201 @@ def mergeTeams():
 			Clubswim.delete().where(Clubswim.team==team.id).execute()
 		print Clubteam.delete().where(Clubteam.id==team.id).execute()
 
+def showAgeCurves(age=None):
+	men = []
+	women = []
+	w5, w32, w40, w50, w60, w68, w95 = [], [], [], [], [], [], []
+	m5, m32, m40, m50, m60, m68, m95 = [], [], [], [], [], [], []
+	for gender in ['Men', 'Women']:
+		#for age in range(8, 19):
+		for year in range(2007, 2017):
+			#year = 1999 + age  # start at 2007
+			age = age
+			cdf = getSkewDist(gender=gender, age=age, course='SCY', event='100 Free', year=year)
+			if gender=='Men':
+				m50.append(cdf.median())
+				(lo, hi) = cdf.interval(.2)
+				m40.append(lo)
+				m60.append(hi)
+				(lo, hi) = cdf.interval(.68)
+				m32.append(lo)
+				m68.append(hi)
+				(lo, hi) = cdf.interval(.95)
+				m5.append(lo)
+				m95.append(hi)
+			else:
+				w50.append(cdf.median())
+				(lo, hi) = cdf.interval(.2)
+				w40.append(lo)
+				w60.append(hi)
+				(lo, hi) = cdf.interval(.68)
+				w32.append(lo)
+				w68.append(hi)
+				(lo, hi) = cdf.interval(.95)
+				w5.append(lo)
+				w95.append(hi)
+	#yvalues = range(8, 19)
+	yvalues = range(2007, 2017)
+	plt.plot(yvalues, w50, 'r-', linewidth=3)
+	plt.plot(yvalues, w40, 'r-', linewidth=2)
+	plt.plot(yvalues, w60, 'r-', linewidth=2)
+	plt.plot(yvalues, w32, 'r-', linewidth=1)
+	plt.plot(yvalues, w68, 'r-', linewidth=1)
+	plt.plot(yvalues, w95, 'r-')
+	plt.plot(yvalues, w5, 'r-')
+	plt.plot(yvalues, m50, 'b-', linewidth=3)
+	plt.plot(yvalues, m40, 'b-', linewidth=2)
+	plt.plot(yvalues, m60, 'b-', linewidth=2)
+	plt.plot(yvalues, m32, 'b-', linewidth=1)
+	plt.plot(yvalues, m68, 'b-', linewidth=1)
+	plt.plot(yvalues, m95, 'b-')
+	plt.plot(yvalues, m5, 'b-')
+	plt.show()
+	print w5, w32, w40, w50, w60, w68, w95, m5, m32, m40, m50, m60, m68, m95
+
+def showAttrition(gender='Women'):
+	raw_data = {}
+	percentile_swims = {}
+	percentile_drops = {}
+	for year in range(2007, 2017):
+		age = year - 1999
+		percentile_swims[str(age)] = {}
+		percentile_drops[str(age)] = {}
+		dist1 = getSkewDist(gender=gender, age=age, course='SCY', event='100 Free', year=year)
+		dist2 = getSkewDist(gender=gender, age=age+1, course='SCY', event='100 Free', year=year)
+
+		# get swims for that year
+		swims = {}
+		for swim in Clubswim.select(Clubswim, Clubswimmer, Clubteam).join(Clubswimmer).switch()\
+				.join(Clubteam).where(Clubteam.season==year,
+			Clubswimmer.gender==gender, Clubswimmer.age==age):
+			swims[swim.swimmer.name] = swim
+		orig_size = len(swims)
+
+		# see who swam next season
+
+		newSwims = {}
+		for swim in Clubswim.select(Clubswim, Clubswimmer, Clubteam).join(Clubswimmer).switch()\
+				.join(Clubteam).where(Clubteam.season==year+1,
+			Clubswimmer.gender==gender, Clubswimmer.age==age+1):
+			newSwims[swim.swimmer.name] = swim
+
+		# go though young folks and see what percentile they were in the next year
+		for name in swims:
+			percentileold = str(int(dist1.cdf(swims[name].time/100) * 5) * 2)
+			if percentileold == 10: percentileold = 8
+			if name in newSwims:
+				percentilenew = str(int(dist2.cdf(newSwims[name].time / 100) * 5) * 2)
+				if percentilenew == 10: percentilenew = 8
+				#print newSwims[name].time, percentilenew
+			else:
+				percentilenew = '9'#'None'
+			source_target = str(age) +'-'+ percentileold +'-'+ str(age+1) +'-'+ percentilenew
+			if source_target not in raw_data:
+				raw_data[source_target] = 0
+			raw_data[source_target] += 1
+
+			if not percentileold in percentile_swims[str(age)]:
+				percentile_swims[str(age)][str(percentileold)] = 0
+				percentile_drops[str(age)][str(percentileold)] = 0
+			percentile_swims[str(age)][str(percentileold)] += 1
+			if percentilenew=='9':
+				percentile_drops[str(age)][str(percentileold)] += 1
+
+		# now get the ones who didn't swim the first year
+		for name in newSwims:
+			if name not in swims:
+				percentileold = '9'#'None'
+				percentilenew = str(int(dist2.cdf(newSwims[name].time / 100) * 5) * 2)
+				if percentilenew == 10: percentilenew = 8
+				source_target = str(age) +'-'+ percentileold +'-'+ str(age+1) +'-'+ percentilenew
+				if source_target not in raw_data:
+					raw_data[source_target] = 0
+				raw_data[source_target] += 1
+
+		for age in percentile_swims:
+			for percentile in ['0', '2', '4', '6', '8']:  #percentile_swims[age]:
+				print age, percentile, percentile_drops[age][percentile] / float(percentile_swims[age][percentile])
+
+
+	links = {'source':[], 'target':[], 'value': [], 'label': []}
+	nodes = {'label':[]}
+	for label in raw_data:
+		parts = label.split('-')
+		#print parts
+		#print "['Age:" + parts[0] + ' %' + parts[1] + "','Age:" \
+		#	  + parts[2] + ' %' + parts[3] + "'," + str(raw_data[label]) + "],"
+		links['source'].append(int(parts[0] + parts[1]))
+		links['target'].append(int(parts[2] + parts[3]))
+		links['value'].append(raw_data[label])
+		nodes['label'].append(parts[0] + parts[1])
+
+	'''
+	import plotly.plotly as py
+	data_trace = dict(
+    type='sankey',
+    #domain = dict(
+    #  x =  [0, 1],
+    #  y =  [0, 1]
+    #),
+    orientation = "h",
+    valueformat = ".0f",
+    valuesuffix = "TWh",
+    node = dict(
+      pad = 15,
+      thickness = 15,
+      line = dict(
+        color = "black",
+        width = 0.5
+      ),
+      label = nodes['label']
+      #color = 'rgba(31, 119, 180, 0.8)'
+    ),
+    link = dict(
+      source = links['source'],
+      target = links['target'],
+      value = links['value'],
+      label = links['label']
+  ))
+
+	layout =  dict(
+    	title = 'Improvement',
+    	font = dict(
+      		size = 10
+    	)
+	)
+
+	fig = dict(data=[data_trace], layout=layout)
+	py.iplot(fig, validate=True)
+	'''
+
 
 if __name__== '__main__':
-	#mergeTeams()
-	#8277 = team_id
-	#safeImport(age=19, year=2016)
-	#safeImport(age=20, year=2016)
-	#safeImport(age=21, year=2016)
-	'''
-	db.drop_tables([Clubswim])
-	db.drop_tables([Clubswimmer])
-	db.drop_tables([Clubteam])
-	db.create_tables([Clubteam])
-	db.create_tables([Clubswimmer])
-	db.create_tables([Clubswim])
-	#db.create_tables([Clubtimedist])
-	'''
+	#for age in range(20, 21):
+	#	for year in range(2007, 2018):
+	#		safeImport(age=age, year=year, load_course='LCM')
 
+	#showAttrition()
+	#showAgeCurves(age=16)
+
+	print Clubtimedist.select().where(Clubtimedist.gender=='Women', Clubtimedist.age==23,
+				Clubtimedist.event=='400 Free', Clubtimedist.course=='LCM', Clubtimedist.year.is_null()).get().a
+
+	'''
 	for event in allevents:
 		for gender in ['Women', 'Men']:
 			for age in ['22-30']:
 				for course in ['LCM']:
 					safeImport(age=age, year=2016)
+	'''
+	#for age in range(15, 19):
+	#for event in eventsLCM:
+	#	for age in range(8, 24):
+	#		for gender in ['Men', 'Women']:
+	#			saveSkewDist(gender=gender, event=event, age=age, course='LCM', plot=False)
 
-	#saveSkewDist(gender='Women', event='100 Free', age=21, course='LCM', plot=True)
 	#print convert(gender='Men', event='100 Free', age=14, fromCourse='SCY', toCourse='LCM', time=58)
+
 
 
 

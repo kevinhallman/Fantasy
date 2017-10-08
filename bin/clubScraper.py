@@ -1,15 +1,14 @@
 import time
 import re
 import os
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+import json
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
-from unidecode import unidecode
+import datetime
 
 eventsSCY = ['1650 Free', '500 Free', '200 Free', '100 Free', '50 Free',
 				'50 Fly', '100 Fly', '200 Fly',
@@ -37,151 +36,181 @@ def init_driver():
 
 # converts to a time in seconds
 def toTime(time):
-	if time[0]=="X" or time[0]=="x":
+	if time[0]=='X' or time[0]=='x':
 		time=time[1:]
-	if time[len(time)-1]=="r" or time[len(time)-1]=="R":
+	if time[len(time)-1]=='r' or time[len(time)-1]=='R':
 		time=time[0:len(time)-1]
-	if re.match(".*:.*",time) == None:
+	if re.match('.*:.*',time) == None:
 		return time
-	return float(re.split(":",time)[0])*60 +float(re.split(":",time)[1])
+	return float(re.split(':',time)[0])*60 +float(re.split(':', time)[1])
 
 
-def lookup(driver, gender="M", event="50 Free", courseStr="LCM", bestAll="Best", nTimes="7000", year="2016", File=None,
-		   minAge='All', maxAge='All', zone=None, oldTimes=set()):
-	driver.get('http://www.usaswimming.org/DesktopDefault.aspx?TabId=1482&Alias=Rainbow&Lang=en')
-	if(gender=="M"):
-		sex="radMale"
-		genderOut="Men"
-	else:
-		sex = "radFemale"
-		genderOut = "Women"
-	distance = event[0:event.find(" ")]
-	strke = event[event.find(" ") + 1:]
-	strokeDict = {"Free": 1, "Back": 2, "Breast": 3, "Fly": 4, "IM": 5}
-	stroke = strokeDict[strke]
-	courseDict = {"SCY": 1, "SCM": 2, "LCM": 3}
-	course = courseDict[courseStr]
-	bestAllDict = {"All": "radAllTimesForSwimmer", "Best": "radBestTimeOnly"}
+def lookup(driver, gender='Men', event='50 Free', course='LCM', bestAll='Best', nTimes='4500', year='2016',
+		   filePath='test', minAge='All', maxAge='All', zone='All'):
+	driver.get('https://www.usaswimming.org/times/event-rank-search')
+
+	# translate to USA swimming values
+	distance = event[0:event.find(' ')]
+	stroke = event[event.find(' ') + 1:]
+	strokeDict = {'Free': 1, 'Back': 2, 'Breast': 3, 'Fly': 4, 'IM': 5}
+	strokeId = strokeDict[stroke]
+	courseDict = {'SCY': 1, 'SCM': 2, 'LCM': 3}
+	courseId = courseDict[course]
+	bestAllDict = {'All': 'radAllTimesForSwimmer', 'Best': 'radBestTimeOnly'}
 	bestAll = bestAllDict[bestAll]
-	yearDict = {"1996":"1","1997":"2","1998":"3","1999":"4","2000":"5","2001":"6","2002":"7","2003":"8","2004":"9",
-			   "2005":"10","2006":"11","2007":"12","2008":"13","2009":"14","2010":"15","2011":"16","2012":"17","2013":"18","2014":"19","2015":"20","2016":"21"}
-	year = yearDict[year]
+	yearDict = {'1996': '1', '1997': '2', '1998': '3', '1999': '4', '2000': '5', '2001': '6', '2002': '7', '2003': '8',
+				'2004': '9', '2005': '10', '2006': '11', '2007': '12', '2008': '13', '2009': '14',
+				'2010': '15', '2011': '16', '2012': '17', '2013': '18', '2014': '19', '2015': '20', '2016': '21',
+				'2017': '22'}
+	yearId = yearDict[year]
+	zoneDict = {'All': 0, 'Central': 1, 'Eastern': 2, 'Southern': 3, 'Western': 4}
+	zoneId = zoneDict[zone]
 
-	for page in range(0, int(nTimes)/50):
+	'''
+		data: { divId: 'Times_EventRankSearch_Index_Div_1',
+			SelectedDateType: ($(theDiv).find('#' + 'Times_EventRankSearch_Index_Div_1' + 'ddlDateRanges').val() !== "0") ? 'CompletionPeriod' : "DateRange",
+			StartDate: $(theDiv).find('#' + divId + 'StartDate').val(),
+			EndDate: $(theDiv).find('#' + divId + 'EndDate').val(),
+			DateRangeID: $(theDiv).find('#' + divId + 'ddlDateRanges').val(),
+			SelectedGender: $(theDiv).find("input[name='SelectedGender']:checked").val(),
+			DSC: { DistanceID: $(theDiv).find('#' + divId + 'cboDistance').val(),
+			StrokeID: $(theDiv).find('#' + divId + 'cboStroke').val(),
+			CourseID: $(theDiv).find('#' + divId + 'cboCourse').val() },
+			StandardID: $(theDiv).find('#' + divId + 'ddlStandards').val(),
+			LSCs: lscList,
+			ZoneID: $(theDiv).find('#' + divId + 'ddlZones').val(),
+			AgeRangeStart: $(theDiv).find('#' + divId + 'ddlStartAge').val(),
+			AgeRangeEnd: $(theDiv).find('#' + divId + 'ddlEndAge').val(),
+			SelectedTimesToInclude: $(theDiv).find('#' + divId + 'ddlIncludedTimes').val(),
+			SelectedMembersToInclude: $(theDiv).find('#' + divId + 'ddlIncludedMembers').val(),
+			MaxResults: $(theDiv).find('#MaxResults').val(),
+			OrderBy: orderBy,var orderBy = $(theDiv).find('#' + divId + 'SortBy1').val();
+                if ($(theDiv).find('#' + divId + 'SortBy2').val() != '')
+                    orderBy = orderBy + ', ' + $(theDiv).find('#' + divId + 'SortBy2').val();
+                if ($(theDiv).find('#' + divId + 'SortBy3').val() != '')
+                    orderBy = orderBy + ', ' + $(theDiv).find('#' + divId + 'SortBy3').val();
+			clubId: $(theDiv).find("#hidClubId").val(),
+			TimeType: $(theDiv).find("input[name='TimeType']:checked").val() }
+	'''
+
+	# modify elements on the pave to match selections
+	divId = 'Times_EventRankSearch_Index_Div_1'
+	element = driver.find_element_by_id(divId + 'ddlDateRanges')
+	driver.execute_script('arguments[0].value =' + yearId, element)
+
+	element = driver.find_element_by_id(divId + 'cboDistance')
+	driver.execute_script('arguments[0].value =' + str(distance), element)
+
+	element = driver.find_element_by_id(divId + 'cboStroke')
+	driver.execute_script('arguments[0].value =' + str(strokeId), element)
+
+	element = driver.find_element_by_id(divId + 'cboCourse')
+	driver.execute_script('arguments[0].value =' + str(courseId), element)
+
+	if minAge != 'All':
+		element = driver.find_element_by_id(divId + 'ddlStartAge')
+		driver.execute_script('arguments[0].value =' + str(minAge), element)
+	if maxAge != 'All':
+		element = driver.find_element_by_id(divId + 'ddlEndAge')
+		driver.execute_script('arguments[0].value =' + str(maxAge), element)
+
+	if gender=='Women':
+		driver.find_element_by_css_selector('label[for=SelectedGender_Female').click()
+	elif gender=='Men':
+		driver.find_element_by_css_selector('label[for=SelectedGender_Male').click()
+	else:
+		driver.find_element_by_css_selector('label[for=SelectedGender_Mixed').click()
+
+	element = driver.find_element_by_id(divId + 'ddlZones')
+	driver.execute_script('arguments[0].value =' + str(zoneId), element)
+
+	element = driver.find_element_by_id('MaxResults')
+	driver.execute_script('arguments[0].value =' + str(nTimes), element)
+
+	driver.execute_script("$('#saveButton').click()")
+
+	# grab the data from the script to place it in
+	time.sleep(5)
+	try:
+		element = driver.find_element_by_xpath("//div[@id='Times_EventRankSearch_Index_Div_1-Results']/script[2]")
+	except:  # wait another three seconds if nothing
+		time.sleep(3)
 		try:
-			if page == 0:
-				driver.find_element_by_xpath("//select[@id='ctl68_ddNamedDateRange']/option[@value="+year+"]").click()
-				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddDistance']/option[@value="+distance+"]").click()
-				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddStroke']/option[@value="+str(stroke)+"]").click()
-				driver.find_element_by_xpath("//select[@id='ctl68_ucDistStrokeCourse_ddCourse']/option[@value="+str(course)+"]").click()
-				driver.find_element_by_xpath("//input[@id='ctl68_" + sex + "']").click()
-				driver.find_element_by_xpath("//input[@id='ctl68_radlStandard_14']").click()
-				driver.find_element_by_xpath("//input[@id='ctl68_" + bestAll + "']").click()
-				driver.find_element_by_id("ctl68_txtMaxResults").clear()
-				driver.find_element_by_id("ctl68_txtMaxResults").send_keys(nTimes)
-				if zone:
-					driver.find_element_by_xpath("//select[@id='ctl68_ddZone']/option[@value=" + zone + "]").click()
-				if minAge!="All":
-					driver.find_element_by_xpath("//select[@id='ctl68_ddAgeStart']/option[@value="+minAge+"]").click()
-				if maxAge!="All":
-					driver.find_element_by_xpath("//select[@id='ctl68_ddAgeEnd']/option[@value="+maxAge+"]").click()
-				driver.find_element_by_id("ctl68_btnSearch").click()
+			element = driver.find_element_by_xpath("//div[@id='Times_EventRankSearch_Index_Div_1-Results']/script[2]")
+		except:
+			print 'no results'
+			return
 
-			if page > 0:
-				try:
-					driver.find_element_by_link_text(str(page+1)).click()
-				except WebDriverException:
-					try:
-						if len(driver.find_elements_by_link_text("..."))>1:
-							driver.find_elements_by_link_text("...")[1].click()
-						else:
-							if page==30:
-								driver.find_element_by_link_text("...").click()
-							else:
-								break
-					except WebDriverException:
-						break
-			time.sleep(3.5)
-			r=driver.page_source
-		except TimeoutException:
-			print("Error")
+	datascript = element.get_attribute('innerHTML')
+	start = datascript.find('data: ')
+	end = datascript.find('}]', start)
 
-		place = r.find('<td>Meet Results</td>') + 25
-		end = r.find('</table>', place + 1000)
-		count = 0
-		previousResult = ""
+	#print datascript
+	#print datascript[start + 6: end + 1]
+	dataraw = datascript[start + 6: end + 2].strip().encode('ascii', 'ignore')
+	#print dataraw
+	#print dataraw[636850:636890]
+	data = json.loads(dataraw)
 
-		# there are vastly more efficient ways to loop through this, but this code is done and works, so I don't care
-		while place > 0:
-			place = r.find('</td>', place + 1, end)
-			count = (count + 1) % 12
-			if count == 1:
-				timeMMSS = r[r.find('>',place+5)+1:r.find('<',place+9)]
-				if len(timeMMSS) == 0:
-					break
-			if count == 4:
-				place = r.find('<span',place+1,end)
-				swimmer = r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count == 8:
-				team = r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count == 6:
-				age = r[r.find('>',place+5)+1:r.find('<',place+9)]
-			if count == 5:
-				fore = r[r.find('>',place+5)+1:r.find('<',place+9)]
-				if len(fore)==0:
-					foreign = ""
-				else:
-					foreign = fore
-			if count == 9:
-				place = r.find('<span',place+1,end)
-				meet = r[r.find('>',place+5)+1:r.find('<',place+9)-8]
-				date = r[r.find('<',place+9)-8:r.find('<',place+9)]
-				# the web page sometimes returns the same result a bunch of times in a row.
-				# this throws a time out if it repeats the swimmer name age time and date of the row above.
-				# also throws out the header row
-				if timeMMSS=='Time' or previousResult == swimmer+age+timeMMSS+date:
-					continue
-				previousResult = swimmer + age + timeMMSS + date
-				if not swimmer:
-					continue
-				outputstring = meet+'\t'+swimmer+'\t'+age+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+str(toTime(
-					timeMMSS))+'\t'+timeMMSS+'\t'+date+'\t'+courseStr+'\t'+'\n'
-				outputstring = unidecode(outputstring)
-				outputstring = str(outputstring).translate(None, "#")
-				outputstring= outputstring.replace("'", "")
+	#print data
 
-				if outputstring not in oldTimes:  # make sure the time doesn't already exist
-					File.write(outputstring)
-					oldTimes.add(outputstring)
+	# parse the data
+	'''{u'EventID': 3, u'TeamName': u'King Marlin Swim Club', u'LSC': u'OK', u'SwimTime': u'2:15.64',
+	u'EventSortOrder': 30, u'FullName': u'Rice, Keaton', u'Rank': 250, u'Foreign': u'',
+	u'SwimDate': u'/Date(1452841200000)/', u'MeetID': 121828, u'PersonClusteredID': u'2095794',
+	u'MeetName': u'2016 OK 65th Annual Phillips 66 Meet ', u'AltAdjSwimTime': u'2:15.64', u'AthletesPdf': None,
+	u'SponsorWebsite': u'', u'Age': 10, u'EventDesc': u'200 FR SCY', u'Athletes': None, u'PowerPoints': 687,
+	u'StandardName': u'"AAA"', u'SponsorImage': u''}'''
+
+	with open(filePath, 'w+') as outFile:
+		for line in data:
+			jsondate = int(line['SwimDate'][6:-2])
+			date = datetime.date.fromtimestamp(jsondate/1000.0)
+			name = line['FullName'].encode('ascii', 'ignore')
+			outFile.write(line['EventDesc']+'\t'+line['TeamName']+'\t'+line['SwimTime']+'\t'+str(date)+'\t'+ \
+				line['MeetName']+'\t'+name+'\t'+gender+'\t'+str(line['Age'])+'\t'+line['StandardName']+'\n')
 
 
 if __name__ == "__main__":
 	basedirectory = 'data/club'
-	driver = init_driver()
-	years = ['2016']#, '2015']  # ['2013', '2012']
-	genders = ['M', 'F']
+	years = range(2015, 2016)
+	genders = ['Men', 'Women']
 	course = 'LCM'
 	if course=='SCY':
 		events = eventsSCY
 	elif course=='SCM':
 		events = eventsSCM
-	elif course=='LCM':
+	else:
 		events = eventsLCM
 
 	#events = ['100 Free']
-	#zones = ['1', '2', '3', '4']
-	zones = ['All']
-	#ages = range(22, 30)
-	ages = ['22-30']
+	zones = {'Central', 'Eastern', 'Southern', 'Western'}
+	#zones = ['All']
+	ages = range(8, 21)
 
 	for gender in genders:
 		for event in events:
-			for year in years:
+			for yearInt in years:
 				for age in ages:
 					for zone in zones:
+						year = str(yearInt)
 						directory = basedirectory + '/' + year + '/' + str(age)
 						if not os.path.exists(directory):
 							os.makedirs(directory)
+
+						# skip some data for smaller results sets
+						if age == 20:
+							minAge = 20
+							maxAge = 40
+						else:
+							maxAge = str(age)
+							minAge= str(age)
+
+						if age > 16:
+							if zone == 'Central':
+								zone = 'All'
+							else:
+								continue
 
 						filename = 'Club_' + year + '_' + course + '_' + gender + '_' + event + '_Age_' + str(age) + \
 								   '_' + zone
@@ -195,13 +224,7 @@ if __name__ == "__main__":
 								for line in oldMeetFile:
 									oldTimes.add(line)
 
-						with open(filepath, 'a+') as meetFile:
-							try:
-								lookup(driver, event=event, courseStr=course, gender=gender, year=year, File=meetFile,
-							   		minAge='22', maxAge='30', zone=None, oldTimes=oldTimes)
-							except:
-								print 'Error'
-							finally:
-								print 'OK'
-	time.sleep(5)
-	driver.quit()
+						driver = init_driver()
+						lookup(driver, event=event, course=course, gender=gender, year=year, filePath=filepath,
+						   		minAge=minAge, maxAge=maxAge, zone=zone)
+						driver.quit()
