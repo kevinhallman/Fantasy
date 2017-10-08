@@ -1285,8 +1285,17 @@ if __name__== '__main__':
 	#showAttrition()
 	#showAgeCurves(age=16)
 
-	print Clubtimedist.select().where(Clubtimedist.gender=='Women', Clubtimedist.age==23,
-				Clubtimedist.event=='400 Free', Clubtimedist.course=='LCM', Clubtimedist.year.is_null()).get().a
+	migrator = PostgresqlMigrator(db)
+	with db.transaction():
+		migrate(
+			migrator.add_column('clubtimedist', 'year', Clubtimedist.year),
+			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
+			#migrator.adsd_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
+		)
+
+	#print Clubtimedist.select().where(Clubtimedist.gender=='Women', Clubtimedist.age==23,
+	#			Clubtimedist.event=='400 Free', Clubtimedist.course=='LCM', Clubtimedist.year.is_null()).get().a
 
 	'''
 	for event in allevents:
