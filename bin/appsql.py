@@ -123,7 +123,7 @@ app.add_processor(connection_processor)
 database = sqlmeets.SwimDatabase(database=db)
 (conferences, allTeams) = getConfs()
 
-currentSeason = 2017
+currentSeason = 2018
 
 # appends the gender and division to the URL and allows them to be changed via there as well
 def setGenDiv(gender, division):
@@ -338,6 +338,7 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
+				print season
 				confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)

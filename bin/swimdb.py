@@ -185,6 +185,8 @@ def thisSeason():
 
 def seasonString(dateString):
 	dateParts = re.split('/', dateString)
+	if len(dateParts) < 3:
+		print dateString
 	year = int(dateParts[2])
 	month = int(dateParts[0])
 	day = int(dateParts[1])
@@ -1028,7 +1030,7 @@ class TempMeet:
 	def getEvents(self, events=''):
 		myEvents = set(self.eventSwims.keys())
 		if events=='':
-			if self.events == None:
+			if not self.events:
 				events = allEvents
 			else:
 				events = self.events
@@ -1569,8 +1571,9 @@ class TempMeet:
 	def setHeats(self, heats=2):
 		self.heats = heats
 
-	def printout(self, events=''):
-		events=self.getEvents(events)
+	def printout(self):
+		events = self.getEvents()
+		print 'events', events, self.events
 		for event in events:
 			if event not in self.eventSwims: continue
 			print "-------------------------------------------------------------------------------------"

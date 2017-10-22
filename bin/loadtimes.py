@@ -36,6 +36,23 @@ def getNewConfs():
 				confTeams[division][gender][year][team] = conf
 	return confTeams
 
+badEventMap = {
+ '100 Backstroke': '100 Yard Backstroke',
+ '1650 Freestyle': '1650 Yard Freestyle',
+ '200 Butterfly': '200 Yard Butterfly',
+ '500 Freestyle': '500 Yard Freestyle',
+ '400 IM': '400 Yard Individual Medley',
+ '200 IM': '200 Yard Individual Medley',
+ '1000 Freestyle': '1000 Yard Freestyle',
+ '100 Butterfly': '100 Yard Butterfly',
+ '200 Freestyle': '200 Yard Freestyle',
+ '50 Freestyle': '50 Yard Freestyle',
+ '200 Backstroke': '200 Yard Backstroke',
+ '100 Freestyle': '100 Yard Freestyle',
+ '100 Breastroke': '100 Yard Breastroke',
+ '200 Breastroke': '200 Yard Breastroke'
+}
+
 '''
 load in new swim times
 can load in to all SQL tables if params are true
@@ -86,6 +103,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				gender = swimArray[5]
 				event = swimArray[6]
 				time = toTime(swimArray[7])
+
+				if event in badEventMap:
+					event = badEventMap[event]
 
 				if season and swimDate and name and team and gender and event and time:
 					pass
@@ -219,7 +239,7 @@ def deleteDups():
         'WHERE t.rnum > 1)').execute()
     '''
 
-def safeLoad(year=17):
+def safeLoad(year=18):
 	print 'loading teams...'
 	load(loadTeams=True, loadyear=year)
 	print 'loading meets and swimmers...'
@@ -448,11 +468,11 @@ def fixMeetNames():
 
 if __name__ == '__main__':
 	start = Time.time()
-	fixMeetNames()
+	#fixMeetNames()
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad()
+	safeLoad()
 	#deleteDupImprovement()
 	#fixConfs()
 	#fixDivision()

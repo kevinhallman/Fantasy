@@ -57,7 +57,11 @@ def getSkewCDF(gender, age, event, course='LCM', percent=1.0, year=None):
 		return freezeCDF
 
 	try:
-		dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course, year=year)
+		if year:
+			dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course, year=year)
+		else:
+			dist = Clubtimedist.select().where(Clubtimedist.gender==gender, Clubtimedist.age==age,
+				Clubtimedist.event==event, Clubtimedist.course==course, Clubtimedist.year.is_null()).get()
 	except Clubtimedist.DoesNotExist:
 		dist = saveSkewDist(gender, age, event, course, year=year)
 
@@ -66,7 +70,6 @@ def getSkewCDF(gender, age, event, course='LCM', percent=1.0, year=None):
 
 
 def getSkewDist(gender, age, event, course='LCM', getData=False, year=None):
-	print gender, age, event, course, year
 	try:
 		if year:
 			dist = Clubtimedist.get(gender=gender, age=age, event=event, course=course, year=year)
@@ -174,7 +177,6 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 
 	# find percentile rank of course time was done in
 	percent = fromdist.sf(time)
-	print percent
 
 	# convert using inverse survival function
 	newtime = todist.isf(percent)
@@ -247,93 +249,87 @@ class Clubswimmer(Model):
 		indexes = ((('name', 'team', 'gender', 'age'), True),)
 		database = db
 
-	def similarSwimmers(self, num=3):
-		swims1 = self.eventPPts()
-		print swims1
-
-		# compare earlier ages as well
-		previous = self.nextSeason(-1)
+	def similarSwimmers(self, limit=3, search=100, verbose=False, usePrevious=False):
+		# make sure earlier and future ages exist
+		previous = self.ageup(-1)
 		if not previous:
+			if verbose: print 'missing pre'
 			return
 
-		preswims1 = previous.eventPPts()
-		print preswims1
+		futureSelf = self.ageup()
+		numSwims = len(self.getSwims())
+		if not futureSelf or numSwims < 3:
+			if verbose: print 'missing future'
+			return
+
+		if verbose:
+			if usePrevious: print 'previous swims', previous.eventPoints()
+			print 'current swims', self.eventPoints()
 
 		totalDeltas = {}
-		# same age and gender
+		if verbose: print 'searching...'
+		count = 0
 		for s2 in Clubswimmer.select().where(Clubswimmer.gender==self.gender, Clubswimmer.age==self.age).order_by(
-				fn.Random()).limit(10):
-			if s2.id==self.id:  # don't use own times
+				fn.Random()).limit(search*3):  # same age and gender
+			if count == search:
+				break
+			if s2.id==self.id:  # don't use own times, that's cheating
 				continue
-			swims2 = s2.eventPPts()
 
-			# compare both seasons only if they both exist
-			previous2 = s2.nextSeason(-1)
-			if previous and previous2:
-				preswims2 = previous2.eventPPts()
-				print swims2
-				print preswims2
+			future2 = s2.ageup()
+			if not future2: continue
+			count += 1
+			totalDeltas[s2] = self.compare(s2)
 
-				totalDeltas[s2] = 0
-				events = set(swims1.keys()) | set(swims2.keys())
-				for event in events:
-					if event in swims1 and event in swims2:
-						totalDeltas[s2] += (swims1[event] - swims2[event]) ** 2
-					elif event in swims1:
-						totalDeltas[s2] += swims1[event] ** 2
-					elif event in swims2:
-						totalDeltas[s2] += swims2[event] ** 2
+			if usePrevious:
+				previous2 = s2.ageup(-1)
+				if not previous2: continue
+				discountFactor = 2.0
+				totalDeltas[s2] += previous.compare(previous2) / discountFactor
 
-				events = set(preswims1.keys()) | set(preswims2.keys())
-				for event in events:
-					if event in swims1 and event in preswims1:
-						totalDeltas[s2] += (preswims1[event] - preswims2[event]) ** 2
-					elif event in preswims1:
-						totalDeltas[s2] += preswims1[event] ** 2
-					elif event in preswims2:
-						totalDeltas[s2] += preswims2[event] ** 2
-
-		# now find who was the most similar, probably can keep running total
+		# find who was the most similar, probably can keep running total
 		totalSwimmers = 0
 		totalEvents = 0
 		events = {}
 		for swimmer, value in sorted(totalDeltas.iteritems(), key=lambda (k, v): (v, k)):
 			totalSwimmers += 1
-			if totalSwimmers > num:
+			if totalSwimmers > limit:
 				break
-			futureSwimmer = swimmer.nextSeason()
-			if futureSwimmer:
-				tapers = futureSwimmer.getTaperSwims()
-				for event in tapers:
-					if event not in events:
-						events[event] = []
-					events[event].append(tapers[event].time)
-					totalEvents += 1
+			tapers = swimmer.ageup().getTaperSwims()
+			if verbose: print 'Comp' + str(totalSwimmers)
+			for event in tapers:
+				eventCourse = event + '-' + tapers[event].course
+				if eventCourse not in events:
+					events[eventCourse] = []
+				events[eventCourse].append(tapers[event].time)
+				totalEvents += 1
 
-		# now average out the times for the most similar swimmers
+		# average out the times for the most similar swimmers
 		predictedTapers = {}
-		for event in events:
-			time = np.mean(events[event])
-			ppt = round(Clubswim(event=event, age=self.age, gender=self.gender, time=time,
-								 course=self.course).getPPTs())
-			std = np.std(events[event])
-			percent = float(len(events[event]))/ float(totalEvents)
+		for eventCourse in events:
+			time = np.mean(events[eventCourse])
+			event, course = eventCourse.split('-')
+			ppt = getPoints(event=event, age=self.age, gender=self.gender, time=time, course=course)
+			std = np.std(events[eventCourse])
+			percent = float(len(events[eventCourse]))/ float(totalEvents)
 			predictedTapers[event] = {'time': time, 'std': std, 'ppts': ppt, 'percent': percent}
-			print event, time, std, ppt, percent
 
-
-		print 'swimmer1'
+		futureTapers = futureSelf.getTaperSwims()
 		tapers = self.getTaperSwims()
-		for event in tapers:
-			print event, tapers[event].time
-		print 'next season'
-		futureSelf = self.nextSeason()
-		if futureSelf:
-			futureTapers = futureSelf.getTaperSwims()
-			for event in futureTapers:
-				print event, futureTapers[event].time, futureTapers[event].getPPTs()
 
-		return tapers, futureTapers, predictedTapers
+		if verbose:
+			print 'swimmer1'
+			for event in tapers:
+				print event, tapers[event].time / 100.0, tapers[event].getPPTs()
+			print 'next season'
+			for event in futureTapers:
+				print event, futureTapers[event].time / 100.0, futureTapers[event].getPPTs()
+			print 'predictions'
+			for event in predictedTapers:
+				if event in futureTapers:
+					print event, predictedTapers[event]['time'] / 100.0, predictedTapers[event]['ppts']
+
+		return previous.getTaperSwims(), tapers, futureTapers, predictedTapers
 
 	def stats(self, distNum=20, topNum=3):  # used to find if two swimmers are similar
 		topSwims = self.topSwims(distNum)
@@ -349,11 +345,12 @@ class Clubswimmer(Model):
 
 		return eventDist, avgPpt
 
-	def topSwims(self, n=20, event=None, distinctEvents=False):
+	def topSwims(self, n=20, event=None, distinctEvents=True):
 		times = []
 		for swim in Clubswim.select().where(Clubswim.swimmer==self):
 			swim.getPPTs(zscore=False)
-			if swim.event=='1000 Yard Freestyle': continue
+			if swim.event=='1000 Yard Freestyle' or (swim.event =='200 Breast' and self.age < 11):
+				continue
 			times.append(swim)
 
 		times.sort(key=lambda x: x.powerpoints, reverse=True)
@@ -368,14 +365,14 @@ class Clubswimmer(Model):
 				topTimes.append(swim)
 				if len(topTimes) == n: break
 
-		else:  # find the top n absolute times
-			topTimes = times[:n]
+		topTimes = times[:n]
 		if event:
 			topTimes = [time for time in topTimes if time.event==event]
 
 		return topTimes
 
-	def eventPPts(self):
+	# gives top event powerpoints and caches them, courses are lumped together
+	def eventPoints(self):
 		if self.eventppts:
 			swims = {}
 			parts = re.split(',', self.eventppts)
@@ -403,12 +400,14 @@ class Clubswimmer(Model):
 		times = []
 
 		for swim in Clubswim.raw("WITH topTimes as "
-			"(SELECT name, gender, meet, event, time, age, clubswimmer_id, row_number() OVER "
+			"(SELECT name, gender, meet, event, time, age, course, swimmer_id, row_number() OVER "
 			"(PARTITION BY event, name ORDER BY time) as rnum "
-			"FROM Swim WHERE swimmer_id=%s) "
-			"SELECT name, gender, meet, event, time, age, clubswimmer_id FROM topTimes WHERE rnum=1",
-			self.id):
-			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
+			"FROM Clubswim, Clubswimmer WHERE swimmer_id=%s and Clubswimmer.id=%s) "
+			"SELECT name, gender, meet, event, time, age, course, swimmer_id FROM topTimes WHERE rnum=1",
+			self.id, self.id):
+			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event or \
+				((swim.event == '200 Breast' or swim.event == '200 Fly' or swim.event == '200 Back') and
+						 self.age < 11):
 				continue
 			points = swim.getPPTs(save=False)
 			heapq.heappush(times, (points, swim))
@@ -438,6 +437,32 @@ class Clubswimmer(Model):
 		except Clubswimmer.DoesNotExist:
 			return
 
+	def compare(self, swimmer2, countNulls=True):
+		swims1 = self.eventPoints()
+		swims2 = swimmer2.eventPoints()
+
+		delta = 0
+		events = set(swims1.keys()) | set(swims2.keys())
+		for event in events:
+			if event in swims1 and event in swims2:
+				delta += (swims1[event] - swims2[event]) ** 2
+			elif event in swims1:
+				delta += swims1[event] ** 2
+			elif event in swims2:
+				delta += swims2[event] ** 2
+
+		if countNulls:  # assume a standard distance of 250 ppts for events not in common
+			for event in set(swims1.keys()) - set(swims2.keys()):
+				delta += 100 ** 2
+		return delta ** .5
+
+	def getSwims(self):
+		swims = []
+		for swim in Clubswim.select().where(Clubswim.swimmer==self.id):
+			swims.append(swim)
+		return swims
+
+
 
 class Clubswim(Model):
 	swimmer = ForeignKeyField(Clubswimmer)
@@ -464,11 +489,11 @@ class Clubswim(Model):
 		if self.powerpoints:
 			return self.powerpoints
 
-		if not self.gender or not self.division or not self.event or not self.time:
+		if not self.swimmer.gender or not self.event or not self.time:
 			return None
 
-		cdf = getSkewCDF(self.gender, self.age, self.course, self.event)
-		percent = 1 - cdf(self.time)
+		cdf = getSkewCDF(self.swimmer.gender, self.swimmer.age, self.event, self.course)
+		percent = 1 - cdf(self.time/100)
 		if percent==0 or not percent:
 			print self.time, self.event, self.id
 			self.powerpoints = 0
@@ -482,7 +507,6 @@ class Clubswim(Model):
 		else:
 			zscore = 0
 
-		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
 		if save:
 			self.save()
@@ -1237,73 +1261,93 @@ def showAttrition(gender='Women'):
 		links['value'].append(raw_data[label])
 		nodes['label'].append(parts[0] + parts[1])
 
-	'''
-	import plotly.plotly as py
-	data_trace = dict(
-    type='sankey',
-    #domain = dict(
-    #  x =  [0, 1],
-    #  y =  [0, 1]
-    #),
-    orientation = "h",
-    valueformat = ".0f",
-    valuesuffix = "TWh",
-    node = dict(
-      pad = 15,
-      thickness = 15,
-      line = dict(
-        color = "black",
-        width = 0.5
-      ),
-      label = nodes['label']
-      #color = 'rgba(31, 119, 180, 0.8)'
-    ),
-    link = dict(
-      source = links['source'],
-      target = links['target'],
-      value = links['value'],
-      label = links['label']
-  ))
+def getPoints(gender, event, time, age, course):
+	if (event == '200 Breast' or event == '200 Fly' or event == '200 Back') and	age < 11:
+			return 0
+	cdf = getSkewCDF(gender, age, event, course)
+	percent = 1 - cdf(time/100)
+	if percent==0 or not percent:
+		return 0
+	percentileScore = (1 - percent) * 500
+	powerScore = 1 / percent
+	zscore = log(powerScore) * 50  # approximately the number of stds away from the means
 
-	layout =  dict(
-    	title = 'Improvement',
-    	font = dict(
-      		size = 10
-    	)
-	)
+	powerpoints = percentileScore + zscore
+	return round(powerpoints, 3)
 
-	fig = dict(data=[data_trace], layout=layout)
-	py.iplot(fig, validate=True)
-	'''
+def testTimePre(limit=100):
+	misses = []
+	flatMisses = []
+	avgFlatMisses = []
+	combinedMisses = []
+	count = 0
+	for s1 in Clubswimmer.select().order_by(fn.Random()):
+		if count==limit:
+			break
 
+		parts = s1.similarSwimmers(search=1000, limit=10, verbose=True)
+		if not parts:
+			continue
+		count += 1
+
+		pastTimes, times, futureTimes, predictedTimes = parts
+		print s1.id
+		for event in futureTimes:
+			if event in predictedTimes:
+				misses.append(abs(futureTimes[event].time - predictedTimes[event]['time']) / futureTimes[event].time)
+			if event in times:
+				if '400' in event or '1500' in event:
+					predictedTime = convert(gender=s1.gender, age=s1.age, toage=s1.age + 1, fromCourse='LCM',
+									   toCourse='LCM', event=event, time=times[event].time/100.0)
+				else:
+					predictedTime = convert(gender=s1.gender, age=s1.age, toage=s1.age + 1, fromCourse='SCY',
+									   toCourse='SCY', event=event, time=times[event].time/100.0)
+				predictedTimeAvg = None
+				if event in pastTimes:
+					# from two seasons ago
+					if '400' in event or '1500' in event:
+						predictedTime2 = convert(gender=s1.gender, age=s1.age-1, toage=s1.age + 1, fromCourse='LCM',
+										   toCourse='LCM', event=event, time=pastTimes[event].time/100.0)
+					else:
+						predictedTime2 = convert(gender=s1.gender, age=s1.age-1, toage=s1.age + 1, fromCourse='SCY',
+										   toCourse='SCY', event=event, time=pastTimes[event].time/100.0)
+					predictedTimeAvg = (predictedTime*3 + predictedTime2) / 4
+
+				print event
+				if event in futureTimes: print 'real', futureTimes[event].time/100.0
+				if event in predictedTimes: print 'knn', predictedTimes[event]['time']/100.0
+				if predictedTimeAvg:
+					print '2convert', predictedTimeAvg
+					avgFlatMisses.append(abs(predictedTimeAvg*100 - futureTimes[event].time) / futureTimes[event].time)
+				if predictedTime:
+					print 'convert', predictedTime
+				if event in predictedTimes:
+					combine = (predictedTime + predictedTimes[event]['time']/100.0) / 2
+					print 'combine', combine
+					combinedMisses.append(abs(combine*100 - futureTimes[event].time) / futureTimes[event].time)
+				flatMisses.append(abs(predictedTime*100 - futureTimes[event].time) / futureTimes[event].time)
+
+
+	print 'knn', np.mean(misses), np.std(misses)
+	print 'flat', np.mean(flatMisses), np.std(flatMisses)
+	print '2flat', np.mean(avgFlatMisses), np.std(avgFlatMisses)
+	print 'combine', np.mean(combinedMisses), np.std(combinedMisses)
 
 if __name__== '__main__':
-	#for age in range(20, 21):
-	#	for year in range(2007, 2018):
+	#for age in range(10, 21):
+	#	for year in range(2015, 2016):
 	#		safeImport(age=age, year=year, load_course='LCM')
+
+	print testTimePre()
+	#mark = Clubswimmer.get(id=4487181)
+	#mark.similarSwimmers(search=2000, limit=10)
 
 	#showAttrition()
 	#showAgeCurves(age=16)
 
-	migrator = PostgresqlMigrator(db)
-	with db.transaction():
-		migrate(
-			migrator.add_column('clubtimedist', 'year', Clubtimedist.year),
-			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
-			#migrator.adsd_column('swimmer', 'teamid_id', Swimmer.teamid)
-			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
-		)
-
 	#print Clubtimedist.select().where(Clubtimedist.gender=='Women', Clubtimedist.age==23,
 	#			Clubtimedist.event=='400 Free', Clubtimedist.course=='LCM', Clubtimedist.year.is_null()).get().a
 
-	'''
-	for event in allevents:
-		for gender in ['Women', 'Men']:
-			for age in ['22-30']:
-				for course in ['LCM']:
-					safeImport(age=age, year=2016)
-	'''
 	#for age in range(15, 19):
 	#for event in eventsLCM:
 	#	for age in range(8, 24):
