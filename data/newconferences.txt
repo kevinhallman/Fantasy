@@ -6427,6 +6427,7 @@ D3	Men	18	Heartland Collegiate	Manchester
 D3	Men	18	Heartland Collegiate	Anderson
 D3	Men	18	Heartland Collegiate	Rose-Hulman
 D3	Men	18	Heartland Collegiate	Franklin
+D3	Men	18	Heartland Collegiate	Transylvania
 D3	Men	18	New Jersey Athletic	Ramapo
 D3	Men	18	New Jersey Athletic	Montclair St.
 D3	Men	18	New Jersey Athletic	WPUNJ
@@ -6447,6 +6448,7 @@ D3	Men	18	University Athletic	NYU
 D3	Men	18	University Athletic	Rochester
 D3	Men	18	University Athletic	CMU
 D3	Men	18	Michigan Intercollegiate	Kalamazoo
+D3	Men	18	Michigan Intercollegiate	Albion
 D3	Men	18	Michigan Intercollegiate	Calvin
 D3	Men	18	New England Intercoll.	Bridgewater St.
 D3	Men	18	New England Intercoll.	Norwich
@@ -6454,6 +6456,7 @@ D3	Men	18	New England Intercoll.	SJCME
 D3	Men	18	New England Intercoll.	Colby-Sawyer
 D3	Men	18	New England Intercoll.	Regis
 D3	Men	18	New England Intercoll.	Gordon
+D3	Men	18	New England Intercoll.	Keene St.
 D3	Men	18	New England Intercoll.	Elms
 D3	Men	18	North Coast Athletic	Ohio Wesleyan
 D3	Men	18	North Coast Athletic	Wittenberg
@@ -6468,14 +6471,16 @@ D3	Men	18	North Coast Athletic	Hiram
 D3	Men	18	Midwest	Knox College
 D3	Men	18	Midwest	Beloit College
 D3	Men	18	Midwest	Illinois College
-D3	Men	18	Midwest	Monmouth
 D3	Men	18	Midwest	Lawrence
+D3	Men	18	Midwest	Monmouth
+D3	Men	18	Midwest	Grinnell
 D3	Men	18	Midwest	Lake Forest
 D3	Men	18	Midwest	Ripon
 D3	Men	18	State Univ of New York	SUNY Potsdam
 D3	Men	18	State Univ of New York	SUNY Brockport
 D3	Men	18	State Univ of New York	SUNY Oswego
 D3	Men	18	State Univ of New York	SUNY Fredonia
+D3	Men	18	State Univ of New York	SUNY Cortland
 D3	Men	18	State Univ of New York	SUNY Oneonta
 D3	Men	18	State Univ of New York	SUNY Geneseo
 D3	Men	18	State Univ of New York	Buffalo St.
@@ -6483,17 +6488,23 @@ D3	Men	18	State Univ of New York	SUNY New Paltz
 D3	Men	18	Independent	William Peace
 D3	Men	18	Independent	CNR
 D3	Men	18	City Univ. of New York	Brooklyn
+D3	Men	18	City Univ. of New York	York College
 D3	Men	18	City Univ. of New York	Baruch
+D3	Men	18	MIAC	St. Thomas
+D3	Men	18	MIAC	St. Olaf
+D3	Men	18	MIAC	Saint Mary's MN
+D3	Men	18	MIAC	Hamline
 D3	Men	18	MIAC	Gustavus
 D3	Men	18	MIAC	Macalester
-D3	Men	18	MIAC	St. Olaf
+D3	Men	18	MIAC	St. John's
 D3	Men	18	MIAC	Carleton
-D3	Men	18	MIAC	Hamline
 D3	Men	18	Pacific Collegiate	UC Santa Cruz
-D3	Men	18	New England	Worcester Poly
 D3	Men	18	New England	Clark
-D3	Men	18	New England	Coast Guard
+D3	Men	18	New England	Worcester Poly
 D3	Men	18	New England	Wheaton MA
+D3	Men	18	New England	Babson
+D3	Men	18	New England	Coast Guard
+D3	Men	18	New England	MIT
 D3	Men	18	New England	Springfield
 D3	Men	18	North Eastern Athletic	Cazenovia
 D3	Men	18	North Eastern Athletic	Gallaudet
@@ -6507,13 +6518,15 @@ D3	Men	18	Southern Collegiate	Colorado College
 D3	Men	18	Southern Collegiate	Austin College
 D3	Men	18	Southern Collegiate	Trinity U.
 D3	Men	18	Skyline	Purchase College
+D3	Men	18	Skyline	MSMC
 D3	Men	18	Skyline	Sarah Lawrence
 D3	Men	18	Skyline	St. Joseph's Br
 D3	Men	18	Little East	UM Dartmouth
-D3	Men	18	College of Illinois/Wisc	North Central
-D3	Men	18	College of Illinois/Wisc	IWU
 D3	Men	18	College of Illinois/Wisc	Carthage
 D3	Men	18	College of Illinois/Wisc	Carroll
+D3	Men	18	College of Illinois/Wisc	North Central
+D3	Men	18	College of Illinois/Wisc	IWU
+D3	Men	18	College of Illinois/Wisc	Millikin
 D3	Men	18	College of Illinois/Wisc	Wheaton IL
 D3	Men	18	Old Dominion Athletic	Ferrum
 D3	Men	18	Old Dominion Athletic	W&L
@@ -6525,14 +6538,16 @@ D3	Men	18	Old Dominion Athletic	Hampden-Sydney
 D3	Men	18	Old Dominion Athletic	Virginia Wesleya
 D3	Men	18	Old Dominion Athletic	Roanoke College
 D3	Men	18	Old Dominion Athletic	Randolph
-D3	Men	18	Ohio Athletic	Wilmington C.
+D3	Men	18	Ohio Athletic	Ohio Northern
 D3	Men	18	Ohio Athletic	Mount Union
 D3	Men	18	Ohio Athletic	John Carroll
+D3	Men	18	Ohio Athletic	Wilmington C.
 D3	Men	18	Ohio Athletic	Baldwin Wallace
 D3	Men	18	Empire 8	NAZ
 D3	Men	18	Empire 8	Hartwick
 D3	Men	18	Empire 8	Utica
 D3	Men	18	Empire 8	Alfred
+D3	Men	18	Empire 8	Stevens
 D3	Men	18	Southern California	Occidental
 D3	Men	18	Southern California	La Verne
 D3	Men	18	Southern California	Claremont MS
@@ -6546,15 +6561,18 @@ D3	Men	18	Middle Atlantic	Misericordia
 D3	Men	18	Middle Atlantic	Stevenson
 D3	Men	18	Middle Atlantic	King's
 D3	Men	18	Middle Atlantic	Albright
+D3	Men	18	Middle Atlantic	Lebanon Valley
 D3	Men	18	Middle Atlantic	Lycoming
 D3	Men	18	Middle Atlantic	Messiah
 D3	Men	18	Middle Atlantic	Hood
 D3	Men	18	Commonwealth Coast	RWU
 D3	Men	18	Landmark	Catholic UA
+D3	Men	18	Landmark	Susquehanna
 D3	Men	18	Landmark	Scranton
 D3	Men	18	Landmark	Drew
 D3	Men	18	Landmark	Goucher
 D3	Men	18	Landmark	Marywood
+D3	Men	18	Landmark	Elizabethtown
 D3	Men	18	Landmark	Juniata
 D3	Men	18	Capital Athletic	Mary Washington
 D3	Men	18	Capital Athletic	Marymount
@@ -6562,6 +6580,14 @@ D3	Men	18	Capital Athletic	YCP
 D3	Men	18	Capital Athletic	St. Mary's MD
 D3	Men	18	Capital Athletic	Salisbury
 D3	Men	18	Capital Athletic	Frostburg St.
+D3	Men	18	Northwest Conference	Whitman
+D3	Men	18	Northwest Conference	L&C
+D3	Men	18	Northwest Conference	Willamette
+D3	Men	18	Northwest Conference	Puget Sound
+D3	Men	18	Northwest Conference	Pacific Lutheran
+D3	Men	18	Northwest Conference	Linfield
+D3	Men	18	Northwest Conference	Pacific Oregon
+D3	Men	18	Northwest Conference	Whitworth
 D3	Men	18	Presidents	W&J
 D3	Men	18	Presidents	Bethany
 D3	Men	18	Presidents	Saint Vincent
@@ -6570,6 +6596,7 @@ D3	Men	18	Presidents	Westminster
 D3	Men	18	Presidents	Chatham
 D3	Men	18	Wisconsin Intercollegiate	UW-Whitewater
 D3	Men	18	Wisconsin Intercollegiate	UWEC
+D3	Men	18	Wisconsin Intercollegiate	UW-Stevens Point
 D3	Men	18	Wisconsin Intercollegiate	UW-Oshkosh
 D3	Men	18	Wisconsin Intercollegiate	UW-L
 D3	Men	18	Liberty League	Skidmore
@@ -6588,15 +6615,18 @@ D3	Men	18	Allegheny Mountain	Behrend
 D3	Men	18	Appalachian (ASC)	LaGrange
 D3	Men	18	Centennial	McDaniel
 D3	Men	18	Centennial	Ursinus
+D3	Men	18	Centennial	Gettysburg
 D3	Men	18	Centennial	Washington
 D3	Men	18	Centennial	F&M
 D3	Men	18	Centennial	Swarthmore
 D3	Men	18	Centennial	Dickinson
-D3	Men	18	Liberal Arts	Illinois Tech
 D3	Men	18	Liberal Arts	Luther
 D3	Men	18	Liberal Arts	Neb Wesleyan
+D3	Men	18	Liberal Arts	Illinois Tech
+D3	Men	18	Liberal Arts	Principia
 D3	Men	18	Liberal Arts	Coe
 D3	Men	18	Liberal Arts	Loras
+D3	Men	18	Liberal Arts	Simpson
 D3	Women	18	Heartland Collegiate	Manchester
 D3	Women	18	Heartland Collegiate	Anderson
 D3	Women	18	Heartland Collegiate	Rose-Hulman
@@ -6615,39 +6645,41 @@ D3	Women	18	Southern Athletic Associa	Berry
 D3	Women	18	Southern Athletic Associa	Sewanee
 D3	Women	18	Southern Athletic Associa	BSC
 D3	Women	18	University Athletic	Case Western
-D3	Women	18	University Athletic	Rochester
+D3	Women	18	University Athletic	Wash U. MO
 D3	Women	18	University Athletic	Chicago
 D3	Women	18	University Athletic	Brandeis
 D3	Women	18	University Athletic	Emory
 D3	Women	18	University Athletic	NYU
-D3	Women	18	University Athletic	Wash U. MO
+D3	Women	18	University Athletic	Rochester
 D3	Women	18	University Athletic	CMU
 D3	Women	18	Michigan Intercollegiate	Kalamazoo
 D3	Women	18	Michigan Intercollegiate	Albion
 D3	Women	18	Michigan Intercollegiate	Calvin
-D3	Women	18	New England Intercoll.	Norwich
-D3	Women	18	New England Intercoll.	Bridgewater St.
 D3	Women	18	New England Intercoll.	Colby-Sawyer
+D3	Women	18	New England Intercoll.	Bridgewater St.
+D3	Women	18	New England Intercoll.	Norwich
 D3	Women	18	New England Intercoll.	SJCME
 D3	Women	18	New England Intercoll.	Westfield State
 D3	Women	18	New England Intercoll.	Regis
 D3	Women	18	New England Intercoll.	Assumption
 D3	Women	18	New England Intercoll.	Gordon
+D3	Women	18	New England Intercoll.	Keene St.
 D3	Women	18	New England Intercoll.	Elms
 D3	Women	18	North Coast Athletic	Ohio Wesleyan
 D3	Women	18	North Coast Athletic	Wittenberg
 D3	Women	18	North Coast Athletic	DePauw
 D3	Women	18	North Coast Athletic	Oberlin
-D3	Women	18	North Coast Athletic	Kenyon
+D3	Women	18	North Coast Athletic	Wooster
 D3	Women	18	North Coast Athletic	Allegheny
 D3	Women	18	North Coast Athletic	Denison
-D3	Women	18	North Coast Athletic	Wooster
+D3	Women	18	North Coast Athletic	Kenyon
 D3	Women	18	North Coast Athletic	Hiram
 D3	Women	18	Midwest	Knox College
 D3	Women	18	Midwest	Beloit College
 D3	Women	18	Midwest	Illinois College
-D3	Women	18	Midwest	Monmouth
 D3	Women	18	Midwest	Lawrence
+D3	Women	18	Midwest	Monmouth
+D3	Women	18	Midwest	Grinnell
 D3	Women	18	Midwest	Lake Forest
 D3	Women	18	Midwest	Ripon
 D3	Women	18	State Univ of New York	SUNY Potsdam
@@ -6655,32 +6687,44 @@ D3	Women	18	State Univ of New York	Buffalo St.
 D3	Women	18	State Univ of New York	SUNY Brockport
 D3	Women	18	State Univ of New York	SUNY Oswego
 D3	Women	18	State Univ of New York	SUNY Fredonia
+D3	Women	18	State Univ of New York	SUNY Cortland
 D3	Women	18	State Univ of New York	SUNY Oneonta
 D3	Women	18	State Univ of New York	SUNY Geneseo
 D3	Women	18	State Univ of New York	SUNY New Paltz
 D3	Women	18	Independent	William Peace
-D3	Women	18	Independent	CNR
 D3	Women	18	Independent	Mills
+D3	Women	18	Independent	CNR
+D3	Women	18	Independent	Pfeiffer
 D3	Women	18	City Univ. of New York	Brooklyn
+D3	Women	18	City Univ. of New York	John Jay
+D3	Women	18	City Univ. of New York	Hunter
+D3	Women	18	City Univ. of New York	York College
 D3	Women	18	City Univ. of New York	Baruch
+D3	Women	18	MIAC	St. Thomas
 D3	Women	18	MIAC	Hamline
+D3	Women	18	MIAC	Saint Mary's MN
 D3	Women	18	MIAC	Augsburg
 D3	Women	18	MIAC	St. Olaf
 D3	Women	18	MIAC	Gustavus
 D3	Women	18	MIAC	Macalester
 D3	Women	18	MIAC	Concordia
-D3	Women	18	MIAC	Carleton
 D3	Women	18	MIAC	St. Kate's
+D3	Women	18	MIAC	Saint Benedict
+D3	Women	18	MIAC	Carleton
 D3	Women	18	Pacific Collegiate	UC Santa Cruz
 D3	Women	18	New England	Clark
 D3	Women	18	New England	Mount Holyoke
 D3	Women	18	New England	Worcester Poly
 D3	Women	18	New England	Smith
 D3	Women	18	New England	Wheaton MA
+D3	Women	18	New England	Babson
 D3	Women	18	New England	Coast Guard
+D3	Women	18	New England	MIT
 D3	Women	18	New England	Springfield
 D3	Women	18	North Eastern Athletic	Cazenovia
 D3	Women	18	North Eastern Athletic	Gallaudet
+D3	Women	18	North Eastern Athletic	Wells
+D3	Women	18	North Eastern Athletic	Cedar Crest
 D3	Women	18	Great Northeast Athletic	Saint Joseph CT
 D3	Women	18	Great Northeast Athletic	Simmons
 D3	Women	18	Great Northeast Athletic	Husson
@@ -6694,15 +6738,19 @@ D3	Women	18	Southern Collegiate	Colorado College
 D3	Women	18	Southern Collegiate	Austin College
 D3	Women	18	Southern Collegiate	Trinity U.
 D3	Women	18	Skyline	Purchase College
+D3	Women	18	Skyline	MSMC
 D3	Women	18	Skyline	St. Joseph's LI
 D3	Women	18	Skyline	Sarah Lawrence
 D3	Women	18	Skyline	St. Joseph's Br
 D3	Women	18	Little East	E. Connecticut
+D3	Women	18	Little East	Plymouth State
+D3	Women	18	Little East	WestConn
 D3	Women	18	Little East	UM Dartmouth
-D3	Women	18	College of Illinois/Wisc	North Central
-D3	Women	18	College of Illinois/Wisc	IWU
 D3	Women	18	College of Illinois/Wisc	Carthage
 D3	Women	18	College of Illinois/Wisc	Carroll
+D3	Women	18	College of Illinois/Wisc	North Central
+D3	Women	18	College of Illinois/Wisc	IWU
+D3	Women	18	College of Illinois/Wisc	Millikin
 D3	Women	18	College of Illinois/Wisc	Wheaton IL
 D3	Women	18	Old Dominion Athletic	Roanoke College
 D3	Women	18	Old Dominion Athletic	W&L
@@ -6716,14 +6764,16 @@ D3	Women	18	Old Dominion Athletic	Virginia Wesleya
 D3	Women	18	Old Dominion Athletic	Emory & Henry
 D3	Women	18	Old Dominion Athletic	Randolph
 D3	Women	18	Old Dominion Athletic	Sweet Briar
+D3	Women	18	Ohio Athletic	Ohio Northern
+D3	Women	18	Ohio Athletic	Baldwin Wallace
+D3	Women	18	Ohio Athletic	John Carroll
 D3	Women	18	Ohio Athletic	Wilmington C.
 D3	Women	18	Ohio Athletic	Mount Union
-D3	Women	18	Ohio Athletic	John Carroll
-D3	Women	18	Ohio Athletic	Baldwin Wallace
 D3	Women	18	Empire 8	NAZ
 D3	Women	18	Empire 8	Hartwick
 D3	Women	18	Empire 8	Utica
 D3	Women	18	Empire 8	Alfred
+D3	Women	18	Empire 8	Stevens
 D3	Women	18	Southern California	Occidental
 D3	Women	18	Southern California	La Verne
 D3	Women	18	Southern California	Claremont MS
@@ -6735,6 +6785,7 @@ D3	Women	18	Middle Atlantic	Stevenson
 D3	Women	18	Middle Atlantic	Misericordia
 D3	Women	18	Middle Atlantic	King's
 D3	Women	18	Middle Atlantic	Albright
+D3	Women	18	Middle Atlantic	Lebanon Valley
 D3	Women	18	Middle Atlantic	Lycoming
 D3	Women	18	Middle Atlantic	Messiah
 D3	Women	18	Middle Atlantic	Hood
@@ -6743,10 +6794,12 @@ D3	Women	18	Commonwealth Coast	Western NE
 D3	Women	18	Commonwealth Coast	RWU
 D3	Women	18	Commonwealth Coast	UNE
 D3	Women	18	Landmark	Catholic UA
+D3	Women	18	Landmark	Susquehanna
 D3	Women	18	Landmark	Scranton
 D3	Women	18	Landmark	Drew
 D3	Women	18	Landmark	Goucher
 D3	Women	18	Landmark	Marywood
+D3	Women	18	Landmark	Elizabethtown
 D3	Women	18	Landmark	Juniata
 D3	Women	18	Capital Athletic	Mary Washington
 D3	Women	18	Capital Athletic	Marymount
@@ -6754,19 +6807,30 @@ D3	Women	18	Capital Athletic	YCP
 D3	Women	18	Capital Athletic	St. Mary's MD
 D3	Women	18	Capital Athletic	Salisbury
 D3	Women	18	Capital Athletic	Frostburg St.
+D3	Women	18	Northwest Conference	Whitman
+D3	Women	18	Northwest Conference	L&C
+D3	Women	18	Northwest Conference	Willamette
+D3	Women	18	Northwest Conference	Puget Sound
+D3	Women	18	Northwest Conference	Pacific Lutheran
+D3	Women	18	Northwest Conference	Linfield
+D3	Women	18	Northwest Conference	Pacific Oregon
+D3	Women	18	Northwest Conference	Whitworth
 D3	Women	18	Presidents	W&J
-D3	Women	18	Presidents	Westminster
+D3	Women	18	Presidents	Bethany
 D3	Women	18	Presidents	Saint Vincent
 D3	Women	18	Presidents	Grove City
+D3	Women	18	Presidents	Westminster
 D3	Women	18	Presidents	Chatham
 D3	Women	18	Wisconsin Intercollegiate	UW-Oshkosh
 D3	Women	18	Wisconsin Intercollegiate	UW-Whitewater
 D3	Women	18	Wisconsin Intercollegiate	UWEC
+D3	Women	18	Wisconsin Intercollegiate	UW-Stevens Point
 D3	Women	18	Wisconsin Intercollegiate	UW-L
 D3	Women	18	Liberty League	Skidmore
 D3	Women	18	Liberty League	Clarkson
 D3	Women	18	Liberty League	RIT
 D3	Women	18	Liberty League	Saint Lawrence
+D3	Women	18	Liberty League	William Smith
 D3	Women	18	Liberty League	Rensselaer
 D3	Women	18	Liberty League	Bard
 D3	Women	18	Liberty League	VASSAR
@@ -6780,25 +6844,27 @@ D3	Women	18	Allegheny Mountain	Pitt-Bradford
 D3	Women	18	Appalachian (ASC)	LaGrange
 D3	Women	18	Centennial	McDaniel
 D3	Women	18	Centennial	Ursinus
-D3	Women	18	Centennial	Washington
-D3	Women	18	Centennial	Bryn Mawr
 D3	Women	18	Centennial	Gettysburg
+D3	Women	18	Centennial	Bryn Mawr
+D3	Women	18	Centennial	Washington
 D3	Women	18	Centennial	F&M
 D3	Women	18	Centennial	Swarthmore
 D3	Women	18	Centennial	Dickinson
-D3	Women	18	Liberal Arts	Illinois Tech
 D3	Women	18	Liberal Arts	Luther
 D3	Women	18	Liberal Arts	Neb Wesleyan
+D3	Women	18	Liberal Arts	Illinois Tech
+D3	Women	18	Liberal Arts	Principia
 D3	Women	18	Liberal Arts	Coe
 D3	Women	18	Liberal Arts	Loras
+D3	Women	18	Liberal Arts	Simpson
 D1	Men	18	Big Ten	Northwestern
 D1	Men	18	Big Ten	Iowa
 D1	Men	18	Big Ten	Wisconsin
-D1	Men	18	Big Ten	Penn St
-D1	Men	18	Big Ten	Michigan
 D1	Men	18	Big Ten	Purdue
+D1	Men	18	Big Ten	Michigan
 D1	Men	18	Big Ten	Minnesota
 D1	Men	18	Big Ten	Ohio St
+D1	Men	18	Big Ten	Penn St
 D1	Men	18	Big Ten	Indiana
 D1	Men	18	Big Ten	Michigan St
 D1	Men	18	Metro Atlantic Athl. Conf	Iona Coll
@@ -6823,13 +6889,16 @@ D1	Men	18	Big East	Providence
 D1	Men	18	Big East	Xavier
 D1	Men	18	Horizon League	Illinois-Chicago
 D1	Men	18	Horizon League	Wis.- Green Bay
+D1	Men	18	Horizon League	Wright State
 D1	Men	18	Horizon League	Cleveland St
 D1	Men	18	Horizon League	Wis.- Milwaukee
 D1	Men	18	Horizon League	Oakland
 D1	Men	18	Horizon League	IUPUI
+D1	Men	18	Ivy League	Penn
 D1	Men	18	Ivy League	Brown
-D1	Men	18	Ivy League	Yale
 D1	Men	18	Ivy League	Princeton
+D1	Men	18	Ivy League	Columbia
+D1	Men	18	Ivy League	Yale
 D1	Men	18	Mid	Miami (Ohio)
 D1	Men	18	Mid	SIUC (M)
 D1	Men	18	Mid	Missouri St. (M)
@@ -6863,14 +6932,16 @@ D1	Men	18	SEC	Alabama
 D1	Men	18	Big 12	TCU
 D1	Men	18	Big 12	Texas
 D1	Men	18	Big 12	West Virginia
-D1	Men	18	American Athletic Conf	Connecticut
+D1	Men	18	American Athletic Conf	SMU
 D1	Men	18	American Athletic Conf	Cincinnati
+D1	Men	18	American Athletic Conf	Connecticut
 D1	Men	18	American Athletic Conf	East Carolina
-D1	Men	18	Pac 12	Southern Cali
-D1	Men	18	Pac 12	Arizona St
-D1	Men	18	Pac 12	California
-D1	Men	18	Pac 12	Utah
+D1	Men	18	Pac 12	Arizona
 D1	Men	18	Pac 12	Stanford
+D1	Men	18	Pac 12	Utah
+D1	Men	18	Pac 12	Southern Cali
+D1	Men	18	Pac 12	California
+D1	Men	18	Pac 12	Arizona St
 D1	Men	18	The Summit League	Western Ill
 D1	Men	18	The Summit League	Eastern Ill
 D1	Men	18	The Summit League	South Dakota
@@ -6936,13 +7007,13 @@ D1	Women	18	Metro Atlantic Athl. Conf	Fairfield
 D1	Women	18	Metro Atlantic Athl. Conf	Niagara
 D1	Women	18	Metro Atlantic Athl. Conf	Siena
 D1	Women	18	Metro Atlantic Athl. Conf	Rider
+D1	Women	18	Mid	Miami (Ohio)
 D1	Women	18	Mid	Bowling Green
 D1	Women	18	Mid	Toledo
 D1	Women	18	Mid	Akron
-D1	Women	18	Mid	Miami (Ohio)
 D1	Women	18	Mid	Ohio
-D1	Women	18	Mid	Buffalo
 D1	Women	18	Mid	Ball State
+D1	Women	18	Mid	Buffalo
 D1	Women	18	Mid	Eastern Mich
 D1	Women	18	Northeast Conf	Bryant U (W)
 D1	Women	18	Northeast Conf	St. Francis
@@ -6992,6 +7063,7 @@ D1	Women	18	ACC (Atlantic Coast)	Miami (FL)
 D1	Women	18	Independent	Pepperdine
 D1	Women	18	Horizon League	Illinois-Chicago
 D1	Women	18	Horizon League	Wis.- Green Bay
+D1	Women	18	Horizon League	Wright State
 D1	Women	18	Horizon League	Cleveland St
 D1	Women	18	Horizon League	Wis.- Milwaukee
 D1	Women	18	Horizon League	Youngstown St
@@ -7017,9 +7089,10 @@ D1	Women	18	The Summit League	UN Omaha
 D1	Women	18	The Summit League	Denver
 D1	Women	18	America East	Stony Brook
 D1	Women	18	America East	Vermont
-D1	Women	18	America East	UMBC
 D1	Women	18	America East	New Hampshire
 D1	Women	18	America East	Binghamton
+D1	Women	18	America East	UMBC
+D1	Women	18	America East	Maine
 D1	Women	18	Pac 12	Arizona
 D1	Women	18	Pac 12	Stanford
 D1	Women	18	Pac 12	Oregon St
@@ -7041,14 +7114,14 @@ D1	Women	18	American Athletic Conf	Tulane
 D1	Women	18	American Athletic Conf	SMU
 D1	Women	18	American Athletic Conf	Connecticut
 D1	Women	18	American Athletic Conf	East Carolina
-D1	Women	18	Mountain West	UNLV (W)
-D1	Women	18	Mountain West	Fresno State
+D1	Women	18	Mountain West	Wyoming (W)
 D1	Women	18	Mountain West	Nevada
 D1	Women	18	Mountain West	Boise St
 D1	Women	18	Mountain West	San Jose St
 D1	Women	18	Mountain West	Air Force (W)
+D1	Women	18	Mountain West	Fresno State
 D1	Women	18	Mountain West	Colorado St.
-D1	Women	18	Mountain West	Wyoming (W)
+D1	Women	18	Mountain West	UNLV (W)
 D1	Women	18	Mountain West	New Mexico
 D1	Women	18	Mountain West	San Diego St
 D1	Women	18	Atlantic 10	St. Louis
@@ -7090,9 +7163,11 @@ D1	Women	18	Big 12	TCU
 D1	Women	18	Big 12	Iowa State
 D1	Women	18	Big 12	Texas
 D1	Women	18	Big 12	West Virginia
-D1	Women	18	Ivy League	Cornell
 D1	Women	18	Ivy League	Brown
+D1	Women	18	Ivy League	Columbia
 D1	Women	18	Ivy League	Princeton
+D1	Women	18	Ivy League	Cornell
+D1	Women	18	Ivy League	Harvard
 D1	Women	18	Ivy League	Yale
 D1	Women	18	Western Athletic Conf	Grand Canyon
 D1	Women	18	Western Athletic Conf	Northern Colo
