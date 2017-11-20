@@ -50,7 +50,12 @@ badEventMap = {
  '200 Backstroke': '200 Yard Backstroke',
  '100 Freestyle': '100 Yard Freestyle',
  '100 Breastroke': '100 Yard Breastroke',
- '200 Breastroke': '200 Yard Breastroke'
+ '200 Breastroke': '200 Yard Breastroke',
+	'200 Freestyle Relay': '200 Yard Freestyle Relay',
+	'400 Freestyle Relay': '400 Yard Freestyle Relay',
+	'800 Freestyle Relay': '800 Yard Freestyle Relay',
+	'200 Medley Relay': '200 Yard Medley Relay',
+	'400 Medley Relay': '400 Yard Medley Relay'
 }
 
 '''
