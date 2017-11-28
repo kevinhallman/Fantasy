@@ -76,7 +76,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])', swimFileName)
+		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
 			continue
 		div, year, gender = match.groups()
@@ -478,7 +478,7 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad(year=17)
+	safeLoad(year=18)
 	#safeLoad(year=18)
 	#deleteDupImprovement()
 	#fixConfs()
