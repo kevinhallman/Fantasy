@@ -1,0 +1,44 @@
+$def with (content)
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" href="/static/swimswam.png">
+
+		<title>Fantasy Swimming</title>
+		<meta name="description"
+			  content="The swimulator allows you to simulate potential collegiate swim meets as well as providing other statistics about college swimming.">
+	</head>
+
+	<body>
+	<div class="container">
+		<div class="sidebar">
+			<ul id="gender">
+				<li id="Women"><span>Women</span></li>
+				<li id="Men"><span>Men</span></li>
+			</ul>
+			<ul id="division">
+				<li id="D1"><span>D1</span></li>
+				<li id="D2"><span>D2</span></li>
+				<li id="D3"><span>D3</span></li>
+			</ul>
+		</div>
+
+		<div class="header">
+			<ul class="bannerList">
+				<li value=1 ><a href="/">Home</a></li>
+				<li value=2 ><a href="/team">My Team</a> </li>
+				<li value=3 ><a href="/swimmers">Swimmers</a></li>
+				<li value=4 ><a href="/league">League</a></li>
+			</ul>
+		</div>
+
+		<div class="content">
+			<div class="innerContent">
+				$:content
+			</div>
+		</div>
+	</div>
+
+	</body>
+</html>

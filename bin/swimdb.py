@@ -701,8 +701,8 @@ class Swimmer(Model):
 		return taperSwims
 
 	def getPPTs(self):
-		if self.ppts:
-			return self.ppts
+		#if self.ppts:
+		#	return self.ppts
 
 		totalPPts = 0
 		taperSwims = self.getTaperSwims()
@@ -965,7 +965,7 @@ class TempMeet:
 				query = query.select().where(Swim.season==season)
 			if topSwim:
 				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time),
-					Swim.year).group_by(Swim.name, Swim.event, Swim.team, Swim.gender, Swim.year)
+					Swim.year, Swim.date).group_by(Swim.name, Swim.event, Swim.team, Swim.gender, Swim.year, Swim.date)
 			for swim in query:
 				if topSwim:
 					swim.time = swim.min
@@ -1364,10 +1364,10 @@ class TempMeet:
 							place += 1
 
 	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
-						weeksOut=4, taper=False):
+						weeksOut=None, taper=False):
 		# need to include taper by teams
-		weeksIn = 16 - weeksOut
 		if taper:
+			weeksIn = 16 - weeksOut
 			self.taper(weeksIn)
 		# default the sigma if we just know the date
 		if weeksOut == -1:
@@ -1760,16 +1760,13 @@ def testTimePre():
 
 if __name__ == '__main__':
 	migrator = PostgresqlMigrator(db)
-	with db.transaction():
+	'''with db.transaction():
 		migrate(
 			migrator.add_column('teamseason', 'attrition', TeamSeason.attrition),
 			migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
 			#migrator.adsd_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
+	'''
 
-	for team in TeamSeason.select().where(TeamSeason.season>2012, TeamSeason.season<2017):
-		print team.getStrength(update=True)
-		print team.getAttrition(update=True)
-		print team.getImprovement(update=True)
 
