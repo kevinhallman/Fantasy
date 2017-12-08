@@ -348,11 +348,11 @@ class Conf():
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
 			print Time.time() - start
-			winProb = confMeet.scoreMonteCarlo(runs=100)
+			#winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
-			winProb = None
+			#winProb = None
 		if teamScores:
 			table = googleTable(teamScores, scores['scores'])
 		else:
@@ -360,7 +360,7 @@ class Conf():
 
 		print Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
-							finalScores=showScores(scores), table=table, winTable=showWinTable(winProb))
+							finalScores=showScores(scores), table=table, winTable='')  # showWinTable(winProb))
 
 class ConfJSON():
 	def GET(self):
