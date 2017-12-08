@@ -348,7 +348,7 @@ class Conf():
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
 			print Time.time() - start
-			#winProb = confMeet.scoreMonteCarlo(runs=100)
+			winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
@@ -360,7 +360,7 @@ class Conf():
 
 		print Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
-							finalScores=showScores(scores), table=table, winTable='')#showWinTable(winProb))
+							finalScores=showScores(scores), table=table, winTable=showWinTable(winProb))
 
 class ConfJSON():
 	def GET(self):
@@ -784,8 +784,6 @@ class TeamStats():
 		setGenDiv(form.gender, form.division)
 		if not team:
 			return render.teamstats(None, None, None, None, None, None, None, None, None)
-		print team, form.gender, form.season
-
 		try:
 			teamseason = TeamSeason.get(TeamSeason.team==team, TeamSeason.division==session.division,
 										TeamSeason.season==season, TeamSeason.gender==session.gender)
