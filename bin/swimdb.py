@@ -258,16 +258,15 @@ class TeamSeason(Model):
 		return 0
 
 	def getWinconf(self, previous=0):
-		#print self.team, self.id
 		if not self.conference:
-			return ''
+			return 0
 		for stats in TeamStats.select(TeamStats.winconf, TeamStats.week)\
 				.where(TeamStats.winconf.is_null(False), TeamStats.teamseasonid==self.id, TeamStats.week > 0)\
 				.order_by(TeamStats.week.desc()).limit(1).offset(previous):
 			if stats.winconf:
 				return stats.winconf
 		if self.winconf:
-			return self.winconf
+			return self.winconfs
 		return 0
 
 	# pulls top team strength for that year
