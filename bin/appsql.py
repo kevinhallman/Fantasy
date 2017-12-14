@@ -314,12 +314,15 @@ class Conf():
 		season = int(form.season)
 
 		if form.date and form.date != 'Whole Season':  # parse the date string
-			(month, day) = re.split('/', form.date)
-			if month in ['10', '11', '12']:
-				year = str(season - 1)
-			else:
-				year = str(season)
-			swimdate = year + '-' + month + '-' + day
+			try:
+				(month, day) = re.split('/', form.date)
+				if month in ['10', '11', '12']:
+					year = str(season - 1)
+				else:
+					year = str(season)
+				swimdate = year + '-' + month + '-' + day
+			except:  # default
+				swimdate = None
 		else:
 			swimdate = None
 
