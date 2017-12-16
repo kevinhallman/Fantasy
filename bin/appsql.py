@@ -1573,7 +1573,6 @@ def JSONScores(scores):
 			elif len(swimmer) == 6:
 				(name, team, event, time, meet, score) = swimmer
 			else:
-				print swimmer
 				continue
 			scoresLabel[event][name] = {}
 			scoresLabel[event][name] = {'team': team, 'time': time, 'score': score, 'meet': meet}
