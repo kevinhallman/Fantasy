@@ -4,6 +4,7 @@ import re
 import os
 import urlparse
 from peewee import *
+from events import badEventMap
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -35,28 +36,6 @@ def getNewConfs():
 			if not conf in confTeams[division][gender][year]:
 				confTeams[division][gender][year][team] = conf
 	return confTeams
-
-badEventMap = {
- '100 Backstroke': '100 Yard Backstroke',
- '1650 Freestyle': '1650 Yard Freestyle',
- '200 Butterfly': '200 Yard Butterfly',
- '500 Freestyle': '500 Yard Freestyle',
- '400 IM': '400 Yard Individual Medley',
- '200 IM': '200 Yard Individual Medley',
- '1000 Freestyle': '1000 Yard Freestyle',
- '100 Butterfly': '100 Yard Butterfly',
- '200 Freestyle': '200 Yard Freestyle',
- '50 Freestyle': '50 Yard Freestyle',
- '200 Backstroke': '200 Yard Backstroke',
- '100 Freestyle': '100 Yard Freestyle',
- '100 Breastroke': '100 Yard Breastroke',
- '200 Breastroke': '200 Yard Breastroke',
-	'200 Freestyle Relay': '200 Yard Freestyle Relay',
-	'400 Freestyle Relay': '400 Yard Freestyle Relay',
-	'800 Freestyle Relay': '800 Yard Freestyle Relay',
-	'200 Medley Relay': '200 Yard Medley Relay',
-	'400 Medley Relay': '400 Yard Medley Relay'
-}
 
 '''
 load in new swim times
@@ -108,6 +87,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				gender = swimArray[5]
 				event = swimArray[6]
 				time = toTime(swimArray[7])
+
+				if name == '&nbsp;':  # junk data
+					continue
 
 				if event in badEventMap:
 					event = badEventMap[event]
@@ -189,11 +171,15 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						except Swim.DoesNotExist:
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
 										   TeamSeason.gender==gender, TeamSeason.division==division).id
-							swimmerID = Swimmer.get(Swimmer.name==name, Swimmer.teamid==teamID).id
+							swimmer = Swimmer.get(Swimmer.name==name, Swimmer.teamid==teamID)
 							newSwim = {'meet': meet, 'date': swimDate, 'season': season, 'name': name, 'year': year, 'team': team,
 					   			'gender': gender, 'event': event, 'time': time, 'conference': conference, 'division':
-								division, 'relay': relay, 'swimmer': swimmerID}
+								division, 'relay': relay, 'swimmer': swimmer.id}
 							swims.append(newSwim)
+							# wipe powerpoints for that swimmer
+							swimmer.ppts = None
+							swimmer.save()
+
 
 						# incremental load
 						if len(swims) > 1000:
@@ -245,6 +231,9 @@ def deleteDups():
         'WHERE t.rnum > 1)').execute()
     '''
 
+'''
+loads into tables in order
+'''
 def safeLoad(year=18):
 	print 'loading teams...'
 	load(loadTeams=True, loadyear=year)
@@ -253,6 +242,13 @@ def safeLoad(year=18):
 	print 'loading teamMeets and swims...'
 	load(loadTeamMeets=True, loadSwims=True, loadyear=year)
 
+
+'''
+The following functions are all meant for data correction
+
+merge: helper functions to merge two teams or swimmers into the same
+fix: these go through existing data and clean up the various parts
+'''
 def mergeTeams(sourceTeamId, targetTeamId):
 	sourceTeam = TeamSeason.get(id=sourceTeamId)
 	targetTeam = TeamSeason.get(id=targetTeamId)
@@ -404,6 +400,7 @@ def fixDivision():
 		except TeamSeason.DoesNotExist:
 			pass
 
+# allows for manual checking of swimmer names and guesses if they need to be merged
 def fixDupSwimmers():
 	for swim in Swim.raw('SELECT id, time, meet, event, season, gender, name, swimmer_id, team, year FROM '
 							'(SELECT id, time, meet, event, season, gender, name, swimmer_id, team, year, ROW_NUMBER() '
