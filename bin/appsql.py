@@ -946,6 +946,7 @@ class Swimmerstats():
 
 		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
 										conference=form.conference)
+		print swimmers
 		html = ''
 		for idx, swimmer in enumerate(swimmers):
 			swims = swimmer.getTaperSwims()

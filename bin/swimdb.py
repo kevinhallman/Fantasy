@@ -700,18 +700,21 @@ class Swimmer(Model):
 		return taperSwims
 
 	def getPPTs(self):
-		#if self.ppts:
-		#	return self.ppts
-
-		totalPPts = 0
-		taperSwims = self.getTaperSwims()
-		for event in taperSwims:
-			totalPPts += taperSwims[event].getPPTs()
-
-		self.ppts = totalPPts
+		if self.ppts:
+			return self.ppts
+		events = {}
+		for swim in Swim.select().where(Swim.swimmer==self):
+			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
+				continue
+			ppts = swim.getPPTs(save=True)
+			if not swim.event in events:
+				events[swim.event] = ppts
+			elif ppts > events[swim.event]:
+				events[swim.event] = ppts
+		powerpoints = sum(sorted(events.values())[-3:])
+		self.ppts = powerpoints
 		self.save()
-
-		return totalPPts
+		return powerpoints
 
 	def nextSeason(self, years=1):
 		try:
@@ -751,7 +754,6 @@ class Swim(Model):
 		if not self.gender or not self.division or not self.event or not self.time:
 			return None
 		cdf = getSkewCDF(self.gender, self.division, self.event)
-		#cdf = getSkewCDF(self.gender, 'D1', self.event)
 		percent = 1 - cdf(self.time)
 		if percent==0 or percent==None:
 			print self.time, self.event, self.id
@@ -768,6 +770,8 @@ class Swim(Model):
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
+		if self.powerpoints > 1200:  # bullshit check, Ledecky's 1650 is about 1000
+			self.powerpoints = 0
 		if save:
 			self.save()
 		return round(self.powerpoints, 3)
@@ -831,9 +835,6 @@ class Swim(Model):
 			return self.scoreTime
 		return self.time
 
-	def generateTime(self):
-		pass
-
 	def getScore(self):
 		if self.score:
 			return self.score
@@ -892,7 +893,7 @@ class Swim(Model):
 		return self.time
 
 	def __str__(self):
-		return self.name+self.team+self.event+str(toTime(self.time))
+		return self.printScore()
 
 	class Meta:
 		database = db
@@ -1010,8 +1011,10 @@ class TempMeet:
 			self.eventSwims[swim.event] = []
 		self.eventSwims[swim.event].append(swim)
 
-	def addSwims(self, swims):
+	def addSwims(self, swims, newTeamName=None):
 		for swim in swims:
+			if newTeamName:  # optional name override
+				swim.scoreTeam = newTeamName
 			self.addSwim(swim)
 
 	def removeSwimmer(self, name):
