@@ -1,3 +1,20 @@
+eventsDualS = ["200 Yard Medley Relay","1000 Yard Freestyle","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
+
+eventsChamp = ["400 Yard Medley Relay", "400 Yard Freestyle Relay","800 Yard Freestyle Relay",
+			   "400 Yard Individual Medley", "1650 Yard Freestyle", "200 Yard Medley Relay", "200 Yard Freestyle",
+			   "100 Yard Backstroke", "100 Yard Breastroke", "200 Yard Butterfly", "50 Yard Freestyle","1 mtr Diving",
+			   "3 mtr Diving", "100 Yard Freestyle", "200 Yard Backstroke", "200 Yard Breastroke","500 Yard Freestyle",
+			   "100 Yard Butterfly", "200 Yard Individual Medley", "200 Yard Freestyle Relay"]
+
+allEvents = {"200 Yard Medley Relay", "400 Yard Medley Relay",
+			 "200 Yard Freestyle Relay", "400 Yard Freestyle Relay", "800 Yard Freestyle Relay",
+			 "200 Yard Individual Medley", "400 Yard Individual Medley",
+			 "50 Yard Freestyle", "100 Yard Freestyle",
+			 "200 Yard Freestyle", "500 Yard Freestyle", '1000 Yard Freestyle', "1650 Yard Freestyle",
+			 "100 Yard Backstroke", "200 Yard Backstroke",
+			 "100 Yard Butterfly", "200 Yard Butterfly",
+			 '100 Yard Breastroke', '200 Yard Breastroke'}
+
 allevents = ['1650 Free', '1500 Free', '1000 Free', '800 Free', '500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
 				'50 Fly', '100 Fly', '200 Fly',
 				'50 Back', '100 Back', '200 Back',
@@ -7,7 +24,7 @@ allevents = ['1650 Free', '1500 Free', '1000 Free', '800 Free', '500 Free', '400
 ageGroupsChamp = ['10-', '11-12', '13-14', '15-18', '19+']
 ageGroupsAll = ['8-', '9-10', '11-12', '13-14', '15-16', '17-18', '19-22', '22+']
 
-allEventsSCY = ['1650 Free', '1000 Free', '500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
+allEventsSCY = ['1650 Free', '1000 Free', '500 Free', '200 Free', '100 Free', '50 Free',
 				'50 Fly', '100 Fly', '200 Fly',
 				'50 Back', '100 Back', '200 Back',
 				'50 Breast', '100 Breast', '200 Breast',
@@ -39,6 +56,28 @@ eventConvert = {'1650 Free':'1650 Yard Freestyle',
 			   	'200 Breast': '200 Yard Breastroke',
 				'200 IM': '200 Yard Individual Medley',
 			   	'400 IM': '400 Yard Individual Medley'}
+
+badEventMap = {
+ '100 Backstroke': '100 Yard Backstroke',
+ '1650 Freestyle': '1650 Yard Freestyle',
+ '200 Butterfly': '200 Yard Butterfly',
+ '500 Freestyle': '500 Yard Freestyle',
+ '400 IM': '400 Yard Individual Medley',
+ '200 IM': '200 Yard Individual Medley',
+ '1000 Freestyle': '1000 Yard Freestyle',
+ '100 Butterfly': '100 Yard Butterfly',
+ '200 Freestyle': '200 Yard Freestyle',
+ '50 Freestyle': '50 Yard Freestyle',
+ '200 Backstroke': '200 Yard Backstroke',
+ '100 Freestyle': '100 Yard Freestyle',
+ '100 Breastroke': '100 Yard Breastroke',
+ '200 Breastroke': '200 Yard Breastroke',
+	'200 Freestyle Relay': '200 Yard Freestyle Relay',
+	'400 Freestyle Relay': '400 Yard Freestyle Relay',
+	'800 Freestyle Relay': '800 Yard Freestyle Relay',
+	'200 Medley Relay': '200 Yard Medley Relay',
+	'400 Medley Relay': '400 Yard Medley Relay'
+}
 
 
 SCMfactor = {'Men':
