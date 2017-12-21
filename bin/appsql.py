@@ -369,15 +369,15 @@ class ConfJSON():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None, heats=None)
 		web.header("Content-Type", "application/json")
-		division = form.division
-		gender = form.gender
+		division = form.division.title()
+		gender = form.gender.title()
 
 		if form.conference is None:
 			return {}
 
 		season = int(form.season)
 
-		if form.date and form.date != 'Whole Season':  # parse the date string
+		if form.date and form.date.title() != 'Whole Season':  # parse the date string
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
 				year = str(season - 1)
@@ -387,12 +387,13 @@ class ConfJSON():
 		else:
 			swimdate = None
 
-		if form.taper == 'Top Time':
+		if form.taper.title() == 'Top Time':
 			topTimes = True
 		else:
 			topTimes = False
-		if form.conference == 'Nationals':
-			confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
+		if form.conference.title() == 'Nationals':
+			confMeet = database.conference(season, gender, form.conference.title(), division, swimdate,
+										   topTimes=topTimes)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
@@ -401,7 +402,9 @@ class ConfJSON():
 			scores = confMeet.scoreString(25)
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
-			confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
+			print season, gender, form.conference.title(), division, swimdate, topTimes
+			confMeet = database.conference(season, gender, form.conference.title(), division, swimdate,
+										   topTimes=topTimes)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
