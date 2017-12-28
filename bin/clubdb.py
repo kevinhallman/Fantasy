@@ -7,10 +7,10 @@ import time as Time
 import urlparse
 from playhouse.migrate import *
 from swimdb import toTime, swimTime, Swim
-from scipy.stats import norm, skewnorm
+from scipy.stats import norm, skewnorm, expon
 import numpy as np
 #import matplotlib.mlab as mlab
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from math import log
 from sympy import binomial
 import heapq
@@ -35,7 +35,7 @@ def rejectOutliers(dataX, dataY=None, l=5, r=6):
 
 	if dataY:
 		data = zip(dataX, dataY)
-		newList = [i for i in data if (u - l*s < i[0] < u + r*s)]
+		newList = [float(i) for i in data if (u - l*s < i[0] < u + r*s)]
 		newX, newY = zip(*newList)
 		return list(newX), list(newY)
 	else:
@@ -86,7 +86,7 @@ def getSkewDist(gender, age, event, course='LCM', getData=False, year=None):
 	return
 
 
-def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None):
+def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None, getstats=False):
 		age = int(age)
 		times = []
 
@@ -101,7 +101,7 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None):
 			newDist.save()
 			return newDist
 
-
+		# for the full dist (age 23) we will use all times older than 18
 		if age < 23:
 			if year:
 				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).switch(Clubswim).join(Clubteam).where(
@@ -113,9 +113,16 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None):
 							Clubswim.event==event, Clubswimmer.age==age, Clubswim.course==course):
 					times.append(swim.time / 100.0)
 		else:
-			for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
-					Clubswim.event==event, Clubswimmer.age > 20, Clubswim.course==course):
-				times.append(swim.time / 100.0)
+			if year:
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).switch(Clubswim).join(Clubteam).where(
+							Clubswimmer.gender==gender, Clubteam.season==year,
+							Clubswim.event==event, Clubswimmer.age > 17, Clubswim.course==course):
+					times.append(swim.time / 100.0)
+			else:
+				for swim in Clubswim.select(Clubswim.time).join(Clubswimmer).where(Clubswimmer.gender==gender,
+					Clubswim.event==event, Clubswimmer.age > 17, Clubswim.course==course):
+					times.append(swim.time / 100.0)
+
 		print event, age, gender, course, len(times)
 
 		if len(times) == 0:
@@ -129,16 +136,27 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None):
 						Clubswim.event==event, Clubswimmer.age==age - 1, Clubswim.course==course):
 					times.append(swim.time / 100.0)
 
+		print swimTime(min(times)), len(times)
+		if getstats:
+			return min(times), len(times)
+
 		times = rejectOutliers(times, l=4, r=4)
+		#times = [log(i) for i in times]
 
 		# best fit of data
 		(mu, sigma) = norm.fit(times)
+		#print mu, sigma
 		a = 5
 		(a, mu, sigma) = skewnorm.fit(times, a, loc=mu, scale=sigma)
-		print mu, sigma, a
+		#print mu, sigma, a
+		loc, scale = expon.fit(times)
+		print loc, scale
+
 		if plot:  # the histogram of the data
 			n, bins, patches = plt.hist(times, 60, normed=1)
 			y = skewnorm.pdf(bins, a, mu, sigma)
+			plt.plot(bins, y)
+			#y = expon.pdf(bins, loc=loc, scale=scale)
 			plt.plot(bins, y)
 			plt.show()
 			return
@@ -182,6 +200,8 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 	newtime = todist.isf(percent)
 
 	# print time, round(newtime, 2)
+	if newtime < 0:
+		return
 	return newtime
 
 
@@ -1062,7 +1082,6 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False, loadage=18
 					print line
 					continue
 
-
 				if loadTeams:
 					key = team + gender + season
 					if not key in teamKeys:
@@ -1262,7 +1281,7 @@ def showAttrition(gender='Women'):
 		nodes['label'].append(parts[0] + parts[1])
 
 def getPoints(gender, event, time, age, course):
-	if (event == '200 Breast' or event == '200 Fly' or event == '200 Back') and	age < 11:
+	if (event == '200 Breast' or event == '200 Fly' or event == '200 Back') and age < 11:
 			return 0
 	cdf = getSkewCDF(gender, age, event, course)
 	percent = 1 - cdf(time/100)
@@ -1334,27 +1353,52 @@ def testTimePre(limit=100):
 	print 'combine', np.mean(combinedMisses), np.std(combinedMisses)
 
 if __name__== '__main__':
-	#for age in range(10, 21):
-	#	for year in range(2015, 2016):
+	#for age in range(20, 21):
+	#	for year in range(2007, 2015):
+	#		safeImport(age=age, year=year, load_course='SCY')
 	#		safeImport(age=age, year=year, load_course='LCM')
 
-	print testTimePre()
+	#print testTimePre()
 	#mark = Clubswimmer.get(id=4487181)
 	#mark.similarSwimmers(search=2000, limit=10)
 
 	#showAttrition()
 	#showAgeCurves(age=16)
 
-	#print Clubtimedist.select().where(Clubtimedist.gender=='Women', Clubtimedist.age==23,
-	#			Clubtimedist.event=='400 Free', Clubtimedist.course=='LCM', Clubtimedist.year.is_null()).get().a
+	gender = 'Women'
+	records = {}
+	for event in eventsLCM:
+		for age in ['23']:
+			#saveSkewDist(gender=gender, event=event, age=age, course='SCY', plot=False, plot=True)
+			minimum, numtimes = saveSkewDist(gender=gender, event=event, age=age, course='LCM', getstats=True)
+			records[event] = (minimum, numtimes)
 
-	#for age in range(15, 19):
-	#for event in eventsLCM:
-	#	for age in range(8, 24):
-	#		for gender in ['Men', 'Women']:
-	#			saveSkewDist(gender=gender, event=event, age=age, course='LCM', plot=False)
 
-	#print convert(gender='Men', event='100 Free', age=14, fromCourse='SCY', toCourse='LCM', time=58)
+	#for year in range(2010, 2018):
+
+	#'''
+	for event in eventsLCM:
+		dist = getSkewDist(gender=gender, event=event, age=23, course='LCM')
+		num = records[event][1] / 3
+		#num = 5000
+		#num = Swim.select(Swim.name).where(Swim.event==eventConvert[event], Swim.gender==gender,
+		#								   Swim.season==2017).group_by(Swim.name).count()
+		record = records[event][0]
+		#print event, swimTime(dist.isf(1 - 1.0 / num))
+		sample = 1000
+		times = []
+		top = 0
+		for i in range(sample):
+			topTime = min(dist.rvs(size=num))
+			times.append(topTime)
+			if topTime < record:
+				top += 1
+		mu = np.median(times)
+		sigma = np.std(times)
+		n, bins, patches = plt.hist(times, 60, normed=1)
+		#plt.show()
+		print event, swimTime(mu), sigma, norm.cdf(record, loc=mu, scale=sigma), top/float(sample), num
+		#'''
 
 
 
