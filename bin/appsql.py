@@ -1192,12 +1192,12 @@ class Timeconvert():
 			return json.dumps(timestable)
 
 		# otherwise return the points
-		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
-					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
+		newtime = convert(age=form.fromage, fromCourse=form.fromcourse,
+					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time)
 		print newtime
-		if float(newtime) > 10000 or float(newtime) < 0:
+		if newtime > 10000 or newtime < 0:
 			newtime = 'Error: time out of bounds'
-		return json.dumps([newtime])
+		return json.dumps([swimTime(newtime)])
 
 
 class teamMeets():
