@@ -1148,8 +1148,8 @@ class Timeconvert():
 			form.fromage = 23
 		if not form.toage:
 			form.toage = form.fromage
-		if not form.fromage or form.fromcourse=='From Course':
-			return
+		if not form.fromage or form.fromcourse=='From Course' :
+			return 'Error: No age or course selected'
 
 		time = 0
 		try:
@@ -1194,7 +1194,8 @@ class Timeconvert():
 		# otherwise return the points
 		newtime = swimTime(convert(age=form.fromage, fromCourse=form.fromcourse,
 					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time))
-		if newtime > 10000 or newtime < 0:
+		print newtime
+		if float(newtime) > 10000 or float(newtime) < 0:
 			newtime = 'Error: time out of bounds'
 		return json.dumps([newtime])
 
