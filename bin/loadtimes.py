@@ -78,6 +78,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 			for idx, line in enumerate(swimFile):
 				swimArray = re.split('\t', line)
+				if len(swimArray) > 8:
+					continue
 				meet = swimArray[0].strip()
 				d = swimArray[1]
 				(season, swimDate) = seasonString(d)
@@ -475,10 +477,10 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	#safeLoad(year=18)
-	#safeLoad(year=18)
+	safeLoad(year=18)
+	safeLoad(year=17)
 	#deleteDupImprovement()
-	fixConfs()
+	#fixConfs()
 	#fixDivision()
 	#fixRelays()
 	# migrateImprovement()
