@@ -12,21 +12,7 @@ import heapq
 from operator import itemgetter
 from sympy import binomial
 #import matplotlib.pyplot as plt
-
-eventsDualS = ["200 Yard Medley Relay","1000 Yard Freestyle","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
-eventsChamp = ["400 Yard Medley Relay", "400 Yard Freestyle Relay","800 Yard Freestyle Relay",
-			   "400 Yard Individual Medley", "1650 Yard Freestyle", "200 Yard Medley Relay", "200 Yard Freestyle",
-			   "100 Yard Backstroke", "100 Yard Breastroke", "200 Yard Butterfly", "50 Yard Freestyle","1 mtr Diving",
-			   "3 mtr Diving", "100 Yard Freestyle", "200 Yard Backstroke", "200 Yard Breastroke","500 Yard Freestyle",
-			   "100 Yard Butterfly", "200 Yard Individual Medley", "200 Yard Freestyle Relay"]
-allEvents = {"200 Yard Medley Relay", "400 Yard Medley Relay",
-			 "200 Yard Freestyle Relay", "400 Yard Freestyle Relay", "800 Yard Freestyle Relay",
-			 "200 Yard Individual Medley", "400 Yard Individual Medley",
-			 "50 Yard Freestyle", "100 Yard Freestyle",
-			 "200 Yard Freestyle", "500 Yard Freestyle", '1000 Yard Freestyle', "1650 Yard Freestyle",
-			 "100 Yard Backstroke", "200 Yard Backstroke",
-			 "100 Yard Butterfly", "200 Yard Butterfly",
-			 '100 Yard Breastroke', '200 Yard Breastroke'}
+from events import eventsDualS, eventsChamp, allEvents, eventConvertRev
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -379,10 +365,10 @@ class TeamSeason(Model):
 		return newMeet
 
 	def addUpRelay(self, event):
-		if event not in {'400 Yard Medley Relay', '400 Yard Freestyle Relay', '800 Yard Freestyle Relay'}:
+		if event not in {'400 Medley Relay', '400 Free Relay', '800 Free Relay'}:
 			return
 
-		if event=='400 Yard Freestyle Relay':
+		if event=='400 Free Relay':
 			pass
 
 	def getTaperSwims(self, numTimes=3, structured=False):
@@ -499,7 +485,6 @@ class TeamSeason(Model):
 
 	class Meta:
 		database = db
-
 
 class TeamStats(Model):
 	teamseasonid = ForeignKeyField(TeamSeason)
@@ -635,7 +620,7 @@ class Swimmer(Model):
 		times = []
 		for swim in Swim.select().where(Swim.swimmer==self, Swim.relay==False):
 			swim.getPPTs(zscore=False)
-			if swim.event=='1000 Yard Freestyle': continue
+			if swim.event=='1000 Free': continue
 			times.append(swim)
 
 		times.sort(key=lambda x: x.powerpoints, reverse=True)
@@ -689,7 +674,7 @@ class Swimmer(Model):
 			"FROM Swim WHERE swimmer_id=%s) "
 			"SELECT name, event, meet, time, gender, division, year, swimmer_id FROM topTimes WHERE rnum=1",
 			self.id):
-			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
+			if swim.event == '1000 Free' or 'Relay' in swim.event:
 				continue
 			points = swim.getPPTs(save=False)
 			heapq.heappush(times, (points, swim))
@@ -704,7 +689,7 @@ class Swimmer(Model):
 			return self.ppts
 		events = {}
 		for swim in Swim.select().where(Swim.swimmer==self):
-			if swim.event == '1000 Yard Freestyle' or 'Relay' in swim.event:
+			if swim.event == '1000 Free' or 'Relay' in swim.event:
 				continue
 			ppts = swim.getPPTs(save=True)
 			if not swim.event in events:
@@ -891,6 +876,18 @@ class Swim(Model):
 		if self.taperTime:
 			return self.taperTime
 		return self.time
+
+	# returns the original db swim information, useful if pulled from a partition
+	def sync(self):
+		if self.id:
+			return self
+		db_swim = Swim.get(Swim.name==self.name, Swim.time<self.time+.01, Swim.time > self.time-.01,
+						Swim.event==self.event, Swim.date==self.date)
+		return db_swim
+
+	def json(self):
+		db_swim = self.sync()
+		return {'id': db_swim.id, 'name': self.name, 'event': self.event, 'time': self.time}
 
 	def __str__(self):
 		return self.printScore()
@@ -1621,6 +1618,17 @@ class TempMeet:
 		string["scores"] = self.teamScores()
 		return string
 
+	def json(self):
+		json_out = {'teams': {}}
+		for swim in self.getSwims():
+			team = swim.getScoreTeam()
+			if not swim.getScoreTeam() in json_out['teams']:
+				json_out['teams'][team] = []
+			json_out['teams'][team].append(swim.json())
+		json_out['scores'] = self.getScores()
+		return json_out
+
+
 	def __str__(self):
 		if self.name:
 			return self.name
@@ -1737,7 +1745,6 @@ class Timedist(Model):
 	class Meta:
 		database = db
 
-
 def testTimePre():
 	misses = []
 	flatMisses = []
@@ -1760,15 +1767,32 @@ def testTimePre():
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
 
+def norm_swim():
+	eventConvertRev['50 Yard Medley Relay'] = '200 Medley Relay'
+	eventConvertRev['1000 Yard Freestyle'] = '1000 Free'
+	for swim in Swim().select():
+		if swim.event in eventConvertRev.values():
+			continue
+		swim.event = eventConvertRev[swim.event]
+		try:
+			swim.save()
+		except IntegrityError:
+			db.rollback()
+			swim.delete()
+
+
 if __name__ == '__main__':
+	#swim = Swim.get(id=6952239)
+	#print swim.event
+	norm_swim()
 	migrator = PostgresqlMigrator(db)
-	'''with db.transaction():
+	with db.transaction():
 		migrate(
-			migrator.add_column('teamseason', 'attrition', TeamSeason.attrition),
-			migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
-			#migrator.adsd_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swim', 'event_norm', Swim.event_norm),
+			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
+			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
-	'''
+
 
 

@@ -1,20 +1,3 @@
-eventsDualS = ["200 Yard Medley Relay","1000 Yard Freestyle","200 Yard Freestyle","100 Yard Backstroke","100 Yard Breastroke","200 Yard Butterfly","50 Yard Freestyle","1 mtr Diving","3 mtr Diving","100 Yard Freestyle","200 Yard Backstroke","200 Yard Breastroke","500 Yard Freestyle","100 Yard Butterfly","200 Yard Individual Medley","200 Yard Freestyle Relay"]
-
-eventsChamp = ["400 Yard Medley Relay", "400 Yard Freestyle Relay","800 Yard Freestyle Relay",
-			   "400 Yard Individual Medley", "1650 Yard Freestyle", "200 Yard Medley Relay", "200 Yard Freestyle",
-			   "100 Yard Backstroke", "100 Yard Breastroke", "200 Yard Butterfly", "50 Yard Freestyle","1 mtr Diving",
-			   "3 mtr Diving", "100 Yard Freestyle", "200 Yard Backstroke", "200 Yard Breastroke","500 Yard Freestyle",
-			   "100 Yard Butterfly", "200 Yard Individual Medley", "200 Yard Freestyle Relay"]
-
-allEvents = {"200 Yard Medley Relay", "400 Yard Medley Relay",
-			 "200 Yard Freestyle Relay", "400 Yard Freestyle Relay", "800 Yard Freestyle Relay",
-			 "200 Yard Individual Medley", "400 Yard Individual Medley",
-			 "50 Yard Freestyle", "100 Yard Freestyle",
-			 "200 Yard Freestyle", "500 Yard Freestyle", '1000 Yard Freestyle', "1650 Yard Freestyle",
-			 "100 Yard Backstroke", "200 Yard Backstroke",
-			 "100 Yard Butterfly", "200 Yard Butterfly",
-			 '100 Yard Breastroke', '200 Yard Breastroke'}
-
 allevents = ['1650 Free', '1500 Free', '1000 Free', '800 Free', '500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
 				'50 Fly', '100 Fly', '200 Fly',
 				'50 Back', '100 Back', '200 Back',
@@ -43,40 +26,47 @@ eventsSCY['13-14'] = ['1650 Free', '500 Free', '200 Free', '100 Free', '50 Free'
 				'200 IM', '400 IM']
 eventsSCY['19+'] = eventsSCY['15-18'] = eventsSCY['13-14']
 
-eventConvert = {'1650 Free':'1650 Yard Freestyle',
+eventConvert = {'1650 Free': '1650 Yard Freestyle',
 				'500 Free': '500 Yard Freestyle',
-				'200 Free':'200 Yard Freestyle',
-				'100 Free':'100 Yard Freestyle',
-			 	'50 Free':'50 Yard Freestyle',
-				'100 Fly':'100 Yard Butterfly',
-				'200 Fly':'200 Yard Butterfly',
-				'100 Back':'100 Yard Backstroke',
-				'200 Back':'200 Yard Backstroke',
+				'200 Free': '200 Yard Freestyle',
+				'100 Free': '100 Yard Freestyle',
+			 	'50 Free': '50 Yard Freestyle',
+				'100 Fly': '100 Yard Butterfly',
+				'200 Fly': '200 Yard Butterfly',
+				'100 Back': '100 Yard Backstroke',
+				'200 Back': '200 Yard Backstroke',
 				'100 Breast': '100 Yard Breastroke',
 			   	'200 Breast': '200 Yard Breastroke',
 				'200 IM': '200 Yard Individual Medley',
-			   	'400 IM': '400 Yard Individual Medley'}
+			   	'400 IM': '400 Yard Individual Medley',
+				'200 Free Relay': '200 Yard Freestyle Relay',
+				'400 Free Relay': '400 Yard Freestyle Relay',
+				'800 Free Relay': '800 Yard Freestyle Relay',
+				'200 Medley Relay': '200 Yard Medley Relay',
+				'400 Medley Relay': '400 Yard Medley Relay'}
+
+eventConvertRev = {v: k for k, v in eventConvert.iteritems()}
 
 badEventMap = {
- '100 Backstroke': '100 Yard Backstroke',
- '1650 Freestyle': '1650 Yard Freestyle',
- '200 Butterfly': '200 Yard Butterfly',
- '500 Freestyle': '500 Yard Freestyle',
- '400 IM': '400 Yard Individual Medley',
- '200 IM': '200 Yard Individual Medley',
- '1000 Freestyle': '1000 Yard Freestyle',
- '100 Butterfly': '100 Yard Butterfly',
- '200 Freestyle': '200 Yard Freestyle',
- '50 Freestyle': '50 Yard Freestyle',
- '200 Backstroke': '200 Yard Backstroke',
- '100 Freestyle': '100 Yard Freestyle',
- '100 Breastroke': '100 Yard Breastroke',
- '200 Breastroke': '200 Yard Breastroke',
-	'200 Freestyle Relay': '200 Yard Freestyle Relay',
-	'400 Freestyle Relay': '400 Yard Freestyle Relay',
-	'800 Freestyle Relay': '800 Yard Freestyle Relay',
-	'200 Medley Relay': '200 Yard Medley Relay',
-	'400 Medley Relay': '400 Yard Medley Relay'
+ '100 Backstroke': '100 Back',
+ '1650 Freestyle': '1650 Free',
+ '200 Butterfly': '200 Fly',
+ '500 Freestyle': '500 Free',
+ '400 IM': '400 IM',
+ '200 IM': '200 IM',
+ '1000 Freestyle': '1000 Free',
+ '100 Butterfly': '100 Fly',
+ '200 Freestyle': '200 Free',
+ '50 Freestyle': '50 Free',
+ '200 Backstroke': '200 Back',
+ '100 Freestyle': '100 Free',
+ '100 Breastroke': '100 Breast',
+ '200 Breastroke': '200 Breast',
+	'200 Freestyle Relay': '200 Free Relay',
+	'400 Freestyle Relay': '400 Free Relay',
+	'800 Freestyle Relay': '800 Free Relay',
+	'200 Medley Relay': '200 Medley Relay',
+	'400 Medley Relay': '400 Medley Relay'
 }
 
 
@@ -145,3 +135,37 @@ eventsLCM = ['1500 Free', '400 Free', '200 Free', '100 Free', '50 Free',
 				'50 Back', '100 Back', '200 Back',
 				'50 Breast', '100 Breast', '200 Breast',
 				'200 IM', '400 IM']
+
+eventOrder = ['50 Free', '100 Free', '200 Free', '500 Free', '1000 Free',
+			  '1650 Free', '100 Fly', '200 Fly', '100 Back', '200 Back', '100 Breast', '200 Breast', '200 IM', '400 IM', '200 Medley Relay', '400 Medley Relay', '200 Free Relay', '400 Free Relay', '800 Free Relay']
+
+eventOrderInd = ['50 Free', '100 Free', '200 Free', '500 Free', '1000 Free', '1650 Free', '100 Fly', '200 Fly', '100 Back', '200 Back', '100 Breast', '200 Breast', '200 IM', '400 IM']
+
+eventsDualS = ['200 Medley Relay', '1000 Free', '200 Free', '100 Back', '100 Breast', '200 Fly', '50 Free', '1 mtr Diving',
+			   '3 mtr Diving', '100 Free', '200 Back', '200 Breast', '500 Free', '100 Fly', '200 IM', '200 Free Relay']
+
+eventsDualL = ['400 Medley Relay', '1650 Free', '200 Free', '100 Back', '100 Breast', '200 Fly', '50 Free', '1 mtr Diving',
+			   '3 mtr Diving', '100 Free', '200 Back', '200 Breast', '500 Free', '100 Fly', '400 IM', '400 Free Relay']
+
+eventsChamp = ['400 Medley Relay', '400 Free Relay', '800 Free Relay',
+			   '400 IM', '1650 Free', '200 Medley Relay', '200 Free',
+			   '100 Back', '100 Breast', '200 Fly', '50 Free', '1 mtr Diving',
+			   '3 mtr Diving', '100 Free', '200 Back', '200 Breast', '500 Free',
+			   '100 Fly', '200 IM', '200 Free Relay']
+
+allEvents = {'200 Medley Relay', '400 Medley Relay',
+			 '200 Free Relay', '400 Free Relay', '800 Free Relay',
+			 '200 IM', '400 IM',
+			 '50 Free', '100 Free',
+			 '200 Free', '500 Free', '1000 Free', '1650 Free',
+			 '100 Back', '200 Back',
+			 '100 Fly', '200 Fly',
+			 '100 Breast', '200 Breast'}
+
+
+eventsChamp3 = ['200 Free Relay', '', '500 Free', '200 IM', '50 Free', '', '400 Medley Relay', '',
+		'400 IM', '100 Fly', '200 Free', '100 Breast', '100 Back', '', '800 Free Relay', '',
+		'1650 Free', '', '200 Medley Relay', '', '200 Back', '100 Free', '200 Breast', '200 Fly', '', '400 Free Relay']
+
+requiredEvents = {'200 Free', '100 Back', '100 Breast', '200 Fly', '50 Free', '100 Free', '200 Back', '200 Breast',
+				'500 Free', '100 Fly'}
