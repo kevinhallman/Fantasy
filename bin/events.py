@@ -27,6 +27,7 @@ eventsSCY['13-14'] = ['1650 Free', '500 Free', '200 Free', '100 Free', '50 Free'
 eventsSCY['19+'] = eventsSCY['15-18'] = eventsSCY['13-14']
 
 eventConvert = {'1650 Free': '1650 Yard Freestyle',
+				'1000 Free': '1000 Yard Freestyle',
 				'500 Free': '500 Yard Freestyle',
 				'200 Free': '200 Yard Freestyle',
 				'100 Free': '100 Yard Freestyle',
