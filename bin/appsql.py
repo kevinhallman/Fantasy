@@ -401,7 +401,7 @@ class ConfJSON():
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
 			print season, gender, form.conference.title(), division, swimdate, topTimes
-			confMeet = database.conference(season, gender, form.conference.title(), division, swimdate,
+			confMeet = database.conference(season, gender, form.conference, division, swimdate,
 										   topTimes=topTimes)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
@@ -1252,9 +1252,7 @@ def showMeet(scores):
 	html+='<table>'
 	for e in eventOrder:
 		event = eventConvert[e]
-		print event
 		if not event in scores:
-			print 'nope', scores.keys()
 			continue
 		html += '<tr><th align="left" colspan=6>' + event + '</th></tr>'
 		for swim in scores[event]:
