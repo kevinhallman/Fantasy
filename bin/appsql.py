@@ -17,7 +17,7 @@ from clubdb import db as clubdb
 #from clubScraper import eventsSCY
 from operator import itemgetter
 import time as Time
-from events import eventOrder, eventOrderInd
+from events import eventOrder, eventOrderInd, eventConvert
 
 urls = ('/', 'Home',
 	'/home', 'Home',
@@ -1250,8 +1250,12 @@ def showMeet(scores):
 	if scores == None: return None
 	html='<h2 align="center">Simulated Results</h2>'
 	html+='<table>'
-	for event in eventOrder:
-		if not event in scores: continue
+	for e in eventOrder:
+		event = eventConvert[e]
+		print event
+		if not event in scores:
+			print 'nope', scores.keys()
+			continue
 		html += '<tr><th align="left" colspan=6>' + event + '</th></tr>'
 		for swim in scores[event]:
 			html += '<tr>'

@@ -12,7 +12,7 @@ import heapq
 from operator import itemgetter
 from sympy import binomial
 #import matplotlib.pyplot as plt
-from events import eventsDualS, eventsChamp, allEvents, eventConvertRev
+from events import eventsDualS, eventsChamp, allEvents, eventConvert
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -825,7 +825,7 @@ class Swim(Model):
 			return self.score
 		return 0
 
-	def printScore(self, br='\t', gender=True):
+	def printScore(self, br='\t', gender=True, full_event=True):
 		time = swimTime(self.getScoreTime())
 		if gender and self.gender:
 			genderStr = br + self.gender
@@ -839,7 +839,15 @@ class Swim(Model):
 			meet = str(self.meet)
 		else:
 			meet = ''
-		return name+br+self.getScoreTeam()+genderStr+br+self.event+br+time+br+meet
+		if full_event:
+			if self.event in eventConvert:
+				event = eventConvert[self.event]
+			else:
+				event = self.event
+		else:
+			event = self.event
+
+		return name+br+self.getScoreTeam()+genderStr+br+event+br+time+br+meet
 
 	def taper(self, weeks, noise=0):
 		taper, taperStd = self.swimmer.teamid.getTaperStats(weeks=weeks)
@@ -1589,8 +1597,9 @@ class TempMeet:
 		string = {}
 		events = self.getEvents('')
 		for event in events:
+			print event
 			if event not in self.eventSwims: continue
-			string[event] = []
+			string[eventConvert[event]] = []
 
 			# determine last scoring place
 			if showNum != 'all':
@@ -1612,9 +1621,9 @@ class TempMeet:
 					swimAry.insert(0, place)
 				if swim.score and showScores:
 					swimAry.append(str(swim.score))
-					string[event].append(swimAry)
+					string[eventConvert[event]].append(swimAry)
 				else:
-					string[event].append(swimAry)
+					string[eventConvert[event]].append(swimAry)
 		string["scores"] = self.teamScores()
 		return string
 
@@ -1767,24 +1776,8 @@ def testTimePre():
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
 
-def norm_swim():
-	eventConvertRev['50 Yard Medley Relay'] = '200 Medley Relay'
-	eventConvertRev['1000 Yard Freestyle'] = '1000 Free'
-	for swim in Swim().select():
-		if swim.event in eventConvertRev.values():
-			continue
-		swim.event = eventConvertRev[swim.event]
-		try:
-			swim.save()
-		except IntegrityError:
-			db.rollback()
-			swim.delete()
-
 
 if __name__ == '__main__':
-	#swim = Swim.get(id=6952239)
-	#print swim.event
-	norm_swim()
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
