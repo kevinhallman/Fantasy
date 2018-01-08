@@ -478,7 +478,7 @@ if __name__ == '__main__':
 	#deleteDups()
 	#fixDupSwimmers()
 	safeLoad(year=18)
-	safeLoad(year=17)
+	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
 	#fixDivision()
