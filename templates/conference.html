@@ -82,6 +82,16 @@ Simulate a conference or national swim meet using either a swimmer's top times o
 		<option>24</option>
 	</select>
 	</p>
+	<p>
+		<label>Max team size:</label>
+		<select name="size">
+			$for size in range(10, 30):
+				$if size==17:
+					<option selected="selected">$size</option>
+				$else:
+					<option>$size</option>
+		</select>
+	</p>
 
 	<input type="submit" value="Swimulate">
 	<div id="loading"></div>
