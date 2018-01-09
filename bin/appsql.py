@@ -295,7 +295,7 @@ class SwimulateJSON():
 class Conf():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, _unicode=False, division=None,
-						 gender=None, heats=None)
+						 gender=None, heats=None, size=None)
 		setGenDiv(form.gender, form.division)
 
 		start = Time.time()
@@ -329,8 +329,13 @@ class Conf():
 				topTimes = True
 			else:
 				topTimes = False
+			if int(form.size) > 9 and int(form.size) < 31:
+				size = int(form.size)
+			else:
+				size = 17
 			if form.conference == 'Nationals':
-				confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
+				confMeet = database.conference(season, gender, form.conference, division, swimdate,
+											   topTimes=topTimes, teamMax=size)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -339,8 +344,8 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				print season
-				confMeet = database.conference(season, gender, form.conference, division, swimdate, topTimes=topTimes)
+				confMeet = database.conference(season, gender, form.conference, division, swimdate,
+											   topTimes=topTimes, teamMax=size)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -348,12 +353,12 @@ class Conf():
 				confMeet.score()
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
-			print Time.time() - start
+			#print Time.time() - start
 			#winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
-			winProb = None
+			winProb = None  # used for monte carlo simulations
 		if teamScores:
 			table = googleTable(teamScores, scores['scores'])
 		else:
@@ -361,7 +366,7 @@ class Conf():
 
 		print Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
-							finalScores=showScores(scores), table=table, winTable='')#showWinTable(winProb))
+							finalScores=showScores(scores), table=table, winTable='')  # showWinTable(winProb))
 
 class ConfJSON():
 	def GET(self):
@@ -400,7 +405,7 @@ class ConfJSON():
 			scores = confMeet.scoreString(25)
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
-			print season, gender, form.conference.title(), division, swimdate, topTimes
+			#print season, gender, form.conference.title(), division, swimdate, topTimes
 			confMeet = database.conference(season, gender, form.conference, division, swimdate,
 										   topTimes=topTimes)
 			if form.heats and form.heats=='24':
@@ -947,7 +952,7 @@ class Swimmerstats():
 
 		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
 										conference=form.conference)
-		print swimmers
+		#print swimmers
 		html = ''
 		for idx, swimmer in enumerate(swimmers):
 			swims = swimmer.getTaperSwims()
@@ -1028,7 +1033,7 @@ class Taper():
 				except TeamSeason.DoesNotExist:
 					pass
 		table = googleLine(tapers, 'Week')
-		print table
+		#print table
 		return render.taper(conferences=sorted(confList.keys()), table=table)
 
 class TaperJSON():
@@ -1060,7 +1065,7 @@ class TaperJSON():
 					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
 					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
 						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
-						print team, week, taper
+						#print team, week, taper
 						if taper < 0 or taper > 100 or isnan(taper):
 							taper = ''
 						if not team in tapers:
@@ -1068,7 +1073,7 @@ class TaperJSON():
 						tapers[team][week] = taper
 				except TeamSeason.DoesNotExist:
 					pass
-		print tapers
+		#print tapers
 		return json.dumps(tapers)
 
 class Clubppt():

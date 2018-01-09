@@ -1597,7 +1597,6 @@ class TempMeet:
 		string = {}
 		events = self.getEvents('')
 		for event in events:
-			print event
 			if event not in self.eventSwims: continue
 			string[eventConvert[event]] = []
 
@@ -1636,7 +1635,6 @@ class TempMeet:
 			json_out['teams'][team].append(swim.json())
 		json_out['scores'] = self.getScores()
 		return json_out
-
 
 	def __str__(self):
 		if self.name:
