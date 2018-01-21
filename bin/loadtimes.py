@@ -58,9 +58,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
 			continue
-		div, year, gender = match.groups()
+		div, fileyear, gender = match.groups()
 
-		if not (int(year) == loadyear):
+		if not (int(fileyear) == loadyear):
 			continue
 		#if not 'new' in swimFileName:
 		#	continue
@@ -431,6 +431,23 @@ def fixDupSwimmers():
 					except Swimmer.DoesNotExist: # already merged
 						pass
 
+def fixDupSwimmers2():
+	teams = {}
+	for swim in Swim.raw('select s.count, s.name, s.team from '
+		'(select count(s1.id),s1.id,s1.team from swim s1, swim s2 where s1.name!=s2.name and s1.time=s2.time '
+		'and s1.event=s2.event and s1.date=s2.date and s1.team=s2.team and s2.season=2017 group by s1.id,s1.team) '
+		'as s where count>10 order by team'):
+		if swim.team not in teams:
+			teams[swim.team] = []
+		teams[swim.team].append(swim)
+
+	for team in teams:
+		if len(teams[team])==2:
+			swimmer1 = teams[team][0]
+			swimmer2 = teams[team][1]
+
+
+
 def deleteDupImprovement():
 	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY name, event, fromseason, team ORDER BY id) AS rnum '
@@ -477,7 +494,7 @@ if __name__ == '__main__':
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad(year=18)
+	safeLoad(year=17)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
