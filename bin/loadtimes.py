@@ -4,7 +4,7 @@ import re
 import os
 import urlparse
 from peewee import *
-from events import badEventMap
+from events import badEventMap, eventConvert
 
 urlparse.uses_netloc.append("postgres")
 if "DATABASE_URL" in os.environ:  # production
@@ -62,8 +62,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 		if not (int(fileyear) == loadyear):
 			continue
-		#if not 'new' in swimFileName:
-		#	continue
 
 		confTeams = getNewConfs()
 
@@ -93,8 +91,17 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				if name == '&nbsp;':  # junk data
 					continue
 
+				# convert bad event names
 				if event in badEventMap:
 					event = badEventMap[event]
+				convert = dict([[v, k] for k,v in eventConvert.items()])
+				convert['50 Yard Medley Relay'] = '200 Medley Relay'
+				if event in convert:
+					event = convert[event]
+				if 'Yard' in event:
+					print event
+					print 'yard'
+					continue
 
 				if season and swimDate and name and team and gender and event and time:
 					pass
@@ -168,7 +175,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					if not key in swimKeys:
 						swimKeys.add(key)
 						try:
-							Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01, Swim.event==event,
+							swim = Swim.get(Swim.name==name, Swim.time<time+.01, Swim.time > time-.01,
+											Swim.event==event,
 								Swim.date==swimDate)  # floats in SQL and python different precision
 						except Swim.DoesNotExist:
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
@@ -208,9 +216,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 		print 'Team Meets:', len(teamMeets)
 		TeamMeet.insert_many(teamMeets).execute()
 
-	#if loadSwims and len(swims) > 0:
-	#	print 'Swims: ', len(swims)
-	#	Swim.insert_many(swims).execute()
+	if loadSwims and len(swims) > 0:
+		print 'Swims: ', len(swims)
+		Swim.insert_many(swims).execute()
 
 		#for i in range(len(swims) / 100):
 		#	print i
