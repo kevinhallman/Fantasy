@@ -270,7 +270,6 @@ class SwimulateJSON():
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return {}
 
-		#print formMeets.values()
 		newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 		if optimizeTeams:
@@ -307,7 +306,7 @@ class Conf():
 
 		if form.conference is None:
 			return render.conference(conferences=confList, scores=None, teamScores=None,
-									 finalScores=None, table='', winTable=None)
+									 finalScores=None, table='', winTable=None, size=None)
 
 		season = int(form.season)
 
@@ -329,7 +328,10 @@ class Conf():
 				topTimes = True
 			else:
 				topTimes = False
-			if int(form.size) > 9 and int(form.size) < 31:
+				
+			if not form.size:
+				size = 17
+			elif int(form.size) > 9 and int(form.size) < 31:
 				size = int(form.size)
 			else:
 				size = 17
