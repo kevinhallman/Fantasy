@@ -55,7 +55,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])', swimFileName)
+		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
 			continue
 		div, fileyear, gender = match.groups()
@@ -252,6 +252,10 @@ def safeLoad(year=18):
 	print 'loading teamMeets and swims...'
 	load(loadTeamMeets=True, loadSwims=True, loadyear=year)
 
+	print 'Updating powerpoints'
+	for swimmer in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.ppts.is_null()):
+		swimmer.getPPTs()
+
 
 '''
 The following functions are all meant for data correction
@@ -439,20 +443,31 @@ def fixDupSwimmers():
 					except Swimmer.DoesNotExist: # already merged
 						pass
 
-def fixDupSwimmers2():
-	teams = {}
-	for swim in Swim.raw('select s.count, s.name, s.team from '
-		'(select count(s1.id),s1.id,s1.team from swim s1, swim s2 where s1.name!=s2.name and s1.time=s2.time '
-		'and s1.event=s2.event and s1.date=s2.date and s1.team=s2.team and s2.season=2017 group by s1.id,s1.team) '
-		'as s where count>10 order by team'):
-		if swim.team not in teams:
-			teams[swim.team] = []
-		teams[swim.team].append(swim)
+def fixDupSwimmers2(season=2018):
+	swimmers_merged = set()
+	for swim in Swim.raw('select s.count, s.swimmer1, s.swimmer2 from '
+		'(select count(s1.id),s1.swimmer_id as swimmer1, s2.swimmer_id as swimmer2 from swim s1, swim s2 '
+		'where s1.swimmer_id!=s2.swimmer_id and s1.time=s2.time and s1.event=s2.event and s1.date=s2.date and '
+		's1.team=s2.team and s2.season=%s group by s1.swimmer_id, s2.swimmer_id) as s '
+		'where count>3 order by count desc', season):
+		print swimmers_merged
+		print swim.swimmer1, swim.swimmer2
+		if swim.swimmer1 in swimmers_merged or swim.swimmer2 in swimmers_merged:
+			continue
+		swimmers_merged.add(swim.swimmer1)
+		swimmers_merged.add(swim.swimmer2)
 
-	for team in teams:
-		if len(teams[team])==2:
-			swimmer1 = teams[team][0]
-			swimmer2 = teams[team][1]
+		count1 = Swim.select().where(Swim.swimmer==swim.swimmer1).count()
+		count2 = Swim.select().where(Swim.swimmer==swim.swimmer2).count()
+
+		#print count1, Swimmer.get(id=swim.swimmer).name
+		#print count2, Swimmer.get(id=swim.swimmer_id2).name
+
+		if count1 > count2:
+			mergeSwimmers(swim.swimmer2, swim.swimmer1)
+		elif count1 < count2:
+			mergeSwimmers(swim.swimmer1, swim.swimmer2)
+
 
 
 
@@ -498,12 +513,14 @@ def fixMeetNames():
 
 if __name__ == '__main__':
 	start = Time.time()
+	fixDupSwimmers2(2018)
+	fixDupSwimmers2(2017)
 	#fixMeetNames()
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	safeLoad(year=17)
-	safeLoad(year=18)
+	#safeLoad(year=17)
+	#safeLoad(year=18)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
