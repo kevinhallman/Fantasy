@@ -306,7 +306,7 @@ class Conf():
 
 		if form.conference is None:
 			return render.conference(conferences=confList, scores=None, teamScores=None,
-									 finalScores=None, table='', winTable=None, size=None)
+									 finalScores=None, table='', winTable=None)
 
 		season = int(form.season)
 
@@ -328,7 +328,7 @@ class Conf():
 				topTimes = True
 			else:
 				topTimes = False
-				
+
 			if not form.size:
 				size = 17
 			elif int(form.size) > 9 and int(form.size) < 31:
