@@ -727,7 +727,7 @@ class ProgramsJSON():
 					teamRank[team] = []
 					teamRank[team].append(0)
 				# overall score will be sum of individual z-scores
-				teamRank[team][0] += round((score - avg)/dev * 100, 0)
+				teamRank[team][0] += -round((score - avg)/dev * 100, 0)
 				teamRank[team].append((idx, score))
 
 		teamRankLabel = {}
