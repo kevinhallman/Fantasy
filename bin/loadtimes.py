@@ -450,6 +450,8 @@ def fixDupSwimmers2(season=2018):
 		'where s1.swimmer_id!=s2.swimmer_id and s1.time=s2.time and s1.event=s2.event and s1.date=s2.date and '
 		's1.team=s2.team and s2.season=%s group by s1.swimmer_id, s2.swimmer_id) as s '
 		'where count>3 order by count desc', season):
+
+		# make sure we don't try and delete the reverse
 		print swimmers_merged
 		print swim.swimmer1, swim.swimmer2
 		if swim.swimmer1 in swimmers_merged or swim.swimmer2 in swimmers_merged:
@@ -460,16 +462,11 @@ def fixDupSwimmers2(season=2018):
 		count1 = Swim.select().where(Swim.swimmer==swim.swimmer1).count()
 		count2 = Swim.select().where(Swim.swimmer==swim.swimmer2).count()
 
-		#print count1, Swimmer.get(id=swim.swimmer).name
-		#print count2, Swimmer.get(id=swim.swimmer_id2).name
-
+		# merge into the swimmer with more swims
 		if count1 > count2:
 			mergeSwimmers(swim.swimmer2, swim.swimmer1)
 		elif count1 < count2:
 			mergeSwimmers(swim.swimmer1, swim.swimmer2)
-
-
-
 
 def deleteDupImprovement():
 	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
@@ -513,14 +510,14 @@ def fixMeetNames():
 
 if __name__ == '__main__':
 	start = Time.time()
-	fixDupSwimmers2(2018)
-	fixDupSwimmers2(2017)
+	#fixDupSwimmers2(2018)
+	#fixDupSwimmers2(2017)
 	#fixMeetNames()
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
 	#safeLoad(year=17)
-	#safeLoad(year=18)
+	safeLoad(year=18)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()

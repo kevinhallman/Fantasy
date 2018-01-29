@@ -5,16 +5,13 @@ import sqlmeets
 import re
 import json
 import os, urlparse
-import numpy
+from numpy import percentile, median, mean, std
 from peewee import *
-#from guppy import hpy
 from math import isnan
-
 from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, swimTime, db
 from swimdb import getSkewDist as getSkewDistCollege
 from clubdb import convert, getSkewDist
 from clubdb import db as clubdb
-#from clubScraper import eventsSCY
 from operator import itemgetter
 import time as Time
 from events import eventOrder, eventOrderInd, eventConvert
@@ -553,11 +550,11 @@ class ImprovementJSON():
 			if teamImp[team] == []:
 				continue
 			jsonImp[team] = {}
-			med = numpy.median(teamImp[team])
+			med = median(teamImp[team])
 			nums = teamImp[team]
 			jsonImp[team]['min'] = min(nums)
-			jsonImp[team]['bottomquartile'] = numpy.percentile(nums, 25)
-			jsonImp[team]['topquartile'] = numpy.percentile(nums, 75)
+			jsonImp[team]['bottomquartile'] = percentile(nums, 25)
+			jsonImp[team]['topquartile'] = percentile(nums, 75)
 			jsonImp[team]['max'] = max(nums)
 			jsonImp[team]['median'] = med
 			jsonImp[team]['n'] = len(nums)
@@ -673,13 +670,16 @@ class Programs():
 						teamImprovement[team] = stats.improvement
 
 		teamRank = {}
-		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
+		for dict in [teamRecruits, teamAttrition, teamImprovement]:
+			avg = mean(dict.values())
+			dev = std(dict.values())
 			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
 				(team, score) = teamScore
 				if not team in teamRank:
 					teamRank[team] = []
 					teamRank[team].append(0)
-				teamRank[team][0] += idx
+				# overall score will be sum of individual z-scores
+				teamRank[team][0] += (score - avg)/dev
 				teamRank[team].append((idx, score))
 
 		html = showPrograms(teamRank)
@@ -718,13 +718,16 @@ class ProgramsJSON():
 						teamImprovement[team] = stats.improvement
 
 		teamRank = {}
-		for i, dict in enumerate([teamRecruits, teamAttrition, teamImprovement]):
+		for dict in [teamRecruits, teamAttrition, teamImprovement]:
+			avg = mean(dict.values())
+			dev = std(dict.values())
 			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
 				(team, score) = teamScore
 				if not team in teamRank:
 					teamRank[team] = []
 					teamRank[team].append(0)
-				teamRank[team][0] += idx
+				# overall score will be sum of individual z-scores
+				teamRank[team][0] += round((score - avg)/dev * 100, 0)
 				teamRank[team].append((idx, score))
 
 		teamRankLabel = {}
@@ -1197,6 +1200,7 @@ class Timeconvert():
 			return json.dumps(timestable)
 
 		# otherwise return the points
+		print form.toage
 		newtime = convert(age=form.fromage, fromCourse=form.fromcourse,
 					toCourse=form.tocourse, gender=form.gender, event=fromevent, toage=form.toage, time=time)
 		print newtime
@@ -1340,13 +1344,13 @@ def showPrograms(teamRank):
 	html += '<th>Improvement %</th>'
 	html += '</tr></thead>'
 	html += '<tbody>'
-	for (teamRank, teamStats) in enumerate(sorted(teamRank.items(), key=itemgetter(1))):
+	for (teamRank, teamStats) in enumerate(sorted(teamRank.items(), key=itemgetter(1), reverse=True)):
 		#('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
 		(team, rank) = teamStats
 		html += '<tr>'
 		html += '<td>' + str(teamRank+1) + '</td>'
 		html += '<td>' + team + '</td>'
-		html += '<td>' + str(rank[0]) + '</td>'
+		html += '<td>' + str(round(rank[0],2)) + '</td>'
 		for (idx, part) in enumerate(rank[1:]):
 			html += '<td>' + str(part[0]) + '</td>'
 			html += '<td>' + str(round(part[1], 3)) + '</td>'
@@ -1466,11 +1470,11 @@ def googleCandle(confImp):
 	teamord = []
 	for team in confImp:
 		if confImp[team] == []: continue
-		teamord.append((team, numpy.median(confImp[team])))
+		teamord.append((team, median(confImp[team])))
 	for team, med in sorted(teamord, key=lambda score: score[1], reverse=True):
 		nums = confImp[team]
 		teamName = re.sub("'", "", team)
-		table.append("['" + teamName + "'," + str(min(nums))+","+str(numpy.percentile(nums, 25))+","+str(numpy.percentile(
+		table.append("['" + teamName + "'," + str(min(nums))+","+str(percentile(nums, 25))+","+str(percentile(
 			nums, 75))+","+str(max(nums)) + ",'" + str(round(med, 2)) + ' n=' + str(len(nums)) + "'],")
 	return table
 
