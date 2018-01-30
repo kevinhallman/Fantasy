@@ -689,6 +689,7 @@ class ProgramsJSON():
 	def GET(self):
 		form = web.input(conference=None, tableOnly=False, gender=None, division=None)
 		web.header("Content-Type", "application/json")
+		setGenDiv(form.gender, form.division)
 		division = session.division
 		gender = session.gender
 		allConfs = conferences[division][gender]
@@ -727,7 +728,7 @@ class ProgramsJSON():
 					teamRank[team] = []
 					teamRank[team].append(0)
 				# overall score will be sum of individual z-scores
-				teamRank[team][0] += -round((score - avg)/dev * 100, 0)
+				teamRank[team][0] += round((score - avg)/dev * 100, 0)
 				teamRank[team].append((idx, score))
 
 		teamRankLabel = {}

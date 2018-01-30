@@ -253,7 +253,11 @@ def safeLoad(year=18):
 	load(loadTeamMeets=True, loadSwims=True, loadyear=year)
 
 	print 'Updating powerpoints'
-	for swimmer in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.ppts.is_null()):
+	updatePowerpoints(year)
+
+def updatePowerpoints(year):
+	for swimmer in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.ppts.is_null(),
+																			  Swimmer.season==year+2000):
 		swimmer.getPPTs()
 
 
