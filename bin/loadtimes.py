@@ -469,7 +469,7 @@ def fixDupSwimmers2(season=2018):
 		# merge into the swimmer with more swims
 		if count1 > count2:
 			mergeSwimmers(swim.swimmer2, swim.swimmer1)
-		elif count1 < count2:
+		else:
 			mergeSwimmers(swim.swimmer1, swim.swimmer2)
 
 def deleteDupImprovement():
@@ -519,13 +519,13 @@ def badTimes():
 			if ppts > 1200 or ppts < 5:
 				print swim.event, swim.time, swim.gender, ppts, swim.name, swim.team, swim.division
 				swim.delete_instance()
-				
+
 
 
 if __name__ == '__main__':
 	start = Time.time()
-	badTimes()
-	#fixDupSwimmers2(2018)
+	#badTimes()
+	fixDupSwimmers2(2018)
 	#fixDupSwimmers2(2017)
 	#fixMeetNames()
 	#uniqueSwimmers()
