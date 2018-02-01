@@ -1039,7 +1039,6 @@ class Taper():
 				except TeamSeason.DoesNotExist:
 					pass
 		table = googleLine(tapers, 'Week')
-		#print table
 		return render.taper(conferences=sorted(confList.keys()), table=table)
 
 class TaperJSON():
@@ -1493,21 +1492,21 @@ def googleLine(teams, xaxis='Season'):
 		break
 	seasons.sort()
 	for season in seasons:
-		line = "['{0}'".format(season)
+		line = '[{0}'.format(season)
 		for team in teams:
 			if season in teams[team]:
 				score = teams[team][season]
 			else:
-				score = 0
-			if score == None:
-				score = 0
+				score = 'null'
+			if not score or score==0:
+				score = 'null'
 			line += ",{0}".format(score)
 		line += "],"
 
 		# deal with trailing commas (browsers don't like) add a zer
 		if line[-3:] == ',],':
 			line = line[:-3]
-			line += ',0],'
+			line += ',""],'
 
 		table.append(line)
 	return table
