@@ -37,8 +37,7 @@ def rejectOutliers(dataX, dataY=None, l=5, r=6):
 		return list(newX), list(newY)
 	else:
 		newList = [i for i in dataX if (u - l*s < i < u + r*s)]
-	#print swimTime(max(newList)), swimTime(min(newList))
-	#print "Num rejected: " + str(len(dataX)-len(newList))
+
 	return newList
 
 '''used to find the the full distribution of times in a single event and a divsion, gender'''
@@ -77,6 +76,7 @@ def getSkewCDF(gender, division, event, percent=1.0):
 		newDist.save()
 	return frozen
 
+
 def getSkewDist(gender, division, event):
 	try:
 		dist = Timedist.get(gender=gender, division=division, event=event, skew=True)
@@ -103,6 +103,7 @@ def getSkewDist(gender, division, event):
 		newDist.save()
 	return frozen
 
+
 '''make time look nice'''
 def swimTime(time):
 	parts = re.split("\.", str(time))
@@ -123,6 +124,7 @@ def swimTime(time):
 		point = point + '0'
 	return minutes + ":" + seconds + "." + point[:2]
 
+
 '''converts to a time in seconds'''
 def toTime(time):
 	try:
@@ -133,6 +135,7 @@ def toTime(time):
 		return float(re.split(":", time)[0]) * 60 + float(re.split(":", time)[1])
 	except TypeError:
 		return 0
+
 
 '''converts a date to the numbered weeks'''
 def date2week(d):
@@ -145,6 +148,7 @@ def date2week(d):
 	startDate = date(season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
 	weeksIn = int((d - startDate).days / 7)
 	return weeksIn
+
 
 '''converts week to a date'''
 def week2date(week, season=None):
@@ -162,12 +166,14 @@ def week2date(week, season=None):
 
 	return simDate
 
+
 '''returns current season'''
 def thisSeason():
 	today = date.today()
 	if today.month > 6:
 		return today.year + 1
 	return today.year
+
 
 def seasonString(dateString):
 	dateParts = re.split('/', dateString)
@@ -732,8 +738,8 @@ class Swim(Model):
 	pastTimes = []
 	taperTime = None
 
-	def getPPTs(self, zscore=True, save=False):
-		if self.powerpoints:
+	def getPPTs(self, zscore=True, save=False, raw=False):
+		if self.powerpoints and not raw:
 			return self.powerpoints
 
 		if not self.gender or not self.division or not self.event or not self.time:
@@ -749,13 +755,13 @@ class Swim(Model):
 		percentileScore = (1 - percent) * 500
 		powerScore = 1 / percent
 		if zscore:
-			zscore = log(powerScore) * 50  # approximately the number of stds away from the means
+			zscore = log(powerScore) * 50  # approximately the number of stds away from the mean
 		else:
 			zscore = 0
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
-		if self.powerpoints > 1200:  # bullshit check, Ledecky's 1650 is about 1000
+		if self.powerpoints > 1200:  # no bullshit check, Ledecky's 1650 is about 1000
 			self.powerpoints = 0
 		if save:
 			self.save()
@@ -1049,6 +1055,7 @@ class TempMeet:
 	top swimmers are decided by highest scoring event right now
 	'''
 	def topEvents(self, teamMax=17, indMax=3, totalMax=4, adjEvents=False, debug=False):
+		debug = False
 		self.place()
 		conference = TempMeet()
 		indSwims = {}
@@ -1127,10 +1134,11 @@ class TempMeet:
 							if debug: print 'team', swim.name, swim.event
 							if debug: print 'team', newSwim.name, newSwim.event
 							drops.append(newSwim)
-							continue # fixed to still add swim when all 18
+							continue  # fixed to still add swim when all 18
 
 					if indSwims[newSwim.name + newSwim.getScoreTeam()] < indMax:  # individual max events
 						conference.addSwim(newSwim)
+						if debug: print 'adding', newSwim
 						indSwims[newSwim.name + newSwim.getScoreTeam()] += 1
 					else:
 						if debug: print 'ind', swim.name, swim.event
