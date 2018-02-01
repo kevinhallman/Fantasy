@@ -511,9 +511,20 @@ def fixMeetNames():
 			meet.meet = newName
 			meet.save()
 
+def badTimes():
+	for event in eventConvert:
+		if event=='1000 Free': continue
+		for swim in Swim.select().where(Swim.event==event).order_by(Swim.time).limit(100):
+			ppts = swim.getPPTs(raw=True)
+			if ppts > 1200 or ppts < 5:
+				print swim.event, swim.time, swim.gender, ppts, swim.name, swim.team, swim.division
+				swim.delete_instance()
+				
+
 
 if __name__ == '__main__':
 	start = Time.time()
+	badTimes()
 	#fixDupSwimmers2(2018)
 	#fixDupSwimmers2(2017)
 	#fixMeetNames()
@@ -521,7 +532,7 @@ if __name__ == '__main__':
 	#deleteDups()
 	#fixDupSwimmers()
 	#safeLoad(year=17)
-	safeLoad(year=18)
+	#safeLoad(year=18)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
