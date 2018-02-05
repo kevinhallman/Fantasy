@@ -469,8 +469,13 @@ def fixDupSwimmers2(season=2018):
 		# merge into the swimmer with more swims
 		if count1 > count2:
 			mergeSwimmers(swim.swimmer2, swim.swimmer1)
-		else:
+		elif count1 > count2:
 			mergeSwimmers(swim.swimmer1, swim.swimmer2)
+		else:  # same number of swims, use higher id meaning newer
+			if swim.swimmer1 > swim.swimmer2:
+				mergeSwimmers(swim.swimmer2, swim.swimmer1)
+			else:
+				mergeSwimmers(swim.swimmer1, swim.swimmer2)
 
 def deleteDupImprovement():
 	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
@@ -525,14 +530,14 @@ def badTimes():
 if __name__ == '__main__':
 	start = Time.time()
 	#badTimes()
-	#fixDupSwimmers2(2018)
+	fixDupSwimmers2(2018)
 	#fixDupSwimmers2(2017)
 	#fixMeetNames()
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
 	#safeLoad(year=17)
-	safeLoad(year=18)
+	#safeLoad(year=18)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
