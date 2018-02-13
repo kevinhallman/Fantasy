@@ -530,6 +530,7 @@ def badTimes():
 if __name__ == '__main__':
 	start = Time.time()
 	#badTimes()
+	safeLoad(year=18)
 	fixDupSwimmers2(2018)
 	#fixDupSwimmers2(2017)
 	#fixMeetNames()
@@ -537,7 +538,6 @@ if __name__ == '__main__':
 	#deleteDups()
 	#fixDupSwimmers()
 	#safeLoad(year=17)
-	#safeLoad(year=18)
 	#safeLoad(year=17)
 	#deleteDupImprovement()
 	#fixConfs()
