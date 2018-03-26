@@ -190,6 +190,7 @@ def seasonString(dateString):
 		year = d.year
 	return year, d
 
+
 def getConfs(confFile):
 	with open(confFile,'r') as file:
 		teams = {}
@@ -489,8 +490,109 @@ class TeamSeason(Model):
 		if pre:
 			return self.getStrength(update=False) - pre.getStrength(update=False)
 
+	def nextSeason(self, years=1):
+		try:
+			return TeamSeason.get(TeamSeason.team==self.team, TeamSeason.gender==self.gender,
+								  TeamSeason.season==self.season + years)
+		except TeamSeason.DoesNotExist:
+			return
+
+	'''
+	Estimate how rested the team is during the season and predict the rest of the season
+	'''
+	def estRest(self):
+		import fbprophet as prophet
+		import pandas as pd
+
+		dates = []
+		drops = []
+		for season in range(1, 4):
+			for taper_swim in self.nextSeason(-season).getTaperSwims():
+				for swim in Swim.select(Swim.time, Swim.date).where(Swim.swimmer==taper_swim.swimmer,
+														 Swim.event==taper_swim.event):
+					ratio = swim.time/taper_swim.time
+					if ratio < 1.25:
+						drops.append(ratio)
+						dates.append(pd.Timestamp(swim.date))
+
+		ts = pd.DataFrame({'y': drops, 'ds': dates})
+
+		# now predict the rest of the current season
+		m = prophet.Prophet(weekly_seasonality=False)
+		m.fit(ts)
+		future = m.make_future_dataframe(periods=400)
+		forecast = m.predict(future)
+
+		difs = []
+		for swimmer in Swimmer.select().where(Swimmer.teamid==self):
+			events = {}
+			weights = {}
+			tapers = swimmer.getTaperSwims()
+			for swim in Swim.select().where(Swim.swimmer==swimmer):
+				est_drop = float(forecast[forecast.ds.isin([swim.date])]['yhat'])
+				if est_drop < 1:
+					est_drop = 1.005
+				p_time = swim.time / est_drop
+				if not swim.event in tapers:
+					continue
+				if not swim.event in events:
+					events[swim.event] = []
+					weights[swim.event] = []
+				events[swim.event].append(p_time)
+				# two sources of error, unknown rest level,
+				# poisson error (sqrt mean), weight inverse of error
+				rest_error = 1/np.sqrt(est_drop - 1)
+				#print p_time, est_drop, rest_error
+				weights[swim.event].append(rest_error)
+
+			# year ago
+			past_swimmer = swimmer.nextSeason(-1)
+			if past_swimmer:
+				for swim in Swim.select().where(Swim.swimmer==past_swimmer):
+					print swim.date
+					print forecast[['ds', 'yhat']]
+					est_drop = float(forecast[forecast.ds.isin([swim.date])]['yhat'])
+					if est_drop < 1:
+						est_drop = 1.005
+					p_time = swim.time / est_drop
+					if not swim.event in tapers:
+						continue
+					if not swim.event in events:
+						events[swim.event] = []
+						weights[swim.event] = []
+					events[swim.event].append(p_time)
+					# two sources of error, unknown rest level,
+					# poisson error (sqrt mean), weight inverse of error
+					rest_error = 1/np.sqrt(est_drop - 1)
+					#print p_time, est_drop, rest_error
+					weights[swim.event].append(rest_error)
+
+			print weights, events
+			#print swimmer.name
+			swimmer2 = swimmer.nextSeason(-1)
+			if swimmer2:
+				tapers2 = swimmer2.getTaperSwims()
+
+			print swimmer.name
+			for event in events:
+				predict = np.average(events[event], weights=weights[event])
+				if swimmer2 and event in tapers2:
+					pass
+					predict = (tapers2[event].time * .995 + np.mean(events[event])) / 2
+				else:
+					pass
+				real = tapers[event].time
+				dif = (predict - real) / ((predict + real) / 2) * 100
+				#print event, dif
+				difs.append(dif)
+				print swimTime(predict), swimTime(real)
+
+		print difs
+		print np.mean(difs), np.std(difs)
+
 	class Meta:
 		database = db
+
 
 class TeamStats(Model):
 	teamseasonid = ForeignKeyField(TeamSeason)
@@ -761,7 +863,7 @@ class Swim(Model):
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
-		if self.powerpoints > 1200:  # no bullshit check, Ledecky's 1650 is about 1000
+		if self.powerpoints > 1300:  # no bullshit check, Ledecky's 1650 is about 1000
 			self.powerpoints = 0
 		if save:
 			self.save()
@@ -967,6 +1069,7 @@ class TempMeet:
 		else:
 			genders = [gender]
 
+		print name, genders, events, teams, season, topSwim
 		if self.name:
 			query = Swim.select().where(Swim.meet==name, Swim.gender << genders, Swim.event << events)
 
@@ -976,7 +1079,8 @@ class TempMeet:
 				query = query.select().where(Swim.season==season)
 			if topSwim:
 				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time),
-					Swim.year, Swim.date).group_by(Swim.name, Swim.event, Swim.team, Swim.gender, Swim.year, Swim.date)
+					Swim.year, Swim.date, Swim.swimmer).group_by(Swim.name, Swim.event, Swim.team, Swim.gender,
+															   Swim.year, Swim.date, Swim.swimmer)
 			for swim in query:
 				if topSwim:
 					swim.time = swim.min
@@ -1759,6 +1863,7 @@ class Timedist(Model):
 
 	class Meta:
 		database = db
+
 
 def testTimePre():
 	misses = []
