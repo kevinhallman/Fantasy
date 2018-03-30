@@ -193,6 +193,9 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 	fromdist = getSkewDist(gender, age, event, fromCourse)
 	todist = getSkewDist(gender, toage, toevent, toCourse)
 
+	if not fromdist or not todist:
+		return 'Error: Event+age not found'
+
 	# find percentile rank of course time was done in
 	percent = fromdist.sf(time)
 
@@ -200,8 +203,6 @@ def convert(gender, age, event, time, toage=None, fromCourse='LCM', toCourse='SC
 	newtime = todist.isf(percent)
 
 	# print time, round(newtime, 2)
-	if newtime < 0:
-		return
 	return newtime
 
 
@@ -209,7 +210,6 @@ class Clubteam(Model):  # one per season
 	season = IntegerField()
 	team = CharField()
 	gender = CharField()
-	#state = CharField()
 	winnats = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
@@ -1364,7 +1364,7 @@ if __name__== '__main__':
 
 	#showAttrition()
 	#showAgeCurves(age=16)
-
+	import matplotlib.pyplot as plt
 	gender = 'Women'
 	records = {}
 	for event in eventsLCM:
