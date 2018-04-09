@@ -439,9 +439,10 @@ class TeamSeason(Model):
 		except TeamStats.DoesNotExist:
 			TeamStats.insert_many([newStats]).execute()
 
-	def getAttrition(self, update=False):
+	def getAttrition(self, update=False, verbose=False):
 		# get previous year's team, drop if null
-		preTeam = self.getPrevious(-1)
+		preTeam = self.getPrevious(1)
+		if verbose: print preTeam
 		if not preTeam:
 			if update:
 				self.attrition = None
@@ -451,15 +452,16 @@ class TeamSeason(Model):
 		teamDrops = 0
 		teamSwims = 0
 		for swimmer in Swimmer.select(Swimmer.name, Swimmer.teamid, Swimmer.year).where(
-			Swimmer.teamid==self.id):
+			Swimmer.teamid==preTeam.id):
+			if verbose: print swimmer.name
 			if swimmer.year=='Senior' or 'Relay' in swimmer.name:
 				continue
 			teamSwims += 1  # total number of swimmers
 			try:
-				Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==preTeam.season, Swimmer.teamid==preTeam.id)
-				# print 'stay', swimmer.name
+				Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==self.season, Swimmer.teamid==self.id)
+				if verbose: print 'stay', swimmer.name
 			except Swimmer.DoesNotExist:
-				# print 'drop', swimmer.name
+				if verbose: print 'drop', swimmer.name
 				teamDrops += 1
 
 		if teamSwims > 0:
@@ -467,11 +469,11 @@ class TeamSeason(Model):
 		else:
 			dropRate = 0
 
+		if verbose: print dropRate
 		if update:
 			self.attrition = dropRate
 			self.save()
 			print self.id, dropRate
-		return dropRate
 
 	def getImprovement(self, update=False):
 		for teamImp in Improvement.select(fn.avg(Improvement.improvement)).where(Improvement.team==self.team,
@@ -863,7 +865,7 @@ class Swim(Model):
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
 		self.powerpoints = percentileScore + zscore
-		if self.powerpoints > 1300:  # no bullshit check, Ledecky's 1650 is about 1000
+		if self.powerpoints > 2000:  # no bullshit check, Ledecky's 1650 is about 1000
 			self.powerpoints = 0
 		if save:
 			self.save()
@@ -1251,7 +1253,6 @@ class TempMeet:
 						drop = True  # can't swim any more events
 
 		self.score()
-
 
 		if debug:
 			print teamSwimmers, indSwims, teamMax, indMax
