@@ -5,9 +5,9 @@ import sqlmeets
 import re
 import json
 import os, urlparse
-from numpy import percentile, median, mean, std
+from numpy import percentile, median, mean, std, average
 from peewee import *
-from math import isnan
+from math import isnan, pow
 from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, swimTime, db
 from swimdb import getSkewDist as getSkewDistCollege
 from clubdb import convert, getSkewDist
@@ -194,6 +194,7 @@ class Swimulate():
 				optimizeTeams[team['team']] = newTeam
 				remove.add(num)
 
+		print formMeets, optimizeTeams
 		# get rid of optimize teams and teams without any meet specified
 		for num in remove:
 			del(formMeets[num])
@@ -214,8 +215,8 @@ class Swimulate():
 			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)
 
-			winProb = newMeet.scoreMonteCarlo()
-			winTable = showWinTable(winProb)
+			#winProb = #newMeet.scoreMonteCarlo()
+			winTable = ''#showWinTable(winProb)
 			return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
 				teamScores), finalScores=showScores(scores), winTable=winTable)
 
@@ -646,31 +647,42 @@ class Programs():
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
 			return render.programs(conferences=sorted(allConfs.keys()), rankings=None)
-		teamRecruits = {}
+		teamStr = {}
 		teamImprovement = {}
 		teamAttrition = {}
 
 		if form.conference != 'All':
-			confs = [form.conference]
+			teams = conferences[division][gender][form.conference]
 		else:
-			confs = allConfs
+			teams = allTeams[gender][division]
 
-		for conference in confs:
-			for team in conferences[division][gender][conference]:
-				# get data from teamseason from 2013 to last full season
-				for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
-					fn.avg(TeamSeason.attrition).alias('attrition'),
-					fn.avg(TeamSeason.improvement).alias('improvement'))\
-					.where(TeamSeason.team==team, TeamSeason.gender==gender,
-						TeamSeason.season>2012, TeamSeason.season<currentSeason, TeamSeason.division==division):
+		# yearly discount for team score weighted average
+		discount = .9
+		for team in teams:
+			print team
+			# get data from teamseason from 2010 to last full season
+			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
+				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
+				TeamSeason.season>2009, TeamSeason.season<currentSeason, TeamSeason.division==division)\
+				.order_by(TeamSeason.season.desc()):
 
-					if stats.inv and stats.attrition and stats.improvement:
-						teamRecruits[team] = stats.inv
-						teamAttrition[team] = stats.attrition
-						teamImprovement[team] = stats.improvement
+				if stats.strengthinvite and stats.attrition and stats.improvement:
+					if team not in teamStr:
+						teamStr[team], teamAttrition[team], teamImprovement[team] = [], [], []
+					print teamStr[team]
+					teamStr[team].append(stats.strengthinvite)
+					teamAttrition[team].append(stats.attrition)
+					teamImprovement[team].append(stats.improvement)
+			if team in teamStr:
+				weights = [pow(discount, n) for n in range(len(teamStr[team]))]
+				teamStr[team] = average(teamStr[team], weights=weights)
+				teamAttrition[team] = average(teamAttrition[team], weights=weights)
+				teamImprovement[team] = average(teamImprovement[team], weights=weights)
 
+		print teamStr
+		print
 		teamRank = {}
-		for dict in [teamRecruits, teamAttrition, teamImprovement]:
+		for dict in [teamStr, teamAttrition, teamImprovement]:
 			avg = mean(dict.values())
 			dev = std(dict.values())
 			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
@@ -679,7 +691,7 @@ class Programs():
 					teamRank[team] = []
 					teamRank[team].append(0)
 				# overall score will be sum of individual z-scores
-				teamRank[team][0] += (score - avg)/dev
+				teamRank[team][0] += (score - avg) / dev
 				teamRank[team].append((idx, score))
 
 		html = showPrograms(teamRank)
@@ -1153,10 +1165,10 @@ class Timeconvert():
 		if not form.tocourse:
 			form.tocourse = form.fromcourse
 		if form.fromage=='Open':
-			form.fromage = 23
+			form.fromage = 22
 		if not form.toage:
 			form.toage = form.fromage
-		if not form.fromage or form.fromcourse=='From Course' :
+		if not form.fromage or form.fromcourse=='From Course':
 			return 'Error: No age or course selected'
 
 		time = 0
@@ -1345,12 +1357,12 @@ def showPrograms(teamRank):
 	html += '</tr></thead>'
 	html += '<tbody>'
 	for (teamRank, teamStats) in enumerate(sorted(teamRank.items(), key=itemgetter(1), reverse=True)):
-		#('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
+		# ('Carleton', [6, (3, -113), (1, 0.08433734939759036), (2, -0.60857689914529911)])
 		(team, rank) = teamStats
 		html += '<tr>'
-		html += '<td>' + str(teamRank+1) + '</td>'
+		html += '<td>' + str(teamRank + 1) + '</td>'
 		html += '<td>' + team + '</td>'
-		html += '<td>' + str(round(rank[0],2)) + '</td>'
+		html += '<td>' + str(round(rank[0], 2)) + '</td>'
 		for (idx, part) in enumerate(rank[1:]):
 			html += '<td>' + str(part[0]) + '</td>'
 			html += '<td>' + str(round(part[1], 3)) + '</td>'

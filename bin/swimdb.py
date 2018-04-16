@@ -283,7 +283,7 @@ class TeamSeason(Model):
 
 		# no stats yet, so save them off
 		if self.season != thisSeason():
-			weeksIn = 20
+			weeksIn = 25
 		else:
 			weeksIn = date2week(date.today())
 		simDate = week2date(weeksIn)
@@ -1071,7 +1071,6 @@ class TempMeet:
 		else:
 			genders = [gender]
 
-		print name, genders, events, teams, season, topSwim
 		if self.name:
 			query = Swim.select().where(Swim.meet==name, Swim.gender << genders, Swim.event << events)
 
@@ -1384,7 +1383,7 @@ class TempMeet:
 			for swim in self.eventSwims[event]:
 				swim.taper(weeks=weeks)
 
-	def expectedScores(self, division='D3', swimmers=6, debug=False):
+	def expectedScores(self, division='D3', swimmers=6, verbose=False):
 		self.place()
 		scores = {}
 		teamSwims = {}
@@ -1405,7 +1404,7 @@ class TempMeet:
 				swim.score = points
 				if points:
 					scores[swim.team] += points
-				if debug: print swim.event, swim.time, points, int(round(scores[swim.team])), losses
+				if verbose: print swim.event, swim.time, points, int(round(scores[swim.team])), losses
 
 		for team in scores:
 			scores[team] = int(round(scores[team]))
@@ -1898,6 +1897,11 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
+	texas = TeamSeason.get(gender='Men', season=2017, team='Texas')
+	florida = TeamSeason.get(gender='Men', season=2017, team='Florida')
 
+	print texas.topTeamScore(dual=False)
+
+	print florida.topTeamScore(dual=False)
 
 
