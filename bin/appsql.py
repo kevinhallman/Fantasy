@@ -659,7 +659,6 @@ class Programs():
 		# yearly discount for team score weighted average
 		discount = .9
 		for team in teams:
-			print team
 			# get data from teamseason from 2010 to last full season
 			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
 				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
@@ -669,7 +668,6 @@ class Programs():
 				if stats.strengthinvite and stats.attrition and stats.improvement:
 					if team not in teamStr:
 						teamStr[team], teamAttrition[team], teamImprovement[team] = [], [], []
-					print teamStr[team]
 					teamStr[team].append(stats.strengthinvite)
 					teamAttrition[team].append(stats.attrition)
 					teamImprovement[team].append(stats.improvement)
@@ -679,8 +677,6 @@ class Programs():
 				teamAttrition[team] = average(teamAttrition[team], weights=weights)
 				teamImprovement[team] = average(teamImprovement[team], weights=weights)
 
-		print teamStr
-		print
 		teamRank = {}
 		for dict in [teamStr, teamAttrition, teamImprovement]:
 			avg = mean(dict.values())
@@ -708,30 +704,38 @@ class ProgramsJSON():
 
 		if (not form.conference or not form.conference in allConfs) and form.conference != 'All':
 			return json.dumps({})
-		teamRecruits = {}
+		teamStr = {}
 		teamImprovement = {}
 		teamAttrition = {}
 
 		if form.conference != 'All':
-			confs = [form.conference]
+			teams = conferences[division][gender][form.conference]
 		else:
-			confs = allConfs
+			teams = allTeams[gender][division]
 
-		for conference in confs:
-			for team in conferences[division][gender][conference]:
-				for stats in TeamSeason.select(fn.avg(TeamSeason.strengthinvite).alias('inv'),
-					fn.avg(TeamSeason.attrition).alias('attrition'),
-					fn.avg(TeamSeason.improvement).alias('improvement'))\
-					.where(TeamSeason.team==team, TeamSeason.gender==gender,
-						TeamSeason.season>2012, TeamSeason.season<2018, TeamSeason.division==division):
+		# yearly discount for team score weighted average
+		discount = .9
+		for team in teams:
+			# get data from teamseason from 2010 to last full season
+			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
+				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
+				TeamSeason.season>2009, TeamSeason.season<currentSeason, TeamSeason.division==division)\
+				.order_by(TeamSeason.season.desc()):
 
-					if stats.inv and stats.attrition and stats.improvement:
-						teamRecruits[team] = stats.inv
-						teamAttrition[team] = stats.attrition
-						teamImprovement[team] = stats.improvement
+				if stats.strengthinvite and stats.attrition and stats.improvement:
+					if team not in teamStr:
+						teamStr[team], teamAttrition[team], teamImprovement[team] = [], [], []
+					teamStr[team].append(stats.strengthinvite)
+					teamAttrition[team].append(stats.attrition)
+					teamImprovement[team].append(stats.improvement)
+			if team in teamStr:
+				weights = [pow(discount, n) for n in range(len(teamStr[team]))]
+				teamStr[team] = average(teamStr[team], weights=weights)
+				teamAttrition[team] = average(teamAttrition[team], weights=weights)
+				teamImprovement[team] = average(teamImprovement[team], weights=weights)
 
 		teamRank = {}
-		for dict in [teamRecruits, teamAttrition, teamImprovement]:
+		for dict in [teamStr, teamAttrition, teamImprovement]:
 			avg = mean(dict.values())
 			dev = std(dict.values())
 			for idx, teamScore in enumerate(sorted(dict.items(), key=itemgetter(1), reverse=True), start=1):
@@ -740,7 +744,7 @@ class ProgramsJSON():
 					teamRank[team] = []
 					teamRank[team].append(0)
 				# overall score will be sum of individual z-scores
-				teamRank[team][0] += round((score - avg)/dev * 100, 0)
+				teamRank[team][0] += (score - avg) / dev
 				teamRank[team].append((idx, score))
 
 		teamRankLabel = {}
