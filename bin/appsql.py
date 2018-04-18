@@ -750,7 +750,7 @@ class ProgramsJSON():
 		teamRankLabel = {}
 		for team in teamRank:
 			teamRankLabel[team] = {}
-			teamRankLabel[team]['totalscore'] = teamRank[team][0]
+			teamRankLabel[team]['totalscore'] = round(teamRank[team][0], 1)
 			for (idx, part) in enumerate(teamRank[team][1:]):
 				if idx == 0:
 					teamRankLabel[team]['strength'] = {'rank': part[0], 'value': part[1]}
