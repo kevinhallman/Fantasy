@@ -338,7 +338,7 @@ class TeamSeason(Model):
 
 	def getTopSwimmers(self, num=10):
 		swimmers = []
-		for swimmer in Swimmer.select().where(Swimmer.teamid==self.id):
+		for swimmer in Swimmer.select().where(Swimmer.team==self.id):
 			if 'Relay' in swimmer.name: continue
 			heapq.heappush(swimmers, (swimmer.getPPTs(), swimmer))
 
@@ -357,7 +357,7 @@ class TeamSeason(Model):
 				"INNER JOIN swimmer sw "
 				"ON swim.swimmer_id=sw.id "
 				"INNER JOIN teamseason ts "
-				"ON sw.teamid_id=ts.id and ts.id=%s) "
+				"ON sw.team_id=ts.id and ts.id=%s) "
 				"WHERE swim.date < %s) AS a "
 				"WHERE a.rank=1", self.id, dateStr):
 			swim.gender = self.gender
@@ -383,7 +383,7 @@ class TeamSeason(Model):
 		if structured:
 			swimDict = {}
 		# grab the taper from the swimmers, assumes different events
-		for swimmer in Swimmer.select().where(Swimmer.teamid==self.id):
+		for swimmer in Swimmer.select().where(Swimmer.team==self.id):
 			for swim in swimmer.getTaperSwims(num=numTimes).values():
 				teamSwims.add(swim)
 				if structured:
@@ -451,14 +451,14 @@ class TeamSeason(Model):
 
 		teamDrops = 0
 		teamSwims = 0
-		for swimmer in Swimmer.select(Swimmer.name, Swimmer.teamid, Swimmer.year).where(
-			Swimmer.teamid==preTeam.id):
+		for swimmer in Swimmer.select(Swimmer.name, Swimmer.team, Swimmer.year).where(
+			Swimmer.team==preTeam.id):
 			if verbose: print swimmer.name
 			if swimmer.year=='Senior' or 'Relay' in swimmer.name:
 				continue
 			teamSwims += 1  # total number of swimmers
 			try:
-				Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==self.season, Swimmer.teamid==self.id)
+				Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==self.season, Swimmer.team==self.id)
 				if verbose: print 'stay', swimmer.name
 			except Swimmer.DoesNotExist:
 				if verbose: print 'drop', swimmer.name
@@ -499,6 +499,61 @@ class TeamSeason(Model):
 		except TeamSeason.DoesNotExist:
 			return
 
+	def getWeekStrength(self, weeksIn, update=True, verbose=False, dual=True, invite=True):
+		if not weeksIn:
+			weeksIn = 25
+		simDate = week2date(weeksIn, self.season)
+
+		scoreDual, scoreInv = None, None
+
+		# check to see if it already exists in db then update
+		try:
+			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
+			if invite and (stats.strengthinvite is None or update):
+				scoreInv = self.topTeamScore(dual=False, weeksIn=weeksIn)
+				stats.strengthinvite = scoreInv
+				if verbose: print self.team, scoreInv
+			if dual and (stats.strengthdual is None or update):
+				scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
+				stats.strengthdual = scoreDual
+				if verbose: print self.team, scoreDual
+			stats.save()
+		except TeamStats.DoesNotExist:
+			if invite:
+				scoreInv = self.topTeamScore(dual=False, weeksIn=weeksIn)
+			else:
+				scoreInv = None
+			if dual:
+				scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
+			else:
+				scoreDual = None
+			stats = TeamStats.create(teamseasonid=self.id, week=weeksIn, strengthinvite=scoreInv,
+								 strengthdual=scoreDual, date=simDate)
+			stats.save()
+			if verbose: print self.team, scoreDual, scoreInv, stats.id
+
+		# update team total if this is the latest week
+		if scoreInv:
+			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week) \
+				.where(TeamStats.strengthinvite.is_null(False), TeamStats.teamseasonid==self.id) \
+				.order_by(TeamStats.week.desc()).limit(1):
+				if stats.week < weeksIn or (update and stats.week == weeksIn):
+
+					self.strengthinvite = scoreInv
+					self.save()
+		if scoreDual:
+			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week) \
+				.where(TeamStats.strengthdual.is_null(False), TeamStats.teamseasonid==self.id) \
+				.order_by(TeamStats.week.desc()).limit(1):
+				if stats.week < weeksIn or (update and stats.week == weeksIn):
+					self.strengthdual = scoreDual
+					self.save()
+
+	def updateSeasonStats(self):
+		self.getAttrition(update=True)
+		self.getImprovement(update=True)
+		self.getWeekStrength(weeksIn=25, update=True, dual=False)
+
 	'''
 	Estimate how rested the team is during the season and predict the rest of the season
 	'''
@@ -526,7 +581,7 @@ class TeamSeason(Model):
 		forecast = m.predict(future)
 
 		difs = []
-		for swimmer in Swimmer.select().where(Swimmer.teamid==self):
+		for swimmer in Swimmer.select().where(Swimmer.team==self):
 			events = {}
 			weights = {}
 			tapers = swimmer.getTaperSwims()
@@ -615,12 +670,11 @@ class TeamStats(Model):
 class Swimmer(Model):
 	name = CharField()
 	season = IntegerField()
-	team = CharField()
 	gender = CharField()
 	year = CharField()
 	ppts = IntegerField()
 	eventppts = CharField(null=True)
-	teamid = ForeignKeyField(TeamSeason, null=True)
+	team = ForeignKeyField(TeamSeason, null=True)
 	taperSwims = {}
 
 	class Meta:
@@ -634,11 +688,10 @@ class Swimmer(Model):
 		totalDeltas = {}
 		# same season
 		for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
-				Swimmer.year==self.year, TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(10000):
+				Swimmer.year==self.year, TeamSeason.division==self.team.division).order_by(fn.Random()).limit(10000):
 			if s2.id==self.id:  # don't use own times
 				continue
 			swims2 = s2.eventPPts()
-			#print swims2
 
 			totalDeltas[s2] = 0
 			for event in allEvents:
@@ -654,7 +707,7 @@ class Swimmer(Model):
 		if previous:
 			swims1 = previous.eventPPts()
 			for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
-					Swimmer.year=='Freshman', TeamSeason.division==self.teamid.division).order_by(fn.Random()).limit(10000):
+					Swimmer.year=='Freshman', TeamSeason.division==self.team.division).order_by(fn.Random()).limit(10000):
 				if s2.id==self.id:  # don't use own times
 					continue
 				swims2 = s2.eventPPts()
@@ -689,7 +742,7 @@ class Swimmer(Model):
 		predictedTapers = {}
 		for event in events:
 			time = np.mean(events[event])
-			ppt = round(Swim(event=event, division=self.teamid.division, gender=self.gender, time=time).getPPTs())
+			ppt = round(Swim(event=event, division=self.team.division, gender=self.gender, time=time).getPPTs())
 			std = np.std(events[event])
 			percent = float(len(events[event]))/ float(totalEvents)
 			predictedTapers[event] = {'time':time, 'std': std, 'ppts': ppt, 'percent': percent}
@@ -779,13 +832,15 @@ class Swimmer(Model):
 		times = []
 
 		for swim in Swim.raw("WITH topTimes as "
-			"(SELECT name, gender, meet, event, time, year, division, swimmer_id, row_number() OVER "
+			"(SELECT name, gender, meet, event, time, division, swimmer_id, row_number() OVER "
 			"(PARTITION BY event, name ORDER BY time) as rnum "
 			"FROM Swim WHERE swimmer_id=%s) "
-			"SELECT name, event, meet, time, gender, division, year, swimmer_id FROM topTimes WHERE rnum=1",
+			"SELECT name, event, meet, time, gender, division, swimmer_id FROM topTimes WHERE rnum=1",
 			self.id):
 			if swim.event == '1000 Free' or 'Relay' in swim.event:
 				continue
+			swim.year = self.year
+
 			points = swim.getPPTs(save=False)
 			heapq.heappush(times, (points, swim))
 
@@ -829,10 +884,8 @@ class Swim(Model):
 	team = CharField()
 	meet = CharField()
 	gender = CharField()
-	conference = CharField()
 	division = CharField()
 	relay = BooleanField()
-	year = CharField()
 	powerpoints = IntegerField(null=True)
 	place = None
 	score = None
@@ -960,7 +1013,7 @@ class Swim(Model):
 		return name+br+self.getScoreTeam()+genderStr+br+event+br+time+br+meet
 
 	def taper(self, weeks, noise=0):
-		taper, taperStd = self.swimmer.teamid.getTaperStats(weeks=weeks)
+		taper, taperStd = self.swimmer.team.getTaperStats(weeks=weeks)
 		if not taper:
 			taper = .03
 		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
@@ -1790,15 +1843,15 @@ class Team(Model):
 										  TeamSeason.season==season).id
 				seasonID2 = TeamSeason.get(TeamSeason.team==self.name, TeamSeason.gender==self.gender,
 										 TeamSeason.season==season + 1).id
-				for swimmer in Swimmer.select(Swimmer.name, Swimmer.teamid, Swimmer.year).where(
-								Swimmer.teamid==seasonID):
+				for swimmer in Swimmer.select(Swimmer.name, Swimmer.team, Swimmer.year).where(
+								Swimmer.team==seasonID):
 						if swimmer.year=='Senior' or 'relay' in swimmer.name:
 							continue
 						#print 'stay', swimmer.name
 						teamSwims += 1  # total number of swimmers
 						try:
 							Swimmer.get(Swimmer.name==swimmer.name, Swimmer.season==season+1,
-										Swimmer.teamid==seasonID2)  # swam the next year
+										Swimmer.team==seasonID2)  # swam the next year
 						except Swimmer.DoesNotExist:
 							#print 'drop', swimmer.name
 							teamDrops += 1
@@ -1894,14 +1947,12 @@ if __name__ == '__main__':
 		migrate(
 			#migrator.add_column('swim', 'event_norm', Swim.event_norm),
 			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
-			#migrator.add_column('swimmer', 'teamid_id', Swimmer.teamid)
+			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
-	texas = TeamSeason.get(gender='Men', season=2017, team='Texas')
-	florida = TeamSeason.get(gender='Men', season=2017, team='Florida')
 
-	print texas.topTeamScore(dual=False)
+	ubmc = TeamSeason.get(id=1567)
 
-	print florida.topTeamScore(dual=False)
+	print ubmc.updateSeasonStats()
 
 

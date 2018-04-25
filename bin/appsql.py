@@ -978,7 +978,7 @@ class Swimmerstats():
 		html = ''
 		for idx, swimmer in enumerate(swimmers):
 			swims = swimmer.getTaperSwims()
-			html += '<p><b>' + str(idx+1) + '. ' + swimmer.name + ' - ' + swimmer.team + '</b>'
+			html += '<p><b>' + str(idx+1) + '. ' + swimmer.name + ' - ' + swimmer.team.team + '</b>'
 			html += '<table>'
 			for swim in swims.values():
 				html += '<tr>'
