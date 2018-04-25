@@ -348,6 +348,7 @@ def fixRelays():
 
 	print count
 
+
 def fixConfs():
 	newConfs = getNewConfs()
 	for team in TeamSeason.select().where(TeamSeason.season>2010):
@@ -360,12 +361,17 @@ def fixConfs():
 		except:
 			pass
 
+
 def normalizeData():
 	for team in TeamSeason().select():
 		for swimmer in Swimmer.select().where(Swimmer.team==team):
 			if swimmer.season != team.season:
-			if swimmer.gender !=
+				pass
+			if swimmer.gender != team.gender:
+				pass
 
+
+# guess duplicate swimmers as people who tied in more than two races
 def fixDupSwimmers(season=2018):
 	swimmers_merged = set()
 	for swim in Swim.raw('select s.count, s.swimmer1, s.swimmer2 from '
@@ -396,26 +402,13 @@ def fixDupSwimmers(season=2018):
 			else:
 				mergeSwimmers(swim.swimmer1, swim.swimmer2)
 
+
 def deleteDupImprovement():
 	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
         'ROW_NUMBER() OVER (partition BY name, event, fromseason, team ORDER BY id) AS rnum '
         'FROM Improvement) i '
         'WHERE i.rnum > 1)').execute()
 
-def uniqueSwimmers():
-	for swimmer in Swimmer.raw('SELECT id, season, name, teamid_id, gender FROM '
-						'(SELECT id, season, name, teamid_id, gender, ROW_NUMBER() '
-	 					'OVER (partition BY season, name, teamid_id, gender ORDER BY id) '
-						'AS rnum FROM swimmer) s WHERE s.rnum > 1'):
-		print swimmer.name, swimmer.id, swimmer.season, swimmer.team, swimmer.gender
-		for targetSwimmer in Swimmer.select().where(Swimmer.name==swimmer.name, Swimmer.season==swimmer.season,
-									   Swimmer.team==swimmer.team, Swimmer.gender==swimmer.gender):
-			if targetSwimmer.id != swimmer.id:
-				try:
-					mergeSwimmers(swimmer.id, targetSwimmer.id)
-				except Swimmer.DoesNotExist:  # already merged
-					pass
-			#print targetSwimmer.name, targetSwimmer.id, targetSwimmer.season, targetSwimmer.team, targetSwimmer.gender
 
 def fixMeetNames():
 	for char in ['+', '@', '&']:
@@ -435,6 +428,7 @@ def fixMeetNames():
 			meet.meet = newName
 			meet.save()
 
+
 def badTimes():
 	for event in eventConvert:
 		if event=='1000 Free': continue
@@ -452,13 +446,13 @@ if __name__ == '__main__':
 	#safeLoad(year=18)
 	#fixDupSwimmers(2018)
 
-	mergeTeams(8624, 3550)
-	mergeTeams(8616, 3402)
+	#mergeTeams(8624, 3550)
+	#mergeTeams(8616, 3402)
 
 	#uniqueSwimmers()
 	#deleteDups()
 	#fixDupSwimmers()
-	#deleteDupImprovement()
+	deleteDupImprovement()
 	#fixConfs()
 	#fixDivision()
 	#fixRelays()
