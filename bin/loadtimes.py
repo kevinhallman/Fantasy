@@ -41,7 +41,8 @@ def getNewConfs():
 load in new swim times
 can load in to all SQL tables if params are true
 '''
-def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=15):
+def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=15,
+		 reload=False):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
@@ -55,7 +56,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	root = 'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
-		match = re.search('(\D+)(\d+)([mf])new', swimFileName)
+		if reload:
+			match = re.search('(\D+)(\d+)([mf])', swimFileName)
+		else:
+			match = re.search('(\D+)(\d+)([mf])new', swimFileName)
 		if not match:
 			continue
 		div, fileyear, gender = match.groups()
@@ -97,6 +101,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					event = badEventMap[event]
 				convert = dict([[v, k] for k,v in eventConvert.items()])
 				convert['50 Yard Medley Relay'] = '200 Medley Relay'
+				convert['50 Yard Freestyle Relay'] = '200 Free Relay'
 				if event in convert:
 					event = convert[event]
 				if 'Yard' in event:
@@ -127,8 +132,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					key = str(season) + team + gender + division
 					if not key in teamKeys:  # try each team once
 						teamKeys.add(key)
-						query = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.division==division).id
+						query = TeamSeason.select().where(TeamSeason.season==season, TeamSeason.team==team,
+										   TeamSeason.gender==gender, TeamSeason.division==division)
 						if not query.exists():
 							newTeam = {'season': season, 'conference': conference, 'team': team, 'gender':
 								gender, 'division': division}
@@ -139,7 +144,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					if not key in meetKeys:
 						meetKeys.add(key)  # try each meet once
 
-						query = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
+						query = Meet.select().where(Meet.meet==meet, Meet.season==season, Meet.gender==gender)
 						if not query.exists():
 							newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
 							meets.append(newMeet)
@@ -157,6 +162,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							newSwimmer = {'season': season, 'name': name, 'year': year, 'gender':
 								gender, 'team': teamID}
 							swimmers.append(newSwimmer)
+						elif not relay:
+							for swimmer in query:
+								if swimmer.year != year:
+									print swimmer.year, year, swimmer.id
+									swimmer.year = year
+									swimmer.save()
 
 				if loadTeamMeets:
 					key = str(season) + meet + gender + team
@@ -165,7 +176,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 						meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
 						teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
 										   TeamSeason.gender==gender, TeamSeason.division==division).id
-						query = TeamMeet.get(TeamMeet.meet==meetID, TeamMeet.team==teamID).id
+						query = TeamMeet.select().where(TeamMeet.meet==meetID, TeamMeet.team==teamID)
 
 						if not query.exists():
 							newTeamMeet = {'meet': meetID, 'team': teamID}
@@ -176,7 +187,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					if not key in swimKeys:
 						swimKeys.add(key)
 
-						query = Swim.get(Swim.name==name, Swim.time<time + .01, Swim.time > time - .01,
+						query = Swim.select().where(Swim.name==name, Swim.time<time + .01, Swim.time > time - .01,
 									Swim.event==event, Swim.date==swimDate)  # floats in SQL and python different
 						if not query.exists():
 							teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
@@ -223,13 +234,13 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 '''
 loads into tables in order
 '''
-def safeLoad(year=18):
+def safeLoad(year=18, reload=False):
 	print 'loading teams...'
-	load(loadTeams=True, loadyear=year)
+	load(loadTeams=True, loadyear=year, reload=reload)
 	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True, loadyear=year)
+	load(loadMeets=True, loadSwimmers=True, loadyear=year, reload=reload)
 	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True, loadyear=year)
+	load(loadTeamMeets=True, loadSwims=True, loadyear=year, reload=reload)
 
 	print 'Updating powerpoints'
 	updatePowerpoints(year)
@@ -438,11 +449,12 @@ def badTimes():
 
 if __name__ == '__main__':
 	start = Time.time()
+	#load(loadSwimmers=True, loadyear=18, reload=True)
 	#normalizeData()
 	#badTimes()
-	#safeLoad(year=18)
-	for season in range(2008, 2018):
-		fixDupSwimmers(season)
+	safeLoad(year=18, reload=True)
+	#for season in range(2008, 2018):
+	#	fixDupSwimmers(season)
 
 	#mergeTeams(8624, 3550)
 	#mergeTeams(8616, 3402)
