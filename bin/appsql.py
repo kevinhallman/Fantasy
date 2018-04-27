@@ -215,8 +215,8 @@ class Swimulate():
 			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)
 
-			#winProb = #newMeet.scoreMonteCarlo()
-			winTable = ''#showWinTable(winProb)
+			#winProb = newMeet.scoreMonteCarlo()
+			winTable = ''  # showWinTable(winProb)
 			return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
 				teamScores), finalScores=showScores(scores), winTable=winTable)
 
@@ -1151,7 +1151,6 @@ class CLubPowerscoreJSON():
 		points = swim.getPPTs()
 		return json.dumps(points)
 
-
 class Timeconvert():
 	def GET(self, conversion):
 		events = ['50 Free', '100 Free', '200 Free', '400/500 Free', '1500/1650 Free',
@@ -1224,7 +1223,6 @@ class Timeconvert():
 			newtime = 'Error: time out of bounds'
 		return json.dumps([swimTime(newtime)])
 
-
 class teamMeets():
 	def GET(self):
 		form = web.input(team=None, division=None, season=None)
@@ -1251,7 +1249,6 @@ class teamMeets():
 
 		# return all seasons if none
 		return json.dumps(meetList)
-
 
 class getConfs():
 	def GET(self):

@@ -191,19 +191,6 @@ def seasonString(dateString):
 	return year, d
 
 
-def getConfs(confFile):
-	with open(confFile,'r') as file:
-		teams = {}
-		for line in file:
-			parts = re.split('\t', line.strip())
-			division = parts[0]
-			conf = parts[1]
-			team = parts[2]
-			if not team in teams:
-				teams[team] = (conf, division)
-	return teams
-
-
 class TeamSeason(Model):
 	season = IntegerField()
 	team = CharField()
@@ -350,8 +337,8 @@ class TeamSeason(Model):
 			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
 
 		newMeet = TempMeet()
-		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year FROM "
-				"(SELECT swim.name, time, event, meet, swim.team, sw.year, rank() "
+		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year, swimmer_id FROM "
+				"(SELECT swim.name, time, event, meet, swim.team, sw.year, swimmer_id, rank() "
 				"OVER (PARTITION BY swim.name, event ORDER BY time) "
 				"FROM (swim "
 				"INNER JOIN swimmer sw "
@@ -370,13 +357,6 @@ class TeamSeason(Model):
 				newMeet.addSwim(swim)
 
 		return newMeet
-
-	def addUpRelay(self, event):
-		if event not in {'400 Medley Relay', '400 Free Relay', '800 Free Relay'}:
-			return
-
-		if event=='400 Free Relay':
-			pass
 
 	def getTaperSwims(self, numTimes=3, structured=False):
 		teamSwims = set()
@@ -1132,9 +1112,9 @@ class TempMeet:
 			if season:
 				query = query.select().where(Swim.season==season)
 			if topSwim:
-				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time),
-					Swim.year, Swim.date, Swim.swimmer).group_by(Swim.name, Swim.event, Swim.team, Swim.gender,
-															   Swim.year, Swim.date, Swim.swimmer)
+				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time),Swim.date,
+									 Swim.swimmer).group_by(Swim.name, Swim.event, Swim.team, Swim.gender,
+															Swim.date, Swim.swimmer)
 			for swim in query:
 				if topSwim:
 					swim.time = swim.min
@@ -1212,12 +1192,10 @@ class TempMeet:
 	decides top events for each swimmer
 	top swimmers are decided by highest scoring event right now
 	'''
-	def topEvents(self, teamMax=17, indMax=3, totalMax=4, adjEvents=False, debug=False):
-		debug = False
+	def topEvents(self, teamMax=17, indMax=3, adjEvents=False, debug=False):
 		self.place()
 		conference = TempMeet()
 		indSwims = {}
-		relaySwims = {}
 		teamSwimmers = {}
 		teamDivers = {}
 		drops = []
@@ -1227,7 +1205,7 @@ class TempMeet:
 			teamSwimmers[team] = 0
 			teamDivers[team] = 0
 
-		for event in self.eventSwims:  # we will keep relays as is, but count them towards total swims
+		for event in self.eventSwims:  # we will keep relays as is
 			if re.search('Relay', event):
 				relayEvents.add(event)
 				while not self.eventSwims[event] == []:  # move relays over to new meet
@@ -1283,7 +1261,7 @@ class TempMeet:
 					if drop:  # already swimming previous or next event
 						continue
 
-					if not newSwim.name+newSwim.getScoreTeam() in indSwims:   # team max events
+					if not newSwim.name + newSwim.getScoreTeam() in indSwims:   # team max events
 						if teamSwimmers[newSwim.getScoreTeam()] < teamMax:
 							indSwims[newSwim.name + newSwim.getScoreTeam()] = 0  # count same person on two teams
 							# differently
@@ -1321,26 +1299,26 @@ class TempMeet:
 	def lineup(self, team, debug=False, splits=False, ppts=False):
 		team = str(team)
 
-		drops = self.topEvents(30, 3, 4)
+		drops = self.topEvents(30, 3)
 		self.place()
 
 		'''
 		now we have a starting point
 		'''
-		extras = {}  # double dictionary,swim:event
+		extras = {}  # double dictionary, swim:event
 		for swim in drops:  # + dropSplits
 			if not swim.name in extras:
 				extras[swim.name] = {}
-			extras[swim.name][swim.event]=swim
+			extras[swim.name][swim.event] = swim
 
-		if debug: self.printout()
+		if debug: print self
 
 		toCheck = self.getSwims(team, False, splits=splits)
 		while len(toCheck) > 0:  # double loop on all swims, trying to see if more points are scored if swapped
-			swim1=toCheck.pop()
-			swims=self.getSwims(team, False, splits=splits)
+			swim1 = toCheck.pop()
+			swims = self.getSwims(team, False, splits=splits)
 			while len(swims) > 0:
-				swim2=swims.pop()
+				swim2 = swims.pop()
 				if swim1==swim2 or swim1.event==swim2.event:
 					continue
 				# make sure swims exist
@@ -1436,6 +1414,9 @@ class TempMeet:
 			for swim in self.eventSwims[event]:
 				swim.taper(weeks=weeks)
 
+	'''
+	gives the expected score of the top team limup as compared to the whole division
+	'''
 	def expectedScores(self, division='D3', swimmers=6, verbose=False):
 		self.place()
 		scores = {}
@@ -1464,15 +1445,21 @@ class TempMeet:
 
 		return scores
 
-	def place(self, events='', storePlace=False):
+	def place(self, events='', storePlace=True):
 		events = self.getEvents(events)
 		for event in events:
-			if not event in self.eventSwims or len(self.eventSwims[event]) == 0:
+			if event not in self.eventSwims or len(self.eventSwims[event]) == 0:
 				continue
-			self.eventSwims[event] = sorted(self.eventSwims[event], key=lambda s:s.getScoreTime(), reverse=False)
+			self.eventSwims[event] = sorted(self.eventSwims[event], key=lambda s: s.getScoreTime(), reverse=False)
 			if storePlace:
+				preTime = None
 				for idx, swim in enumerate(self.eventSwims[event]):
-					swim.place = idx + 1
+					# assign same place for ties
+					if swim.time != preTime:
+						swim.place = idx + 1
+					else:
+						swim.place = idx
+					preTime = swim.getScoreTime()
 
 	def score(self, dual=None, events='', heatSize=8):
 		events = self.getEvents(events)
@@ -1505,35 +1492,41 @@ class TempMeet:
 			pointsI = [9, 4, 3, 2, 1]
 			pointsR = [11, 4, 2]
 
-		for event in self.eventSwims:  # Assign scores to the swims
-			if not event in events and self.eventSwims[event]:  # set score of those not being swum to zero
+		# Assign scores to the swims, use previous placing
+		for event in self.eventSwims:
+			if event not in events and self.eventSwims[event]:  # set score of those not being swum to zero
 				for swim in self.eventSwims[event]:
 					swim.score = 0
 			else:
-				place = 1
+				if 'Relay' in event:  # should use real relay var
+					points = pointsR
+				else:
+					points = pointsI
+
+				# keep track of previous swim to score ties
+				preSwim = None
 				teamSwims = {}
 				for swim in self.eventSwims[event]:
 					swim.score = None  # reset score
-					if not 'Relay' in swim.event:  # should use real relay var
-						team = swim.getScoreTeam()
-						if place > len(pointsI) or (team in teamSwims) and teamSwims[team] >= max:
-							swim.score = 0
-						else:
-							swim.score = pointsI[place-1]
-							if not team in teamSwims:
-								teamSwims[team] = 0
-							teamSwims[team] += 1
-							place += 1
+					team = swim.getScoreTeam()
+					if swim.place > len(pointsI) or (team in teamSwims) and teamSwims[team] >= max:
+						swim.score = 0
 					else:
-						team = swim.getScoreTeam()
-						if place > len(pointsR) or (team in teamSwims) and teamSwims[team] >= max:
-							swim.score = 0
+						if preSwim and swim.place == preSwim.place:  # a tie, average with previous swim's score
+							if swim.place == len(points):
+								score = points[swim.place - 1]
+							else:
+								score = (points[swim.place - 1] + points[swim.place]) / 2.0
+							if score==int(score):
+								score = int(score)
+							swim.score = score
+							preSwim.score = score
 						else:
-							swim.score = pointsR[place-1]
-							if not team in teamSwims:
-								teamSwims[team] = 0
-							teamSwims[team] += 1
-							place += 1
+							swim.score = points[swim.place - 1]
+						if team not in teamSwims:
+							teamSwims[team] = 0
+						teamSwims[team] += 1
+					preSwim = swim
 
 	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
 						weeksOut=None, taper=False):
@@ -1643,7 +1636,7 @@ class TempMeet:
 		if not sorted:
 			return teams
 
-		#now sort
+		# now sort
 		scores = []
 		for team in teams:
 			scores.append([team, teams[team]])
@@ -1662,6 +1655,9 @@ class TempMeet:
 		if not self.scores:
 			return self.teamScores()
 		return self.scores
+
+	def setHeats(self, heats=2):
+		self.heats = heats
 
 	def winningTeam(self):
 		if not self.scores: self.teamScores()
@@ -1725,10 +1721,12 @@ class TempMeet:
 				scores[team]['swimmer'][name] += swim.score
 				scores[team]['total'] += swim.score
 				scores[team]['event'][event] += swim.score
-				if swim.year:
-					if not swim.year in scores[team]['year']:
-						scores[team]['year'][swim.year] = 0
-					scores[team]['year'][swim.year] += swim.score
+
+				year = swim.swimmer.year
+				if year:
+					if not year in scores[team]['year']:
+						scores[team]['year'][year] = 0
+					scores[team]['year'][year] += swim.score
 
 		if repressTeam:
 			zeroTeams = set()
@@ -1739,23 +1737,6 @@ class TempMeet:
 				del(scores[team])
 
 		return scores
-
-	def setHeats(self, heats=2):
-		self.heats = heats
-
-	def printout(self):
-		events = self.getEvents()
-		print 'events', events, self.events
-		for event in events:
-			if event not in self.eventSwims: continue
-			print "-------------------------------------------------------------------------------------"
-			print "Event: " + event
-			for swim in self.eventSwims[event]:
-				if swim.score:
-					print swim.printScore().lstrip()+"\t"+str(swim.score)
-				else:
-					print swim.printScore().lstrip()
-		print self.scores
 
 	def scoreString(self, showNum='all', showScores=True, showPlace=False):
 		self.score()
@@ -1802,13 +1783,25 @@ class TempMeet:
 		return json_out
 
 	def __str__(self):
-		if self.name:
-			return self.name
-		self.printout()
-		return ''
+		events = self.getEvents()
+		print 'events', events, self.events
+		for event in events:
+			if event not in self.eventSwims: continue
+			print "-------------------------------------------------------------------------------------"
+			print "Event: " + event
+			for swim in self.eventSwims[event]:
+				if swim.score:
+					print swim.printScore().lstrip()+"\t"+str(swim.score)
+				else:
+					print swim.printScore().lstrip()
+		if self.scores:
+			return self.scores
+		else:
+			return ''
 
 	def __eq__(self, s):
-		if not type(s)==type(self): return False #not called on a season
+		if not type(s)==type(self):  # not called on a season
+			return False
 		return self.name==s.name and self.date==s.date
 
 
@@ -1951,8 +1944,8 @@ if __name__ == '__main__':
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
 
-	ubmc = TeamSeason.get(id=1567)
+	#ubmc = TeamSeason.get(id=1567)
 
-	print ubmc.updateSeasonStats()
+	#print ubmc.updateSeasonStats()
 
 

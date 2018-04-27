@@ -234,6 +234,7 @@ def safeLoad(year=18):
 	print 'Updating powerpoints'
 	updatePowerpoints(year)
 
+
 def updatePowerpoints(year):
 	for swimmer in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.ppts.is_null(),
 																			  Swimmer.season==year+2000):
@@ -278,6 +279,7 @@ def mergeTeams(sourceTeamId, targetTeamId):
 
 	TeamSeason.delete().where(TeamSeason.id==sourceTeamId).execute()
 
+
 def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 	sourceSwimmer = Swimmer.get(id=sourceSwimmerId)
 	targetSwimmer = Swimmer.get(id=targetSwimmerId)
@@ -300,6 +302,7 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 			swim.save()
 
 	Swimmer.delete().where(Swimmer.id==sourceSwimmerId).execute()
+
 
 def fixRelays():
 	'''finds relays that are attached to non-relay swimmers'''
@@ -324,7 +327,7 @@ def fixRelays():
 			swim.save()
 
 		count +=1
-		if count%1000==0: print count
+		if count % 1000 == 0: print count
 	print count
 
 	'''now fix ones with gender mismatch'''
@@ -366,9 +369,9 @@ def normalizeData():
 	for team in TeamSeason().select():
 		for swimmer in Swimmer.select().where(Swimmer.team==team):
 			if swimmer.season != team.season:
-				pass
+				print swimmer.name, swimmer.season, team.season, team.team, swimmer.id, team.id
 			if swimmer.gender != team.gender:
-				pass
+				print swimmer.name, team.id, swimmer.gender, team.gender
 
 
 # guess duplicate swimmers as people who tied in more than two races
@@ -403,13 +406,6 @@ def fixDupSwimmers(season=2018):
 				mergeSwimmers(swim.swimmer1, swim.swimmer2)
 
 
-def deleteDupImprovement():
-	Improvement.raw('DELETE FROM Improvement WHERE id IN (SELECT id FROM (SELECT id, '
-        'ROW_NUMBER() OVER (partition BY name, event, fromseason, team ORDER BY id) AS rnum '
-        'FROM Improvement) i '
-        'WHERE i.rnum > 1)').execute()
-
-
 def fixMeetNames():
 	for char in ['+', '@', '&']:
 		searchStr = '%' + char + '%'
@@ -434,7 +430,7 @@ def badTimes():
 		if event=='1000 Free': continue
 		for swim in Swim.select().where(Swim.event==event).order_by(Swim.time).limit(100):
 			ppts = swim.getPPTs(raw=True)
-			if ppts > 1200 or ppts < 5:
+			if ppts > 1300 or ppts < 5:
 				print swim.event, swim.time, swim.gender, ppts, swim.name, swim.team, swim.division
 				swim.delete_instance()
 
@@ -442,17 +438,17 @@ def badTimes():
 
 if __name__ == '__main__':
 	start = Time.time()
+	#normalizeData()
 	#badTimes()
 	#safeLoad(year=18)
-	#fixDupSwimmers(2018)
+	for season in range(2008, 2018):
+		fixDupSwimmers(season)
 
 	#mergeTeams(8624, 3550)
 	#mergeTeams(8616, 3402)
 
 	#uniqueSwimmers()
 	#deleteDups()
-	#fixDupSwimmers()
-	deleteDupImprovement()
 	#fixConfs()
 	#fixDivision()
 	#fixRelays()
