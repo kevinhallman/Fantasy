@@ -1011,11 +1011,13 @@ class SwimmerstatsJSON():
 		swimmersJSON = {}
 
 		for idx, swimmer in enumerate(swimmers):
-			swimmersJSON[swimmer.name] = {'team': swimmer.team, 'rank': idx + 1, 'swims': {}}
+			swimmersJSON[swimmer.name] = {'team': swimmer.team.team, 'rank': idx + 1, 'swims': {}}
 			swims = swimmer.getTaperSwims()
 			for swim in swims.values():
 				swimmersJSON[swimmer.name]['swims'][swim.event] = {'time': swimTime(swim.time), 'powerpoints': str(
 					round(swim.getPPTs()))}
+
+		print swimmersJSON
 
 		return json.dumps(swimmersJSON)
 
