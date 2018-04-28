@@ -449,12 +449,11 @@ def badTimes():
 
 if __name__ == '__main__':
 	start = Time.time()
-	#load(loadSwimmers=True, loadyear=18, reload=True)
 	#normalizeData()
 	#badTimes()
-	safeLoad(year=18, reload=True)
-	#for season in range(2008, 2018):
-	#	fixDupSwimmers(season)
+	#safeLoad(year=18)
+
+	fixDupSwimmers(2018)
 
 	#mergeTeams(8624, 3550)
 	#mergeTeams(8616, 3402)
