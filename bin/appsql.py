@@ -194,7 +194,7 @@ class Swimulate():
 				optimizeTeams[team['team']] = newTeam
 				remove.add(num)
 
-		print formMeets, optimizeTeams
+		#print formMeets, optimizeTeams
 		# get rid of optimize teams and teams without any meet specified
 		for num in remove:
 			del(formMeets[num])
@@ -225,6 +225,7 @@ class SwimulateJSON():
 		form = web.input(team1=None, team2=None, meet1=None, meet2=None, _unicode=False, gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 		gender = session.gender
+
 		if not form.team1:
 			return {}
 
@@ -364,7 +365,7 @@ class Conf():
 		else:
 			table = ''
 
-		print Time.time() - start
+		#print Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
 							finalScores=showScores(scores), table=table, winTable='')  # showWinTable(winProb))
 
@@ -372,15 +373,15 @@ class ConfJSON():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None, heats=None)
 		web.header("Content-Type", "application/json")
-		division = form.division.title()
-		gender = form.gender.title()
+		division = form.division
+		gender = form.gender
 
 		if form.conference is None:
 			return {}
 
 		season = int(form.season)
 
-		if form.date and form.date.title() != 'Whole Season':  # parse the date string
+		if form.date and form.date != 'Whole Season':  # parse the date string
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
 				year = str(season - 1)

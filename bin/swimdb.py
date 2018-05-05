@@ -954,8 +954,10 @@ class Swim(Model):
 	def getScoreTeam(self):
 		if self.scoreTeam:
 			return self.scoreTeam
-		if self.team:
+		if isinstance(self.team, basestring):
 			return self.team
+		if isinstance(self.team, TeamSeason):
+			return self.team.team
 		return ''
 
 	def getScoreTime(self):  # can temporarily set a new time, i.e. taper time
@@ -1158,6 +1160,12 @@ class TempMeet:
 
 		if not swim.event in self.eventSwims:
 			self.eventSwims[swim.event] = []
+
+		# prevent duplicate swimmers in same event
+		#for old_swim in self.eventSwims[swim.event]:
+		#	if swim.swimmer == old_swim.swimmer and swim.getScoreTeam() == old_swim.getScoreTeam():
+		#		return
+
 		self.eventSwims[swim.event].append(swim)
 
 	def addSwims(self, swims, newTeamName=None):
