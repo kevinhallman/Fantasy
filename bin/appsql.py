@@ -1174,7 +1174,7 @@ class Timeconvert():
 			form.fromage = 22
 		if not form.toage:
 			form.toage = form.fromage
-		if not form.fromage or form.fromcourse=='From Course':
+		if not form.fromage or form.fromcourse=='From Course' or form.fromcourse=='':
 			return 'Error: No age or course selected'
 
 		time = 0
