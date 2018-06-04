@@ -297,7 +297,7 @@ def mergeSwimmers(sourceSwimmerId, targetSwimmerId):
 	targetTeam = TeamSeason.get(id=targetSwimmer.team)
 	print targetTeam.team
 	for swim in Swim.select().where(Swim.swimmer==sourceSwimmer):
-		swim.team = targetTeam.id
+		swim.team = targetTeam.team
 		swim.division = targetTeam.division
 		swim.season = targetTeam.season
 		swim.swimmer = targetSwimmer.id
@@ -446,6 +446,10 @@ def badTimes():
 				swim.delete_instance()
 
 
+def fixTeams():
+	for swim in Swim.select().join(Swimmer).join(TeamSeason).where(Swim.team != TeamSeason.team):
+		swim.team = swim.swimmer.team.team
+		swim.save()
 
 if __name__ == '__main__':
 	start = Time.time()
@@ -453,7 +457,8 @@ if __name__ == '__main__':
 	#badTimes()
 	#safeLoad(year=18)
 
-	fixDupSwimmers(2018)
+	#fixDupSwimmers(2018)
+	fixTeams()
 
 	#mergeTeams(8624, 3550)
 	#mergeTeams(8616, 3402)
