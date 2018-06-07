@@ -1161,11 +1161,6 @@ class TempMeet:
 		if not swim.event in self.eventSwims:
 			self.eventSwims[swim.event] = []
 
-		# prevent duplicate swimmers in same event
-		#for old_swim in self.eventSwims[swim.event]:
-		#	if swim.swimmer == old_swim.swimmer and swim.getScoreTeam() == old_swim.getScoreTeam():
-		#		return
-
 		self.eventSwims[swim.event].append(swim)
 
 	def addSwims(self, swims, newTeamName=None):
@@ -1315,7 +1310,7 @@ class TempMeet:
 		'''
 		extras = {}  # double dictionary, swim:event
 		for swim in drops:  # + dropSplits
-			if not swim.name in extras:
+			if swim.name not in extras:
 				extras[swim.name] = {}
 			extras[swim.name][swim.event] = swim
 
@@ -1327,10 +1322,26 @@ class TempMeet:
 			swims = self.getSwims(team, False, splits=splits)
 			while len(swims) > 0:
 				swim2 = swims.pop()
+
 				if swim1==swim2 or swim1.event==swim2.event:
 					continue
+
+				# already in that event
+				already_entered = False
+				for swim in self.eventSwims[swim2.event]:
+					if swim.swimmer== swim1.swimmer:
+						already_entered = True
+						break
+				for swim in self.eventSwims[swim1.event]:
+					if swim.swimmer== swim2.swimmer:
+						already_entered = True
+						break
+				if already_entered:
+					continue
+
 				# make sure swims exist
-				if extras.has_key(swim2.name) and extras.has_key(swim1.name) and extras[swim1.name].has_key(swim2.event) and extras[swim2.name].has_key(swim1.event):
+				if swim2.name in extras and swim1.name in extras and swim2.event in extras[swim1.name] and \
+						swim1.event in extras[swim2.name]:
 					self.score()
 					if debug:
 						print self.score()
@@ -1351,7 +1362,9 @@ class TempMeet:
 						if debug:
 							print "swap"
 							print newSwim1.name, newSwim1.event
+							for swim in self.eventSwims[newSwim1.event]: print swim
 							print newSwim2.name, newSwim2.event
+							for swim in self.eventSwims[newSwim2.event]: print swim
 						swims.add(newSwim1)
 						swims.add(newSwim2)
 						if swim1 in swims:
@@ -1387,15 +1400,15 @@ class TempMeet:
 		newSwim1 = extras[swim1.name][swim2.event]
 		newSwim2 = extras[swim2.name][swim1.event]
 
-		if self.eventSwims.has_key(swim2.event) and swim2 in self.eventSwims[swim2.event]: # ind swim
+		if swim2.event in self.eventSwims and swim2 in self.eventSwims[swim2.event]:  # ind swim
 			self.eventSwims[swim2.event].remove(swim2)
 			self.addSwim(newSwim1)
-		else: # gotta be a relay
+		else:  # gotta be a relay
 			self.relaySwap(swim2, newSwim1)
-		if self.eventSwims.has_key(swim1.event) and swim1 in self.eventSwims[swim1.event]: # ind swim
+		if swim1.event in self.eventSwims and swim1 in self.eventSwims[swim1.event]:  # ind swim
 			self.eventSwims[swim1.event].remove(swim1)
 			self.addSwim(newSwim2)
-		else: # gotta be a relay
+		else:  # gotta be a relay
 			self.relaySwap(swim1, newSwim2)
 
 		if not extras.has_key(swim1.name):
@@ -1802,10 +1815,8 @@ class TempMeet:
 					print swim.printScore().lstrip()+"\t"+str(swim.score)
 				else:
 					print swim.printScore().lstrip()
-		if self.scores:
-			return self.scores
-		else:
-			return ''
+
+		return ''
 
 	def __eq__(self, s):
 		if not type(s)==type(self):  # not called on a season

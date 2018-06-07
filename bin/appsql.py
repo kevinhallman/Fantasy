@@ -158,7 +158,7 @@ class Swimulate():
 		setGenDiv(form.gender, form.division)
 		gender = session.gender
 		divTeams = allTeams[gender]
-		if not form.team1:
+		if not form.team1 or not form.meet1:
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 
 		# assemble the data for each team from the form
@@ -194,7 +194,6 @@ class Swimulate():
 				optimizeTeams[team['team']] = newTeam
 				remove.add(num)
 
-		#print formMeets, optimizeTeams
 		# get rid of optimize teams and teams without any meet specified
 		for num in remove:
 			del(formMeets[num])
@@ -215,7 +214,7 @@ class Swimulate():
 			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)
 
-			#winProb = newMeet.scoreMonteCarlo()
+			# winProb = newMeet.scoreMonteCarlo()
 			winTable = ''  # showWinTable(winProb)
 			return render.swimulator(divTeams=divTeams, scores=showMeet(scores), teamScores=showTeamScores(
 				teamScores), finalScores=showScores(scores), winTable=winTable)
