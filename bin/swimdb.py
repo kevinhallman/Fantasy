@@ -1527,13 +1527,18 @@ class TempMeet:
 				# keep track of previous swim to score ties
 				preSwim = None
 				teamSwims = {}
+				non_scoring_swims = 0
 				for swim in self.eventSwims[event]:
 					swim.score = None  # reset score
 					team = swim.getScoreTeam()
-					if swim.place > len(pointsI) or (team in teamSwims) and teamSwims[team] >= max:
+					if swim.place > (len(pointsI)+non_scoring_swims):
 						swim.score = 0
+					elif team in teamSwims and teamSwims[team] >= max:
+						swim.score = 0
+						non_scoring_swims += 1  # keep track of how many swims are over scoring limit per event
 					else:
-						if preSwim and swim.place == preSwim.place:  # a tie, average with previous swim's score
+						if preSwim and swim.place == preSwim.place and preSwim.score > 0:
+							# a tie, average with previous swim's score. If pre swim did not score, then don't
 							if swim.place == len(points):
 								score = points[swim.place - 1]
 							else:
@@ -1543,7 +1548,7 @@ class TempMeet:
 							swim.score = score
 							preSwim.score = score
 						else:
-							swim.score = points[swim.place - 1]
+							swim.score = points[swim.place - 1 - non_scoring_swims]
 						if team not in teamSwims:
 							teamSwims[team] = 0
 						teamSwims[team] += 1
