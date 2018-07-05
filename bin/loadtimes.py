@@ -53,7 +53,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	root = 'data/20' + str(loadyear)
+	root = 'data/best_college'#'data/20' + str(loadyear)
 
 	for swimFileName in os.listdir(root):
 		if reload:
@@ -455,10 +455,11 @@ if __name__ == '__main__':
 	start = Time.time()
 	#normalizeData()
 	#badTimes()
-	#safeLoad(year=18)
+	for year in [16, 15,14,13,12,11,10]:
+		safeLoad(year=year)
 
 	#fixDupSwimmers(2018)
-	fixTeams()
+	#fixTeams()
 
 	#mergeTeams(8624, 3550)
 	#mergeTeams(8616, 3402)
