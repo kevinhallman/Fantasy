@@ -839,7 +839,7 @@ class Swimmer(Model):
 		self.ppts = powerpoints
 		self.save()
 		return powerpoints
-s
+
 	def nextSeason(self, years=1):
 		try:
 			return Swimmer.get(Swimmer.team==self.team, Swimmer.gender==self.gender,
