@@ -210,6 +210,8 @@ class Swimulate():
 				showNum = 20
 			else:
 				showNum = 6
+
+
 			scores = newMeet.scoreString(showNum=showNum)
 			teamScores = newMeet.scoreReport()
 			newMeet.reset(True, True)

@@ -53,9 +53,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	root = 'data/best_college'#'data/20' + str(loadyear)
+	#root = 'data/best_college'#'data/20' + str(loadyear)
+	root = 'data/hs'
 
 	for swimFileName in os.listdir(root):
+
+		'''
 		if reload:
 			match = re.search('(\D+)(\d+)([mf])', swimFileName)
 		else:
@@ -66,6 +69,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 		if not (int(fileyear) == loadyear):
 			continue
+		'''
+		div='DI'
 
 		confTeams = getNewConfs()
 
@@ -80,6 +85,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 			for idx, line in enumerate(swimFile):
 				swimArray = re.split('\t', line)
+				print swimArray
 				if len(swimArray) > 8:
 					continue
 				meet = swimArray[0].strip()
@@ -455,10 +461,10 @@ if __name__ == '__main__':
 	start = Time.time()
 	#normalizeData()
 	#badTimes()
-	for year in [16, 15,14,13,12,11,10]:
-		safeLoad(year=year)
+	#for year in [16, 15,14,13,12,11,10]:
+	#	safeLoad(year=year)
 
-	#fixDupSwimmers(2018)
+	fixDupSwimmers(2018)
 	#fixTeams()
 
 	#mergeTeams(8624, 3550)

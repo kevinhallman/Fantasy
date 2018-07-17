@@ -84,7 +84,7 @@ def getSkewDist(gender, division, event):
 		return frozen
 
 	except Timedist.DoesNotExist:
-		times = [] # 2016 is the only season with all the times
+		times = []  # 2016 is the only season with all the times
 		for swim in Swim.select(Swim.time).where(Swim.division==division, Swim.gender==gender, Swim.event==event,
 												 Swim.season==2016):
 			times.append(swim.time)
@@ -246,7 +246,7 @@ class TeamSeason(Model):
 			if stats.winconf:
 				return stats.winconf
 		if self.winconf:
-			return self.winconfs
+			return self.winconf
 		return 0
 
 	# pulls top team strength for that year
@@ -337,16 +337,10 @@ class TeamSeason(Model):
 			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
 
 		newMeet = TempMeet()
-		for swim in Swim.raw("SELECT event, time, rank, name, meet, team, year, swimmer_id FROM "
-				"(SELECT swim.name, time, event, meet, swim.team, sw.year, swimmer_id, rank() "
-				"OVER (PARTITION BY swim.name, event ORDER BY time) "
-				"FROM (swim "
-				"INNER JOIN swimmer sw "
-				"ON swim.swimmer_id=sw.id "
-				"INNER JOIN teamseason ts "
-				"ON sw.team_id=ts.id and ts.id=%s) "
-				"WHERE swim.date < %s) AS a "
-				"WHERE a.rank=1", self.id, dateStr):
+		for swim in Swim.raw("SELECT time, event, gender, top_swim.name, division, season, date "
+						"FROM top_swim, swimmer, teamseason as ts "
+						"WHERE top_swim.swimmer=swimmer.id and swimmer.team_id=ts.id and ts.id=%s and swim.date < %s) "
+						, self.id, dateStr):
 			swim.gender = self.gender
 			swim.season = self.season
 			swim.division = self.division
@@ -845,7 +839,7 @@ class Swimmer(Model):
 		self.ppts = powerpoints
 		self.save()
 		return powerpoints
-
+s
 	def nextSeason(self, years=1):
 		try:
 			return Swimmer.get(Swimmer.team==self.team, Swimmer.gender==self.gender,
@@ -1175,11 +1169,11 @@ class TempMeet:
 				if swim.name==name:
 					self.eventSwims[event].remove(swim)
 
-	def nextYear(self, database):
+	def nextYear(self):
 		for event in self.eventSwims:
 			if 'Relay' in event:
 				continue
-			self.eventSwims[event] = [x.improve(database) for x in self.eventSwims[event] if x.year != 'Senior']
+			self.eventSwims[event] = [x for x in self.eventSwims[event] if x.year != 'Senior']
 
 	def getEvents(self, events=''):
 		myEvents = set(self.eventSwims.keys())
