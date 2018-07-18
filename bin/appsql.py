@@ -335,9 +335,11 @@ class Conf():
 				size = int(form.size)
 			else:
 				size = 17
+			print 'parse', Time.time() - start
 			if form.conference == 'Nationals':
 				confMeet = database.conference(season, gender, form.conference, division, swimdate,
 											   topTimes=topTimes, teamMax=size)
+				print 'conf', Time.time() - start
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -348,6 +350,7 @@ class Conf():
 			else:
 				confMeet = database.conference(season, gender, form.conference, division, swimdate,
 											   topTimes=topTimes, teamMax=size)
+				print 'conf', Time.time() - start
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -355,7 +358,7 @@ class Conf():
 				confMeet.score()
 				scores = confMeet.scoreString()
 				teamScores = confMeet.scoreReport()
-			#print Time.time() - start
+			print 'scores', Time.time() - start
 			#winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
@@ -366,7 +369,7 @@ class Conf():
 		else:
 			table = ''
 
-		#print Time.time() - start
+		print 'final', Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
 							finalScores=showScores(scores), table=table, winTable='')  # showWinTable(winProb))
 
