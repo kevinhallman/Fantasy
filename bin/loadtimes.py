@@ -4,6 +4,7 @@ import re
 import os
 import urlparse
 import peewee
+import argparse
 from events import badEventMap, eventConvert
 
 urlparse.uses_netloc.append("postgres")
@@ -41,8 +42,8 @@ def getNewConfs():
 load in new swim times
 can load in to all SQL tables if params are true
 '''
-def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=15,
-		 reload=False):
+def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=2015,
+		 type='new'):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
@@ -53,24 +54,23 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	#root = 'data/best_college'#'data/20' + str(loadyear)
-	root = 'data/hs'
+	root = 'data/' + str(loadyear)
+	#root = 'data/hs'
 
 	for swimFileName in os.listdir(root):
-
-		'''
-		if reload:
+		if type == 'reload':
 			match = re.search('(\D+)(\d+)([mf])', swimFileName)
-		else:
+		elif type == 'best':
+			match = re.search('(\D+)(\d+)([mf])best', swimFileName)
+		elif type=='new':
 			match = re.search('(\D+)(\d+)([mf])new', swimFileName)
+
 		if not match:
 			continue
 		div, fileyear, gender = match.groups()
 
-		if not (int(fileyear) == loadyear):
+		if not (int(fileyear) + 2000 == int(loadyear)):
 			continue
-		'''
-		div='DI'
 
 		confTeams = getNewConfs()
 
@@ -81,11 +81,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				division = 'D2'
 			elif div == 'DIII':
 				division = 'D3'
-			print division, swimFileName
 
 			for idx, line in enumerate(swimFile):
 				swimArray = re.split('\t', line)
-				print swimArray
 				if len(swimArray) > 8:
 					continue
 				meet = swimArray[0].strip()
@@ -240,21 +238,27 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 '''
 loads into tables in order
 '''
-def safeLoad(year=18, reload=False):
+def safeLoad(year=2018, type='new'):
 	print 'loading teams...'
-	load(loadTeams=True, loadyear=year, reload=reload)
+	load(loadTeams=True, loadyear=year, type=type)
 	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True, loadyear=year, reload=reload)
+	load(loadMeets=True, loadSwimmers=True, loadyear=year, type=type)
 	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True, loadyear=year, reload=reload)
+	load(loadTeamMeets=True, loadSwims=True, loadyear=year, type=type)
 
 	print 'Updating powerpoints'
 	updatePowerpoints(year)
 
+	print 'fixing duplicates'
+	fixDupSwimmers(year)
+
+	print 'refresh view'
+	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
+
 
 def updatePowerpoints(year):
 	for swimmer in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.ppts.is_null(),
-																			  Swimmer.season==year+2000):
+																			  Swimmer.season==int(year)):
 		swimmer.getPPTs()
 
 
@@ -459,23 +463,31 @@ def fixTeams():
 
 if __name__ == '__main__':
 	start = Time.time()
-	#normalizeData()
-	#badTimes()
-	#for year in [16, 15,14,13,12,11,10]:
-	#	safeLoad(year=year)
 
-	fixDupSwimmers(2018)
-	#fixTeams()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-d', '--dups', help='year to remove duplicate swimmers for')
+	parser.add_argument('-l', '--load', help='year to load in new times')
+	parser.add_argument('-b', '--best', help='year to load in best times')
+	parser.add_argument('-a', '--all', help='year to load in all times')
+	args = vars(parser.parse_args())
 
-	#mergeTeams(8624, 3550)
-	#mergeTeams(8616, 3402)
+	if args['dups']:
+		fixDupSwimmers(args['dups'])
 
-	#uniqueSwimmers()
-	#deleteDups()
+	if args['load']:
+		safeLoad(year=args['load'])
+
+	if args['best']:
+		safeLoad(year=args['best'], type='best')
+
+	if args['all']:
+		safeLoad(year=args['load'], type='all')
+
 	#fixConfs()
 	#fixDivision()
 	#fixRelays()
 	# migrateImprovement()
 	# addRelaySwimmers()
+	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
 	stop = Time.time()
 	print stop - start
