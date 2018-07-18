@@ -335,37 +335,28 @@ class Conf():
 				size = int(form.size)
 			else:
 				size = 17
-			print 'parse', Time.time() - start
 			if form.conference == 'Nationals':
 				confMeet = database.conference(season, gender, form.conference, division, swimdate,
 											   topTimes=topTimes, teamMax=size)
-				print 'conf', Time.time() - start
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
 					confMeet.setHeats(heats=2)
 				confMeet.score()
-				print 'score', Time.time() - start
 				scores = confMeet.scoreString(25)
-				print 'score string', Time.time() - start
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
-				print 'score report', Time.time() - start
 			else:
 				confMeet = database.conference(season, gender, form.conference, division, swimdate,
 											   topTimes=topTimes, teamMax=size)
-				print 'conf', Time.time() - start
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
 					confMeet.setHeats(heats=2)
 				confMeet.score()
-				print 'score', Time.time() - start
 				scores = confMeet.scoreString()
-				print 'score string', Time.time() - start
 				teamScores = confMeet.scoreReport()
-				print 'score report', Time.time() - start
-			#print 'scores', Time.time() - start
-			#winProb = confMeet.scoreMonteCarlo(runs=100)
+			# print 'scores', Time.time() - start
+			# winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
 			teamScores = None
@@ -375,7 +366,6 @@ class Conf():
 		else:
 			table = ''
 
-		print 'final', Time.time() - start
 		return render.conference(conferences=confList, scores=showMeet(scores), teamScores=showTeamScores(teamScores),
 							finalScores=showScores(scores), table=table, winTable='')  # showWinTable(winProb))
 
