@@ -1719,15 +1719,11 @@ class TempMeet:
 	'''
 	def scoreReport(self, repressSwim=False, repressTeam=False):
 		self.score()
-		#print 'score', Time.time() - start
 		scores = {}
 		for team in self.teams:
 			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
-		first = True
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
-				start = Time.time()
-				if first: print Time.time() - start
 				if not swim.score:
 					swim.score = 0
 				if swim.relay:
@@ -1736,28 +1732,22 @@ class TempMeet:
 					name = swim.name
 				if repressSwim and (swim.score == 0 or not swim.score):
 					continue   # repress zero scores
-				if first: print Time.time() - start
+
 				team = swim.getScoreTeam()
-				if first: print 'score team', Time.time() - start
 				if not name in scores[team]['swimmer']:
 					scores[team]['swimmer'][name] = 0
 				if not event in scores[team]['event']:
 					scores[team]['event'][event] = 0
-				if first: print 'dics', Time.time() - start
 				scores[team]['swimmer'][name] += swim.score
 				scores[team]['total'] += swim.score
 				scores[team]['event'][event] += swim.score
 
-				if first: print 'end dics', Time.time() - start
-				year = None #swim.swimmer.year
+				year = swim.year
 				if year:
 					if not year in scores[team]['year']:
 						scores[team]['year'][year] = 0
 					scores[team]['year'][year] += swim.score
-				if first: print 'year', Time.time() - start
-				first = False
 
-		print 'end', Time.time() - start
 		if repressTeam:
 			zeroTeams = set()
 			for team in scores:
