@@ -345,8 +345,11 @@ class Conf():
 				else:
 					confMeet.setHeats(heats=2)
 				confMeet.score()
+				print 'score', Time.time() - start
 				scores = confMeet.scoreString(25)
+				print 'score string', Time.time() - start
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
+				print 'score report', Time.time() - start
 			else:
 				confMeet = database.conference(season, gender, form.conference, division, swimdate,
 											   topTimes=topTimes, teamMax=size)
@@ -356,9 +359,12 @@ class Conf():
 				else:
 					confMeet.setHeats(heats=2)
 				confMeet.score()
+				print 'score', Time.time() - start
 				scores = confMeet.scoreString()
+				print 'score string', Time.time() - start
 				teamScores = confMeet.scoreReport()
-			print 'scores', Time.time() - start
+				print 'score report', Time.time() - start
+			#print 'scores', Time.time() - start
 			#winProb = confMeet.scoreMonteCarlo(runs=100)
 		else:
 			scores = None
