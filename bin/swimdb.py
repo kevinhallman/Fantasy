@@ -1718,11 +1718,14 @@ class TempMeet:
 	lists swimmers by team and by points scored
 	'''
 	def scoreReport(self, repressSwim=False, repressTeam=False):
+		start = Time.time()
 		self.score()
+		print 'score', Time.time() - start
 		scores = {}
 		for team in self.teams:
 			scores[team] = {'total': 0, 'year': {}, 'swimmer': {}, 'event': {}}
 		for event in self.eventSwims:
+			print event, Time.time() - start
 			for swim in self.eventSwims[event]:
 				if not swim.score:
 					swim.score = 0
@@ -1748,6 +1751,7 @@ class TempMeet:
 						scores[team]['year'][year] = 0
 					scores[team]['year'][year] += swim.score
 
+		print 'end', Time.time() - start
 		if repressTeam:
 			zeroTeams = set()
 			for team in scores:
