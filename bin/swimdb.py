@@ -298,14 +298,15 @@ class TeamSeason(Model):
 
 	'''top expected score for the whole team'''
 	def topTeamScore(self, dual=True, weeksIn=None):
+		print weeksIn
 		# convert the week to a date
 		startDate = date(self.season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
-		if weeksIn == None:  # can't simulate with future data
-			simDate = date.today()
+		if not weeksIn:
+			simDate = None
 		else:
 			simDate = startDate + timedelta(weeks=weeksIn)
 		if simDate > date.today():  # can't simulate with future data
-			simDate = date.today()
+			simDate = None
 
 		if dual:
 			events = eventsDualS
@@ -333,14 +334,14 @@ class TeamSeason(Model):
 
 	def topTimes(self, dateStr=None, events=None):
 		if not dateStr:
-			meetDate = date.today()
-			dateStr = str(meetDate.year) + '-' + str(meetDate.month) + '-' + str(meetDate.day)
+			query = Swim.raw("SELECT time, event, gender, name, division, season, date team_id "
+						"FROM top_swim WHERE team_id=%s  ", self.id)
+		else:
+			query = Swim.raw("SELECT time, event, gender, name, division, season, date team_id "
+						"FROM top_swim WHERE team_id=%s and date < %s ", self.id, dateStr)
 
 		newMeet = TempMeet()
-		for swim in Swim.raw("SELECT time, event, gender, top_swim.name, division, season, date "
-						"FROM top_swim, swimmer, teamseason as ts "
-						"WHERE top_swim.swimmer=swimmer.id and swimmer.team_id=ts.id and ts.id=%s and swim.date < %s) "
-						, self.id, dateStr):
+		for swim in query:
 			swim.gender = self.gender
 			swim.season = self.season
 			swim.division = self.division
