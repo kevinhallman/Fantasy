@@ -1109,13 +1109,14 @@ class TempMeet:
 			if season:
 				query = query.select().where(Swim.season==season)
 			if topSwim:
-				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time),Swim.date,
-									 Swim.swimmer).group_by(Swim.name, Swim.event, Swim.team, Swim.gender,
+				query = query.select(Swim.name, Swim.event, Swim.team, Swim.gender, fn.Min(Swim.time), Swim.date,
+								Swim.swimmer).group_by(Swim.name, Swim.event, Swim.team, Swim.gender,
 															Swim.date, Swim.swimmer)
 			for swim in query:
 				if topSwim:
 					swim.time = swim.min
 					swim.meet = name
+				swim.year = swim.swimmer.year
 				self.addSwim(swim)
 
 	def reset(self, teams=False, times=False):
