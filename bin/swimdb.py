@@ -334,10 +334,10 @@ class TeamSeason(Model):
 
 	def topTimes(self, dateStr=None, events=None):
 		if not dateStr:
-			query = Swim.raw("SELECT time, event, gender, name, division, season, date team_id "
+			query = Swim.raw("SELECT time, event, gender, name, division, season, year, team, meet, date, team_id "
 						"FROM top_swim WHERE team_id=%s  ", self.id)
 		else:
-			query = Swim.raw("SELECT time, event, gender, name, division, season, date team_id "
+			query = Swim.raw("SELECT time, event, gender, name, division, season, year, team, meet, date, team_id "
 						"FROM top_swim WHERE team_id=%s and date < %s ", self.id, dateStr)
 
 		newMeet = TempMeet()
