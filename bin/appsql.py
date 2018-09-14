@@ -8,7 +8,7 @@ import os, urlparse
 from numpy import percentile, median, mean, std, average
 from peewee import *
 from math import isnan, pow
-from swimdb import Meet, TeamMeet, Team, TeamSeason, Swim, swimTime, db
+from swimdb import Meet, TeamMeet, TeamSeason, Swim, swimTime, db
 from swimdb import getSkewDist as getSkewDistCollege
 from clubdb import convert, getSkewDist
 from clubdb import db as clubdb
@@ -62,28 +62,6 @@ def connection_processor(handler):
 		if not clubdb.is_closed():
 			clubdb.close()
 
-
-# retrieves all conference affiliations
-def getConfs():
-	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
-	allTeams = {'Men': {'D1': set(), 'D2': set(), 'D3': set()}, 'Women': {'D1': set(), 'D2': set(), 'D3': set()}}
-	for newTeam in TeamSeason.select(TeamSeason.team, TeamSeason.conference, TeamSeason.division,
-									 TeamSeason.gender).distinct(TeamSeason.team):
-		if newTeam.conference not in confs[newTeam.division][newTeam.gender]:
-			confs[newTeam.division][newTeam.gender][newTeam.conference] = set()
-
-		confs[newTeam.division][newTeam.gender][newTeam.conference].add(newTeam.team.strip())
-		allTeams[newTeam.gender][newTeam.division].add(newTeam.team.strip())
-
-	for division in ['D1', 'D2', 'D3']:
-		allTeams['Men'][division] = list(allTeams['Men'][division])
-		allTeams['Men'][division].sort()
-		allTeams['Women'][division] = list(allTeams['Women'][division])
-		allTeams['Women'][division].sort()
-
-	return confs, allTeams
-
-
 # gets the list of meets swum by a team in a given season
 def getMeetList(gender='Women', division='D1', team=None, season=None):
 	if not season:
@@ -115,8 +93,7 @@ render = web.template.render('templates/', base="layout", globals={'context': se
 
 app.add_processor(connection_processor)
 
-database = sqlmeets.SwimDatabase(database=db)
-(conferences, allTeams) = getConfs()
+(conferences, allTeams) = sqlmeets.getConfs()
 
 currentSeason = 2018
 
@@ -202,10 +179,10 @@ class Swimulate():
 			return render.swimulator(divTeams=divTeams, scores=None, teamScores=None, finalScores=None, winTable=None)
 		
 		else:
-			newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
+			newMeet = sqlmeets.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 			if optimizeTeams:
-				newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
+				newMeet = sqlmeets.lineup(optimizeTeams, newMeet, gender=gender)
 			if len(formMeets) > 2:  # show only six swims
 				showNum = 20
 			else:
@@ -270,10 +247,10 @@ class SwimulateJSON():
 		if len(formMeets) + len(optimizeTeams) < 1:
 			return {}
 
-		newMeet = database.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
+		newMeet = sqlmeets.swimMeet(formMeets.values(), gender=gender, includeEvents=sqlmeets.requiredEvents,
 										selectEvents=False, resetTimes=True)
 		if optimizeTeams:
-			newMeet = database.lineup(optimizeTeams, newMeet, gender=gender)
+			newMeet = sqlmeets.lineup(optimizeTeams, newMeet, gender=gender)
 		if len(formMeets) > 2:  # show only six swims
 			showNum = 20
 		else:
@@ -336,8 +313,8 @@ class Conf():
 			else:
 				size = 17
 			if form.conference == 'Nationals':
-				confMeet = database.conference(season, gender, form.conference, division, swimdate,
-											   topTimes=topTimes, teamMax=size)
+				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate,
+											   top=topTimes, teamMax=size)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -346,8 +323,8 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				confMeet = database.conference(season, gender, form.conference, division, swimdate,
-											   topTimes=topTimes, teamMax=size)
+				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate,
+											   top=topTimes, teamMax=size)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -396,8 +373,8 @@ class ConfJSON():
 		else:
 			topTimes = False
 		if form.conference.title() == 'Nationals':
-			confMeet = database.conference(season, gender, form.conference.title(), division, swimdate,
-										   topTimes=topTimes)
+			confMeet = sqlmeets.sim_conference(season, gender, form.conference.title(), division, swimdate,
+											   top=topTimes)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
@@ -407,8 +384,7 @@ class ConfJSON():
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
 			#print season, gender, form.conference.title(), division, swimdate, topTimes
-			confMeet = database.conference(season, gender, form.conference, division, swimdate,
-										   topTimes=topTimes)
+			confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate, top=topTimes)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
@@ -419,75 +395,12 @@ class ConfJSON():
 
 		labeledScores = JSONScores(scores)
 
-		response = {}
+		response = dict()
 		response['individual results'] = labeledScores
 		response['team scores'] = teamScores
 		response['win probability'] = '' #winProb
 
 		return json.dumps(response)
-
-class Times():
-	def GET(self):
-		division = session.division
-		gender = session.gender
-		confList = conferences[division][gender]
-		form = web.input(conference=None, event=None, season=None, _unicode=False)
-		scores = None
-		if form.conference and form.event:
-			season = form.season
-			if form.conference == 'All':
-				teams = []
-				for conference in confList:
-					for team in confList[conference]:
-						teams.append(team)
-			else:
-				teams = confList[form.conference]
-			if form.event == 'All':
-				events = None
-			else:
-				events = [form.event]
-			topTimes = database.topTimes(events=events, teams=teams, gender=gender, season=season)
-			scores = showMeet(topTimes.scoreString(showNum=100, showScores=False, showPlace=True))
-
-		return render.times(conferences=sorted(confList.keys()), events=eventOrder, scores=scores)
-
-class Placing():
-	def GET(self):
-		division = session.division
-		gender = session.gender
-		form = web.input(_unicode=False)
-		if len(form.keys()) == 0:  # initial load
-			confTable = ''
-		else:
-			time = 0
-			event = ''
-			improvement = False
-			for key in form.keys():
-				if key == 'improvement':
-					improvement = True
-				else:
-					try:
-						if 'min' in key:
-							time += 60*int(form[key])
-						elif 'sec' in key:
-							time += int(form[key])
-						elif 'hun' in key:
-							time += .01*int(form[key])
-						elif 'event' in key:
-							event = form[key]
-					except ValueError:
-						pass
-			newSwims = set()
-			if improvement:
-				time *= 0.975
-			newSwims.add((event, time))
-			if len(newSwims) > 0:
-				confPlaces = database.conferencePlace(division=division, gender=gender, newSwims=newSwims, year=2014)
-				confTable = showConf(confPlaces, newSwims)
-			else:
-				confTable = ''
-
-		return render.placing(conferences=confTable, events=eventOrder)
 
 class Improvement():
 	def GET(self):
@@ -508,12 +421,12 @@ class Improvement():
 		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
-			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		elif form.season == 'All':
 			season1 = season
 			season2 = season - 3
-			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		else:
 			table = None
@@ -539,11 +452,11 @@ class ImprovementJSON():
 		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
-			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		elif form.season == 'All':
 			season1 = season
 			season2 = season - 3
-			teamImp = database.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		else:
 			teamImp = None
 
@@ -657,9 +570,12 @@ class Programs():
 		else:
 			teams = allTeams[gender][division]
 
+		print allTeams
+
 		# yearly discount for team score weighted average
 		discount = .9
 		for team in teams:
+			print team
 			# get data from teamseason from 2010 to last full season
 			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
 				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
@@ -669,6 +585,7 @@ class Programs():
 				if stats.strengthinvite and stats.attrition and stats.improvement:
 					if team not in teamStr:
 						teamStr[team], teamAttrition[team], teamImprovement[team] = [], [], []
+					print teamStr
 					teamStr[team].append(stats.strengthinvite)
 					teamAttrition[team].append(stats.attrition)
 					teamImprovement[team].append(stats.improvement)
@@ -767,7 +684,7 @@ class SeasonRankings():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		oldTopTeams = database.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+		oldTopTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		rank = showRank(oldTopTeams)
 		return render.preseason(rank)
@@ -777,7 +694,7 @@ class SeasonRankingsJSON():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		topTeams = database.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+		topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		response = {}
 		for idx, team in enumerate(topTeams):
@@ -973,7 +890,7 @@ class Swimmerstats():
 		if form.conference=='All':
 			form.conference = None
 
-		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
+		swimmers = sqlmeets.swimmerRank(division=division, gender=gender, season=form.season, num=5,
 										conference=form.conference)
 		#print swimmers
 		html = ''
@@ -1007,7 +924,7 @@ class SwimmerstatsJSON():
 		if form.conference=='All':
 			form.conference = None
 
-		swimmers = database.swimmerRank(division=division, gender=gender, season=form.season, num=5,
+		swimmers = sqlmeets.swimmerRank(division=division, gender=gender, season=form.season, num=5,
 										conference=form.conference)
 		swimmersJSON = {}
 
@@ -1018,7 +935,7 @@ class SwimmerstatsJSON():
 				swimmersJSON[swimmer.name]['swims'][swim.event] = {'time': swimTime(swim.time), 'powerpoints': str(
 					round(swim.getPPTs()))}
 
-		print swimmersJSON
+		#print swimmersJSON
 
 		return json.dumps(swimmersJSON)
 

@@ -49,7 +49,7 @@ eventConvert = {'1650 Free': '1650 Yard Freestyle',
 eventConvertRev = {v: k for k, v in eventConvert.iteritems()}
 
 badEventMap = {
- '100 Backstroke': '100 Back',
+ '100 Yard Backstroke': '100 Back',
  '1650 Freestyle': '1650 Free',
  '200 Butterfly': '200 Fly',
  '500 Freestyle': '500 Free',
@@ -60,6 +60,7 @@ badEventMap = {
  '200 Freestyle': '200 Free',
  '50 Freestyle': '50 Free',
  '200 Backstroke': '200 Back',
+ '100 Backstroke': '100 Back',
  '100 Freestyle': '100 Free',
  '100 Breastroke': '100 Breast',
  '200 Breastroke': '200 Breast',
