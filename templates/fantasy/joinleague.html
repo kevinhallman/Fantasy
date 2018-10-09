@@ -1,0 +1,15 @@
+$def with (leagues)
+
+<h1>
+	League
+</h1>
+
+<button>Create New League</button>
+<h3>Join League</h3>
+$for league, leagueid in leagues:
+	<p>$league</p>
+	<form action="/league" method="POST">
+  		Team Name: <input type="text" name="teamname"><br>
+  		<input type="submit" value="Join" name="join">
+		<input type="text" value="$leagueid" name="leagueid" hidden>
+	</form>

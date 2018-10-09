@@ -1,8 +1,10 @@
 $def with (content)
 
-<!DOCTYPE html>
 <html>
 	<head>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.6.3.min.js"></script>
+		<script type="text/javascript" src="/static/jquery.tablesorter.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/fantasy.css">
 		<link rel="icon" href="/static/swimswam.png">
 
 		<title>Fantasy Swimming</title>
@@ -11,25 +13,16 @@ $def with (content)
 	</head>
 
 	<body>
-	<div class="container">
-		<div class="sidebar">
-			<ul id="gender">
-				<li id="Women"><span>Women</span></li>
-				<li id="Men"><span>Men</span></li>
-			</ul>
-			<ul id="division">
-				<li id="D1"><span>D1</span></li>
-				<li id="D2"><span>D2</span></li>
-				<li id="D3"><span>D3</span></li>
-			</ul>
-		</div>
-
 		<div class="header">
 			<ul class="bannerList">
 				<li value=1 ><a href="/">Home</a></li>
-				<li value=2 ><a href="/team">My Team</a> </li>
+				<li value=2 ><a href="/myteams">My Teams</a> </li>
+				<li value=2 ><a href="/roster">My Roster</a> </li>
+				<li value=4 ><a href="/matchup">Matchup</a></li>
 				<li value=3 ><a href="/swimmers">Swimmers</a></li>
-				<li value=4 ><a href="/league">League</a></li>
+				<li value=4 ><a href="/standings">Standings</a></li>
+				<li value=4 ><a href="/join">Create/Join League</a></li>
+				<li value=4 ><a href="/logout">Logout</a></li>
 			</ul>
 		</div>
 

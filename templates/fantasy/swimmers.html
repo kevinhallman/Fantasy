@@ -1,0 +1,19 @@
+$def with (content)
+<script type="text/javascript">
+	\$(document).ready(function() {
+
+		\$("button").click(function( event) {  //post data to add swimmer
+			$$.post('swimmers', {'swimmer': this.id}, function() {})
+		});
+
+   		// sort the table
+        \$(".fantasyswimmers").tablesorter();
+	});
+	//
+</script>
+
+<h1>
+	Swimmers
+</h1>
+
+$:content

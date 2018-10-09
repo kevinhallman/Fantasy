@@ -1,0 +1,32 @@
+$def with(months, meet='', bench='', team_scores='', score_breakdown='')
+
+<h1>Weekly Results</h1>
+
+<form>
+	Week:
+	<select name="month">
+	$for month in months:
+		<option>$month</option>
+	</select>
+	<input id="swim" type="submit" value="Switch Week">
+</form>
+
+<div id="results">
+<div id="scoreTable" class="scores">
+$if meet:
+	$:meet
+</div>
+
+<div id="report" class="scores">
+$if score_breakdown:
+	$:score_breakdown
+</div>
+
+<div id="finalScores" class="scores">
+$if team_scores:
+	$:team_scores
+</div>
+</div>
+
+<h2>Bench</h2>
+$:bench

@@ -1,0 +1,14 @@
+$def with (content)
+
+<script type="text/javascript">
+	\$(document).ready(function() {
+		\$("button").click(function( event) {  //handles switching the summary type
+			$$.post('swimmers', {'swimmer': this.id, 'drop':true}, function() {})
+		});
+	});
+</script>
+
+$:content
+
+$if content=='':
+	<h1> No team selected</h1>
