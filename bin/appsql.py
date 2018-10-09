@@ -95,7 +95,7 @@ app.add_processor(connection_processor)
 
 (conferences, allTeams) = sqlmeets.getConfs()
 
-currentSeason = 2018
+currentSeason = 2019
 
 # appends the gender and division to the URL and allows them to be changed via there as well
 def setGenDiv(gender, division):
@@ -418,7 +418,7 @@ class Improvement():
 		else:
 			return render.improvement(conferences=sorted(confList.keys()), table=None)
 
-		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
+		if int(form.season) in range(2013, currentSeason+1):
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)

@@ -8,6 +8,7 @@ accepts most parms USASwimming does: https://legacy.usaswimming.org/DesktopDefau
 import requests
 import re
 import os
+import argparse
 
 # converts to a time in seconds
 def toTime(time):
@@ -92,7 +93,7 @@ def getTopTimes(file, conference="", team='radAllTeam', date='30', distance='50'
 		EDValid = ED + '-00-00-00'
 
 	# translate the year being used
-	dateDict = {'18 DI': '46', '18 DII': '47', '18 DIII': '48',
+	dateDict = {'19 DI':'53', '19 DII': '54', '19 DIII': '55', '18 DI': '46', '18 DII': '47', '18 DIII': '48',
 				'17 DI': '42', '17 DII': '43', '17 DIII': '44', '16 DI': '37', '16 DII': '38', '16 DIII': '39',
 				'15 DIII': '35', '14 DIII': '31', '13 DIII': '27', '12 DIII': '22', '11 DIII': '8', '15 DI': '33',
 				'14 DI': '30', '13 DI': '25', '12 DI': '20', '11 DI': '7', '10 DI': '4', '09 DI': '5', '08 DI': '6',
@@ -324,11 +325,13 @@ def getConfs():
 				confTeams[division][gender][year][team] = conf
 	return confTeams
 
+
 def topTimesLoop():
+	best_all = 'all'  #'best'
 	confDiv = getConfs()
 	genders = ['f', 'm']
-	divisions = ['DI']
-	distances = {}
+	divisions = ['DIII']
+	distances = dict()
 	distances['FL'] = [100, 200]
 	distances['BK'] = [100, 200]
 	distances['BR'] = [100, 200]
@@ -337,9 +340,9 @@ def topTimesLoop():
 	distances['FR-R'] = [200, 400, 800]
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	conferences = ['']
-	years = ['18']#c,'17','16','15','14','13','12','11','10']
+	years = ['19']#c,'17','16','15','14','13','12','11','10']
 
-	directory = 'data/ncaa/2018'
+	directory = 'data/ncaa/2019'
 	for year in years:
 		for division in divisions:
 			if division == 'DI':
@@ -349,7 +352,10 @@ def topTimesLoop():
 			else:
 				divNum = 'D3'
 			for gender in genders:
-				filePath = directory + '/' + division + year + gender + 'best'
+				if best_all=='all':
+					filePath = directory + '/' + division + year + gender + 'new'
+				else:
+					filePath = directory + '/' + division + year + gender + 'best'
 				oldFilePath = directory + '/' + division + year + gender
 
 				# load old times to prevent dups
@@ -367,7 +373,6 @@ def topTimesLoop():
 							for line in infile:
 								outfile.write(line)
 								oldTimes.add(line)
-								#print 'writing', line
 					os.remove(filePath)
 					print 'removing', filePath
 
@@ -385,7 +390,7 @@ def topTimesLoop():
 
 								# now find the times and load them into the new file if they aren't in the old
 								print getTopTimes(file=meetFile, date=year+' '+division, distance=distance,
-										stroke=stroke, gender=gender, conference=conference, bestAll='best',
+										stroke=stroke, gender=gender, conference=conference, bestAll=best_all,
 												  number=7000, oldTimes=oldTimes, year=year)
 
 # get 100 free results for every conference to figure out which teams are in a conference and division
@@ -414,6 +419,7 @@ def scrapeConferenceData(yearNum=18):
 								print getTopTimes(file=meetFile, date=year+' '+division, distance=distance,
 											stroke=stroke, gender=gender, conference=conference, bestAll='best',
 												  number=7000, oldTimes=set(), year=year)
+
 
 # parse data stored from getConferenceData and store conference mapping to a file
 def storeConfs():
@@ -458,6 +464,7 @@ def storeConfs():
 						for team in confs[div][gender][year][conf]:
 							file.write(div+'\t'+gender+'\t'+year+'\t'+conf+'\t'+team+'\n')
 							#print div, gender, year, conf, team.strip()
+
 
 def updateConfs(year=18):
 	scrapeConferenceData(yearNum=year)

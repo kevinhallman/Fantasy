@@ -1,5 +1,6 @@
 import time as Time
 from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, Meet, seasonString, TeamStats, Improvement
+from sqlmeets import update_weekly_stats
 import re
 import os
 import urlparse
@@ -54,10 +55,11 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	teamMeets = []
 	teamMeetKeys = set()
 	swimKeys = set()
-	root = 'data/' + str(loadyear)
+	root = 'data/ncaa/' + str(loadyear)
 	#root = 'data/hs'
 
 	for swimFileName in os.listdir(root):
+		print swimFileName, type
 		if type == 'reload':
 			match = re.search('(\D+)(\d+)([mf])', swimFileName)
 		elif type == 'best':
@@ -67,9 +69,10 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 		if not match:
 			continue
+		print 'match'
 		div, fileyear, gender = match.groups()
-
-		if not (int(fileyear) + 2000 == int(loadyear)):
+		print fileyear, loadyear
+		if not (int(fileyear) == int(loadyear)) - 2000:
 			continue
 
 		confTeams = getNewConfs()
@@ -122,7 +125,11 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				try:
 					conference = confTeams[division][gender][str(season)][team]
 				except KeyError:
-					conference = ''
+					try:
+						# try last year if not found yet
+						conference = confTeams[division][gender][str(season - 1)][team]
+					except KeyError:
+						conference = ''
 
 				if 'Relay' in event: relay = True
 				else: relay = False
@@ -207,7 +214,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 							swimmer.save()
 
 						# incremental load
-						if len(swims) > 1000:
+						if len(swims) > 999:
 							print 'Swims: ', len(swims)
 							print Swim.insert_many(swims).execute()
 							swims = []
@@ -250,10 +257,10 @@ def safeLoad(year=2018, type='new'):
 	updatePowerpoints(year)
 
 	print 'fixing duplicates'
-	fixDupSwimmers(year)
+	#fixDupSwimmers(year)
 
 	print 'refresh view'
-	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
+	#db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
 
 
 def updatePowerpoints(year):
@@ -469,6 +476,7 @@ if __name__ == '__main__':
 	parser.add_argument('-l', '--load', help='year to load in new times')
 	parser.add_argument('-b', '--best', help='year to load in best times')
 	parser.add_argument('-a', '--all', help='year to load in all times')
+	parser.add_argument('-s', '--stats', help='week to update team stats')
 	args = vars(parser.parse_args())
 
 	if args['dups']:
@@ -483,11 +491,15 @@ if __name__ == '__main__':
 	if args['all']:
 		safeLoad(year=args['load'], type='all')
 
-	#fixConfs()
-	#fixDivision()
-	#fixRelays()
-	# migrateImprovement()
-	# addRelaySwimmers()
-	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
+	if args['stats']:
+		for division in ['D1', 'D2', 'D3']:
+			for gender in ['Men', 'Women']:
+				print division, gender
+				update_weekly_stats(week=int(args['stats']), season=2019, division=division, gender=gender)
+
+
+	# fixConfs()
+	# fixDivision()
+	# fixRelays())
 	stop = Time.time()
 	print stop - start
