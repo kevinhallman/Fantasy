@@ -498,7 +498,7 @@ if __name__ == '__main__':
 
 	if args['stats']:
 		for division in ['D1', 'D2', 'D3']:
-			for gender in ['Men', 'Women']:
+			for gender in ['Men' , 'Women']:
 				print division, gender
 				update_weekly_stats(week=int(args['stats']), season=2019, division=division, gender=gender)
 

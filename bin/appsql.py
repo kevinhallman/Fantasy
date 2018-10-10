@@ -570,12 +570,12 @@ class Programs():
 		else:
 			teams = allTeams[gender][division]
 
-		print allTeams
+		#print allTeams
 
 		# yearly discount for team score weighted average
 		discount = .9
 		for team in teams:
-			print team
+			#print team
 			# get data from teamseason from 2010 to last full season
 			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
 				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
@@ -585,7 +585,7 @@ class Programs():
 				if stats.strengthinvite and stats.attrition and stats.improvement:
 					if team not in teamStr:
 						teamStr[team], teamAttrition[team], teamImprovement[team] = [], [], []
-					print teamStr
+					#print teamStr
 					teamStr[team].append(stats.strengthinvite)
 					teamAttrition[team].append(stats.attrition)
 					teamImprovement[team].append(stats.improvement)

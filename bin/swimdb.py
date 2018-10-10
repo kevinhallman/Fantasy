@@ -298,7 +298,7 @@ class TeamSeason(Model):
 
 	'''top expected score for the whole team'''
 	def topTeamScore(self, dual=True, weeksIn=None):
-		print weeksIn
+		#print weeksIn
 		# convert the week to a date
 		startDate = date(self.season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
 		if not weeksIn:
@@ -480,7 +480,6 @@ class TeamSeason(Model):
 		simDate = week2date(weeksIn, self.season)
 
 		scoreDual, scoreInv = None, None
-
 		# check to see if it already exists in db then update
 		try:
 			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
@@ -1529,22 +1528,19 @@ class TempMeet:
 				for swim in self.eventSwims[event]:
 					swim.score = None  # reset score
 					team = swim.getScoreTeam()
-					if swim.place > (len(pointsI)+non_scoring_swims):
+					if swim.place > (len(pointsI) + non_scoring_swims):
 						swim.score = 0
 					elif team in teamSwims and teamSwims[team] >= max:
 						swim.score = 0
 						non_scoring_swims += 1  # keep track of how many swims are over scoring limit per event
 					else:
+						# a tie, average with previous swim's score. If pre swim did not score, then don't
 						if preSwim and swim.place == preSwim.place and preSwim.score > 0:
-							# a tie, average with previous swim's score. If pre swim did not score, then don't
-							if swim.place == 1:
-								preScore = points[swim.place]
-							else:
-								preScore = points[swim.place - 1]
-							if swim.place == len(points):
+							preScore = points[swim.place - 1 - non_scoring_swims]
+							if swim.place >= len(points):
 								score = preScore
 							else:
-								score = (preScore + points[swim.place]) / 2.0
+								score = (preScore + points[swim.place - non_scoring_swims]) / 2.0
 							if score==int(score):
 								score = int(score)
 							swim.score = score
@@ -1693,7 +1689,7 @@ class TempMeet:
 		return self.scores[0][0]
 
 	# update stored win probabilities
-	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False, taper=True):
+	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False, taper=True, verbose=True):
 		weeksOut = 16 - weeksIn
 		date = week2date(weeksIn, season)
 		if nextYear:
@@ -1711,16 +1707,16 @@ class TempMeet:
 						stats.winnats = teamProb[team]
 					else:
 						stats.winconf = teamProb[team]
-					print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
-					print stats.save()
+					if verbose: print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
+					stats.save()
 				except TeamStats.DoesNotExist:
-					print 'New:', team, season, teamProb[team], weeksIn, date
+					if verbose: print 'New:', team, season, teamProb[team], weeksIn, date
 					if nats:
 						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winnats=teamProb[team], date=date)
 					else:
 						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
 			except TeamSeason.DoesNotExist:
-				print 'wrong', team, division, gender, season
+				if verbose: print 'wrong', team, division, gender, season
 
 	'''
 	lists swimmers by team and by points scored
