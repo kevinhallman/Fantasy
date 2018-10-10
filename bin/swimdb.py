@@ -879,7 +879,7 @@ class Swim(Model):
 		cdf = getSkewCDF(self.gender, self.division, self.event)
 		percent = 1 - cdf(self.time)
 		if percent < 0.00000000001 or not percent:
-			print self.time, self.event, self.id
+			#print self.time, self.event, self.id
 			self.powerpoints = 0
 			if save:
 				self.save()
@@ -893,7 +893,7 @@ class Swim(Model):
 			zscore = 0
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
-		print percent, percentileScore, zscore
+		#print percent, percentileScore, zscore
 		self.powerpoints = percentileScore + zscore
 		if self.powerpoints > 2000:  # no bullshit check, Ledecky's 1650 is about 1000
 			self.powerpoints = 0
