@@ -878,12 +878,13 @@ class Swim(Model):
 			return None
 		cdf = getSkewCDF(self.gender, self.division, self.event)
 		percent = 1 - cdf(self.time)
-		if percent==0 or percent==None:
+		if percent < 0.00000000001 or not percent:
 			print self.time, self.event, self.id
 			self.powerpoints = 0
 			if save:
 				self.save()
 			return self.powerpoints
+
 		percentileScore = (1 - percent) * 500
 		powerScore = 1 / percent
 		if zscore:
@@ -892,6 +893,7 @@ class Swim(Model):
 			zscore = 0
 
 		# print self.name, self.event, self.time, percentileScore, powerScore, zscore
+		print percent, percentileScore, zscore
 		self.powerpoints = percentileScore + zscore
 		if self.powerpoints > 2000:  # no bullshit check, Ledecky's 1650 is about 1000
 			self.powerpoints = 0
@@ -1963,9 +1965,3 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
-
-	#ubmc = TeamSeason.get(id=1567)
-
-	#print ubmc.updateSeasonStats()
-
-
