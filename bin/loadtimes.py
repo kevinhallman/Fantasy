@@ -257,10 +257,10 @@ def safeLoad(year=2018, type='new'):
 	updatePowerpoints(year)
 
 	print 'fixing duplicates'
-	#fixDupSwimmers(year)
+	fixDupSwimmers(year)
 
 	print 'refresh view'
-	#db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
+	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
 
 
 def updatePowerpoints(year):
@@ -477,10 +477,15 @@ if __name__ == '__main__':
 	parser.add_argument('-b', '--best', help='year to load in best times')
 	parser.add_argument('-a', '--all', help='year to load in all times')
 	parser.add_argument('-s', '--stats', help='week to update team stats')
+	parser.add_argument('-p', '--points', help='year to update powerpoints')
+
 	args = vars(parser.parse_args())
 
 	if args['dups']:
 		fixDupSwimmers(args['dups'])
+
+	if args['points']:
+		updatePowerpoints(args['points'])
 
 	if args['load']:
 		safeLoad(year=args['load'])
