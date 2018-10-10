@@ -1537,10 +1537,14 @@ class TempMeet:
 					else:
 						if preSwim and swim.place == preSwim.place and preSwim.score > 0:
 							# a tie, average with previous swim's score. If pre swim did not score, then don't
-							if swim.place == len(points):
-								score = points[swim.place - 1]
+							if swim.place == 1:
+								preScore = points[swim.place]
 							else:
-								score = (points[swim.place - 1] + points[swim.place]) / 2.0
+								preScore = points[swim.place - 1]
+							if swim.place == len(points):
+								score = preScore
+							else:
+								score = (preScore + points[swim.place]) / 2.0
 							if score==int(score):
 								score = int(score)
 							swim.score = score
