@@ -574,8 +574,8 @@ class Programs():
 
 		# yearly discount for team score weighted average
 		discount = .9
+		num_seasons = currentSeason - 2010.0
 		for team in teams:
-			#print team
 			# get data from teamseason from 2010 to last full season
 			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
 				TeamSeason.improvement).where(TeamSeason.team==team, TeamSeason.gender==gender,
@@ -589,11 +589,13 @@ class Programs():
 					teamStr[team].append(stats.strengthinvite)
 					teamAttrition[team].append(stats.attrition)
 					teamImprovement[team].append(stats.improvement)
+
 			if team in teamStr:
+				# discount based off of the number of seasons we have data for
 				weights = [pow(discount, n) for n in range(len(teamStr[team]))]
 				teamStr[team] = average(teamStr[team], weights=weights)
-				teamAttrition[team] = average(teamAttrition[team], weights=weights)
-				teamImprovement[team] = average(teamImprovement[team], weights=weights)
+				teamAttrition[team] = average(teamAttrition[team], weights=weights) * (len(teamAttrition[team]) / num_seasons)
+				teamImprovement[team] = average(teamImprovement[team], weights=weights) * (len(teamImprovement[team]) / num_seasons)
 
 		teamRank = {}
 		for dict in [teamStr, teamAttrition, teamImprovement]:
@@ -633,6 +635,7 @@ class ProgramsJSON():
 
 		# yearly discount for team score weighted average
 		discount = .9
+		num_seasons = currentSeason - 2010.0
 		for team in teams:
 			# get data from teamseason from 2010 to last full season
 			for stats in TeamSeason.select(TeamSeason.strengthinvite, TeamSeason.attrition,
@@ -649,8 +652,8 @@ class ProgramsJSON():
 			if team in teamStr:
 				weights = [pow(discount, n) for n in range(len(teamStr[team]))]
 				teamStr[team] = average(teamStr[team], weights=weights)
-				teamAttrition[team] = average(teamAttrition[team], weights=weights)
-				teamImprovement[team] = average(teamImprovement[team], weights=weights)
+				teamAttrition[team] = average(teamAttrition[team], weights=weights) * (len(teamAttrition[team]) / num_seasons)
+				teamImprovement[team] = average(teamImprovement[team], weights=weights) * (len(teamImprovement[team]) / num_seasons)
 
 		teamRank = {}
 		for dict in [teamStr, teamAttrition, teamImprovement]:

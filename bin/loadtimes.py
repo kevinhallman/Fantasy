@@ -287,7 +287,7 @@ def mergeTeams(sourceTeamId, targetTeamId):
 		swimmer.team = targetTeam.id
 		try:
 			targetSwimmer = Swimmer.get(gender=targetTeam.gender, season=targetTeam.season, name=swimmer.name,
-									teamid=targetTeam)
+									team=targetTeam)
 			mergeSwimmers(swimmer, targetSwimmer)
 		except Swimmer.DoesNotExist:
 			swimmer.save()
@@ -298,7 +298,15 @@ def mergeTeams(sourceTeamId, targetTeamId):
 			swim.season = targetTeam.season
 			if swim.relay:  # change relay names
 				swim.name = targetTeam.team + ' Relay'
-			swim.save()
+
+			query = Swim.select(Swim.name==swim.name, Swim.event==swim.event, Swim.date==swim.date,
+								Swim.time==swim.time)
+
+			if query.exists():
+				print 'delete', swim.name, swim.event, swim.date, swim.time
+				swim.delete()
+			else:
+				swim.save()
 
 	# now switch the meet linking table
 	for teammeet in TeamMeet.select().where(TeamMeet.team==sourceTeam.id):
@@ -433,6 +441,59 @@ def fixDupSwimmers(season=2018):
 			else:
 				mergeSwimmers(swim.swimmer1, swim.swimmer2)
 
+def fix_dup_teams():
+	# find teams that have more than three matching swimmers, three trasnfers to same team unlikely
+	teams_merged = set()
+	for team in TeamSeason.raw('SELECT s.count,s.team1, ts1.strengthinvite as str1, s.team2,ts2.strengthinvite as str2 '
+		'FROM ( '
+			'SELECT count(s1.id), s1.team_id AS team1, s2.team_id AS team2 '
+			'FROM swimmer s1, swimmer s2 '
+			'WHERE s1.team_id!=s2.team_id and s1.name=s2.name and s1.season=s2.season and s1.gender=s2.gender '
+			'GROUP BY s1.team_id, s2.team_id '
+			') AS s '
+		'INNER JOIN teamseason ts1 ON S.team1 = ts1.id '
+		'INNER JOIN teamseason ts2 ON S.team2 = ts2.id '
+		'WHERE count>2 ORDER BY count DESC'):
+
+		# make sure we don't try and delete the reverse
+		print teams_merged
+		print team.team1, team.str1, team.team2, team.str2
+		if team.team1 in teams_merged or team.team2 in teams_merged:
+			continue
+		teams_merged.add(team.team1)
+		teams_merged.add(team.team2)
+
+
+		# merge into the team with higher score
+		if team.str1 > team.str2:
+			mergeTeams(team.team2, team.team1)
+		elif team.str1 < team.str2:
+			mergeTeams(team.team1, team.team2)
+		else:  # same score, use higher id meaning newer
+			if team.team1 > team.team2:
+				mergeTeams(team.team2, team.team1)
+			else:
+				mergeTeams(team.team1, team.team2)
+
+def delete_nulls():
+	pass
+	'''
+	DELETE from swimmer sw WHERE sw.id IN
+	(SELECT r.id FROM swimmer r
+	LEFT OUTER JOIN swim m ON m.swimmer_id=r.id WHERE m.id IS NULL);
+
+	DELETE from teamstats ts WHERE ts.teamseasonid_id IN
+	(SELECT r.id FROM teamseason r
+	LEFT OUTER JOIN swimmer m ON m.team_id=r.id WHERE m.id IS NULL);
+
+	DELETE from teammeet tm WHERE tm.team_id IN
+	(SELECT r.id FROM teamseason r
+	LEFT OUTER JOIN swimmer m ON m.team_id=r.id WHERE m.id IS NULL);
+
+	DELETE from teamseason ts WHERE ts.id IN
+	(SELECT r.id FROM teamseason r
+	LEFT OUTER JOIN swimmer m ON m.team_id=r.id WHERE m.id IS NULL);
+	'''
 
 def fixMeetNames():
 	for char in ['+', '@', '&']:
@@ -451,7 +512,6 @@ def fixMeetNames():
 
 			meet.meet = newName
 			meet.save()
-
 
 def badTimes():
 	for event in eventConvert:
@@ -505,6 +565,6 @@ if __name__ == '__main__':
 
 	# fixConfs()
 	# fixDivision()
-	# fixRelays())
+	fix_dup_teams()
 	stop = Time.time()
 	print stop - start

@@ -1,15 +1,10 @@
 from peewee import *
-import os
-import re
+import os, heapq, urlparse, numpy as np
 from datetime import date, timedelta
 import time as Time
-import urlparse
 from playhouse.migrate import *
 from math import log
 from scipy.stats import norm, truncnorm, skewnorm, linregress
-import numpy as np
-import heapq
-from operator import itemgetter
 from sympy import binomial
 #import matplotlib.pyplot as plt
 from events import eventsDualS, eventsChamp, allEvents, eventConvert
@@ -212,7 +207,15 @@ class TeamSeason(Model):
 			return TeamSeason.get(TeamSeason.team==self.team, TeamSeason.gender==self.gender,
 						   TeamSeason.division==self.division, TeamSeason.season==self.season-yearsBack)
 		except TeamSeason.DoesNotExist:
-			return
+			try:
+				if self.gender == 'Men':
+					gender_str = ' (M)'
+				else:
+					gender_str = ' (W)'
+				return TeamSeason.get(TeamSeason.team==self.team + gender_str, TeamSeason.gender==self.gender,
+						   TeamSeason.division==self.division, TeamSeason.season==self.season-yearsBack)
+			except TeamSeason.DoesNotExist:
+				return
 
 	def getTaperStats(self, weeks=12, yearsback=1, toptime=True):
 		lastSeason = self.getPrevious(yearsBack=yearsback)
@@ -316,9 +319,9 @@ class TeamSeason(Model):
 
 		topMeet.topEvents(teamMax=17, indMax=3)
 		if dual:
-			scores = topMeet.expectedScores(swimmers=6, division=self.division)
+			scores = topMeet.expectedScores(swimmers=6, division=str(self.division))
 		else:
-			scores = topMeet.expectedScores(swimmers=16, division=self.division)
+			scores = topMeet.expectedScores(swimmers=16, division=str(self.division))
 
 		if self.team in scores:
 			return scores[self.team]
@@ -337,8 +340,15 @@ class TeamSeason(Model):
 			query = Swim.raw("SELECT time, event, gender, name, division, season, year, team, meet, date, team_id "
 						"FROM top_swim WHERE team_id=%s  ", self.id)
 		else:
-			query = Swim.raw("SELECT time, event, gender, name, division, season, year, team, meet, date, team_id "
-						"FROM top_swim WHERE team_id=%s and date < %s ", self.id, dateStr)
+			query = Swim.raw("SELECT event, time, rank, name, meet, team, year, swimmer_id, season, gender, division, date FROM "
+			"(SELECT swim.name, time, event, meet, swim.team, sw.year, swimmer_id, ts.season, sw.gender, ts.division, date, rank() "
+			"OVER (PARTITION BY swim.name, event, ts.id ORDER BY time, date) "
+			"FROM (swim "
+				"INNER JOIN swimmer sw ON swim.swimmer_id=sw.id "
+				"INNER JOIN teamseason ts ON sw.team_id=ts.id) "
+				"WHERE ts.id=%s and swim.date<%s "
+			") AS a "
+			"WHERE a.rank=1",self.id, dateStr)
 
 		newMeet = TempMeet()
 		for swim in query:
@@ -451,12 +461,10 @@ class TeamSeason(Model):
 			print self.id, dropRate
 
 	def getImprovement(self, update=False):
+		avgImp = 0
 		for teamImp in Improvement.select(fn.avg(Improvement.improvement)).where(Improvement.team==self.team,
-				Improvement.gender==self.gender, Improvement.division==self.division,
-																			  Improvement.toseason==self.season):
+			Improvement.gender==self.gender, Improvement.division==self.division, Improvement.toseason==self.season):
 			avgImp = teamImp.avg
-		if not avgImp:
-			avgImp = 0
 		if update:
 			self.improvement = avgImp
 			self.save()
