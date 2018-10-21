@@ -652,7 +652,7 @@ class ProgramsJSON():
 			if team in teamStr:
 				weights = [pow(discount, n) for n in range(len(teamStr[team]))]
 				teamStr[team] = average(teamStr[team], weights=weights)
-				teamAttrition[team] = average(teamAttrition[team], weights=weights) * (len(teamAttrition[team]) / num_seasons)
+				teamAttrition[team] = average(teamAttrition[team], weights=weights) #* (len(teamAttrition[team]) / num_seasons)
 				teamImprovement[team] = average(teamImprovement[team], weights=weights) * (len(teamImprovement[team]) / num_seasons)
 
 		teamRank = {}
