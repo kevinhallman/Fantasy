@@ -59,7 +59,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	#root = 'data/hs'
 
 	for swimFileName in os.listdir(root):
-		print swimFileName, type
 		if type == 'reload':
 			match = re.search('(\D+)(\d+)([mf])', swimFileName)
 		elif type == 'best':
@@ -69,13 +68,12 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 
 		if not match:
 			continue
-		print 'match'
 		div, fileyear, gender = match.groups()
-		print fileyear, loadyear
 		if not (int(fileyear) == int(loadyear)) - 2000:
 			continue
 
 		confTeams = getNewConfs()
+		print swimFileName
 
 		with open(root + '/' + swimFileName) as swimFile:
 			if div == 'DI':
