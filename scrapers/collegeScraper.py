@@ -330,7 +330,7 @@ def topTimesLoop():
 	best_all = 'all'  #'best'
 	confDiv = getConfs()
 	genders = ['f', 'm']
-	divisions = ['DIII']
+	divisions = ['DI', 'DII', 'DIII']
 	distances = dict()
 	distances['FL'] = [100, 200]
 	distances['BK'] = [100, 200]
@@ -340,7 +340,7 @@ def topTimesLoop():
 	distances['FR-R'] = [200, 400, 800]
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	conferences = ['']
-	years = ['19']#c,'17','16','15','14','13','12','11','10']
+	years = ['19'] #c,'17','16','15','14','13','12','11','10']
 
 	directory = 'data/ncaa/2019'
 	for year in years:
