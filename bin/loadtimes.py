@@ -59,7 +59,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 	#root = 'data/hs'
 
 	for swimFileName in os.listdir(root):
-		if type == 'reload':
+		if type == 'all':
 			match = re.search('(\D+)(\d+)([mf])', swimFileName)
 		elif type == 'best':
 			match = re.search('(\D+)(\d+)([mf])best', swimFileName)
