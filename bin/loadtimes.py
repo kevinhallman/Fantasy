@@ -101,6 +101,9 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 				if name == '&nbsp;' or team=='&nbsp;':  # junk data
 					continue
 
+				if meet=='Youth Olympic Games Buenos Aires 2018':
+					continue
+
 				# convert bad event names
 				if event in badEventMap:
 					event = badEventMap[event]
