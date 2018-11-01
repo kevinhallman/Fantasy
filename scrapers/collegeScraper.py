@@ -231,6 +231,7 @@ def getTopTimes(file, conference="", team='radAllTeam', date='30', distance='50'
 	count = 0
 	event = str(distance) + ' ' + strokeOut
 	num = 0
+	num_new = 0
 
 	# parse the individual times looping through the html
 	# there is so much extra junk in the html this is faster than fully parsing
@@ -268,6 +269,7 @@ def getTopTimes(file, conference="", team='radAllTeam', date='30', distance='50'
 				# print timeString
 				timeString = timeString.encode('ascii', 'ignore')
 				if timeString not in oldTimes:
+					num_new += 1
 					file.write(timeString)
 	# parse relays
 	elif relInd=='rbRelay':
@@ -300,8 +302,10 @@ def getTopTimes(file, conference="", team='radAllTeam', date='30', distance='50'
 					timeString = meet+'\t'+date+'\t'+swimmer+'\t'+year+'\t'+team+'\t'+genderOut+'\t'+event+'\t'+time+'\n'
 				timeString = timeString.encode('ascii', 'ignore')
 				if timeString not in oldTimes:
+					num_new += 1
 					file.write(timeString)
 
+	print 'total new', num_new
 	return num
 
 # pull team/conference info from file
