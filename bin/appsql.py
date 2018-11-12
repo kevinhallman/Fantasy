@@ -408,7 +408,7 @@ class Improvement():
 		setGenDiv(form.gender, form.division)
 		division = session.division
 		gender = session.gender
-		season = 2017
+		season = currentSeason - 1
 		confList = conferences[division][gender]
 
 		if form.conference in confList:
@@ -418,7 +418,7 @@ class Improvement():
 		else:
 			return render.improvement(conferences=sorted(confList.keys()), table=None)
 
-		if int(form.season) in range(2013, currentSeason+1):
+		if int(form.season) in range(2013, currentSeason):
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
@@ -439,7 +439,7 @@ class ImprovementJSON():
 		web.header("Content-Type", "application/json")
 		division = form.division
 		gender = form.gender
-		season = 2015
+		season = currentSeason - 1
 		confList = conferences[division][gender]
 
 		if form.conference in confList:
@@ -447,9 +447,9 @@ class ImprovementJSON():
 		elif form.conference == 'All':
 			teams = allTeams[gender][division]
 		else:
-			return []
+			return {}
 
-		if form.season in {'2017', '2016', '2015', '2014', '2013'}:
+		if int(form.season) in range(2013, currentSeason):
 			season1 = int(form.season)
 			season2 = int(form.season) - 1
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
@@ -458,7 +458,7 @@ class ImprovementJSON():
 			season2 = season - 3
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		else:
-			teamImp = None
+			return {}
 
 		jsonImp = {}
 		for team in teamImp:
