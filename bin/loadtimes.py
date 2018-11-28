@@ -1,10 +1,11 @@
 import time as Time
-from swimdb import Swim, TeamMeet, TeamSeason, Swimmer, toTime, Meet, seasonString, TeamStats, Improvement
+from swimdb import Swim, TeamSeason, Swimmer, toTime, Meet, seasonString, TeamStats
 from sqlmeets import update_weekly_stats, date2week
 import re
 import os
 import urlparse
 import peewee
+import playhouse.migrate as mig
 import argparse
 from events import badEventMap, eventConvert
 
@@ -43,17 +44,13 @@ def getNewConfs():
 load in new swim times
 can load in to all SQL tables if params are true
 '''
-def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, loadTeamMeets=False, loadyear=2015,
+def load(loadTeams=False, loadSwimmers=False, loadSwims=False, loadyear=2019,
 		 type='new'):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
 	newTeams = []
 	teamKeys = set()
-	meets = []
-	meetKeys = set()
-	teamMeets = []
-	teamMeetKeys = set()
 	swimKeys = set()
 	root = 'data/ncaa/' + str(loadyear)
 	#root = 'data/hs'
@@ -139,7 +136,7 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 					name = team + ' Relay'
 					year = ''
 
-				# now check for existance and load in chunks for performance
+				# now check for existence and load in chunks for performance
 				if loadTeams:
 					key = str(season) + team + gender + division
 					if not key in teamKeys:  # try each team once
@@ -151,18 +148,8 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 								gender, 'division': division}
 							newTeams.append(newTeam)
 
-				if loadMeets:
-					key = str(season) + meet + gender
-					if not key in meetKeys:
-						meetKeys.add(key)  # try each meet once
-
-						query = Meet.select().where(Meet.meet==meet, Meet.season==season, Meet.gender==gender)
-						if not query.exists():
-							newMeet = {'season': season, 'gender': gender, 'meet': meet, 'date': swimDate}
-							meets.append(newMeet)
-
 				if loadSwimmers:
-					key = str(season) + name + str(team) + gender
+					key = str(season) + name + str(team) + gender + division
 					if not key in swimmerKeys:
 						swimmerKeys.add(key)
 						teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
@@ -180,19 +167,6 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 									print swimmer.year, year, swimmer.id
 									swimmer.year = year
 									swimmer.save()
-
-				if loadTeamMeets:
-					key = str(season) + meet + gender + team
-					if not key in teamMeetKeys:
-						teamMeetKeys.add(key)
-						meetID = Meet.get(Meet.meet==meet, Meet.season==season, Meet.gender==gender).id
-						teamID = TeamSeason.get(TeamSeason.season==season, TeamSeason.team==team,
-										   TeamSeason.gender==gender, TeamSeason.division==division).id
-						query = TeamMeet.select().where(TeamMeet.meet==meetID, TeamMeet.team==teamID)
-
-						if not query.exists():
-							newTeamMeet = {'meet': meetID, 'team': teamID}
-							teamMeets.append(newTeamMeet)
 
 				if loadSwims:
 					key = name + event + str(time) + str(swimDate)
@@ -226,22 +200,46 @@ def load(loadMeets=False, loadTeams=False, loadSwimmers=False, loadSwims=False, 
 		print 'Teams:', len(newTeams)
 		TeamSeason.insert_many(newTeams).execute()
 
-	if loadMeets and len(meets) > 0:
-		print 'Meets:', len(meets)
-		Meet.insert_many(meets).execute()
-
 	if loadSwimmers and len(swimmers) > 0:
 		print 'Swimmers:', len(swimmers)
 		Swimmer.insert_many(swimmers).execute()
-
-	if loadTeamMeets and len(teamMeets) > 0:
-		print 'Team Meets:', len(teamMeets)
-		TeamMeet.insert_many(teamMeets).execute()
 
 	if loadSwims and len(swims) > 0:
 		print 'Swims: ', len(swims)
 		Swim.insert_many(swims).execute()
 
+
+def new_load(year=2019):
+	Swim.raw('CREATE TEMP TABLE stage_team AS '
+		'SELECT DISTINCT team, gender, division, season, conference FROM swimstaging WHERE season=2019 and new=True')
+
+	Swim.raw('INSERT INTO teamseason (gender, division, team, season, conference) '
+		'SELECT st.gender, st.division, st.team, 2019, st.conference FROM stage_team st '
+		'LEFT OUTER JOIN teamseason ts ON ts.team=st.team and ts.gender=st.gender and ts.season=2019 '
+		'WHERE ts.id IS NULL')
+
+	Swim.raw('CREATE TEMP TABLE stage_swimmer AS '
+		'SELECT season, name, team, gender, division, year, rank FROM '
+		'(SELECT DISTINCT season, name, team, gender, division, year, rank() OVER '
+		'(PARTITION BY name, team, gender, division ORDER BY date) '
+		'FROM swimstaging) AS s WHERE s.rank=1 order by name')
+
+	Swim.raw('INSERT INTO swimmer (name, season, gender, year, team_id) '
+		'SELECT ss.name, 2019, ss.gender, ss.year, ts.id as team_id FROM stage_swimmer ss '
+		'INNER JOIN teamseason ts ON ss.team=ts.team and ss.division=ts.division and ss.gender=ts.gender and '
+			 'ss.season=ts.season '
+		'LEFT OUTER JOIN swimmer sw on sw.name=ss.name and sw.team_id=team_id where sw.id IS NULL')
+
+	Swim.raw('UPDATE swimstaging SET new=False WHERE new=True')
+
+	print 'fixing duplicates'
+	fixDupSwimmers(year)
+
+	print 'Updating powerpoints'
+	updatePowerpoints(year)
+
+	print 'refresh view'
+	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
 
 '''
 loads into tables in order
@@ -249,16 +247,16 @@ loads into tables in order
 def safeLoad(year=2018, type='new'):
 	print 'loading teams...'
 	load(loadTeams=True, loadyear=year, type=type)
-	print 'loading meets and swimmers...'
-	load(loadMeets=True, loadSwimmers=True, loadyear=year, type=type)
-	print 'loading teamMeets and swims...'
-	load(loadTeamMeets=True, loadSwims=True, loadyear=year, type=type)
-
-	print 'Updating powerpoints'
-	updatePowerpoints(year)
+	print 'loading swimmers...'
+	load(loadSwimmers=True, loadyear=year, type=type)
+	print 'loading swims...'
+	load(loadSwims=True, loadyear=year, type=type)
 
 	print 'fixing duplicates'
 	fixDupSwimmers(year)
+
+	print 'Updating powerpoints'
+	updatePowerpoints(year)
 
 	print 'refresh view'
 	db.execute_sql("REFRESH MATERIALIZED VIEW top_swim")
@@ -549,7 +547,8 @@ if __name__ == '__main__':
 		updatePowerpoints(args['points'])
 
 	if args['load']:
-		safeLoad(year=args['load'])
+		new_load(year=args['load'])
+		#safeLoad(year=args['load'])
 
 	if args['best']:
 		safeLoad(year=args['best'], type='best')
@@ -571,6 +570,15 @@ if __name__ == '__main__':
 
 	# fixConfs()
 	# fixDivision()
-	fix_dup_teams()
+	# fix_dup_teams()
+
+	migrator = mig.PostgresqlMigrator(db)
+	with db.transaction():
+		mig.migrate(
+			#migrator.create_table(Swimstaging),
+			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
+			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
+			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
+		)
 	stop = Time.time()
 	print stop - start

@@ -350,7 +350,7 @@ class TeamSeason(Model):
 			") AS a "
 			"WHERE a.rank=1",self.id, dateStr)
 
-		newMeet = TempMeet()
+		newMeet = Meet()
 		for swim in query:
 			swim.gender = self.gender
 			swim.season = self.season
@@ -985,7 +985,10 @@ class Swim(Model):
 		else:
 			name = self.name
 		if self.meet:
-			meet = str(self.meet)
+			try:
+				meet = str(self.meet)
+			except:
+				meet = 'unicode error'
 		else:
 			meet = ''
 		if full_event:
@@ -1054,6 +1057,27 @@ class Swim(Model):
 		indexes = ('name', 'meet')
 
 
+class Swimstaging(Model):
+	ukey = CharField(primary_key=True)
+	meet = CharField()
+	date = DateField()
+	season = IntegerField()
+	name = CharField()
+	year = CharField(null=True)
+	team = CharField()
+	gender = CharField()
+	event = CharField()
+	time = FloatField()
+	division = CharField()
+	relay = BooleanField()
+	conference = CharField(null=True)
+	new = BooleanField(default=True)
+
+	class Meta:
+		database = db
+		# unique indexe = ('name', 'event', 'time', 'date')
+
+
 class Improvement(Model):
 	swimmer = ForeignKeyField(Swimmer, null=True)
 	name = CharField()
@@ -1077,17 +1101,7 @@ class Improvement(Model):
 		database = db
 
 
-class Meet(Model):
-	season = IntegerField()
-	meet = CharField()
-	gender = CharField()
-	date = DateField()
-
-	class Meta:
-		database = db
-
-
-class TempMeet:
+class Meet:
 	def __init__(self, name=None, events=list(allEvents), gender=None, topSwim=True, teams=None, season=None):
 		self.gender = gender  # None means both
 		self.teams = []  # teams added as swims are
@@ -1202,7 +1216,7 @@ class TempMeet:
 	'''
 	def topEvents(self, teamMax=17, indMax=3, adjEvents=False, debug=False):
 		self.place()
-		conference = TempMeet()
+		conference = Meet()
 		indSwims = {}
 		teamSwimmers = {}
 		teamDivers = {}
@@ -1715,7 +1729,8 @@ class TempMeet:
 						stats.winnats = teamProb[team]
 					else:
 						stats.winconf = teamProb[team]
-					if verbose: print 'Existing:', team, season, stats.winconf, weeksIn, date, teamSeason.id, stats.id
+					if verbose: print 'Existing:', team, season, stats.winconf, stats.winnats, weeksIn, date, \
+						teamSeason.id, stats.id
 					stats.save()
 				except TeamStats.DoesNotExist:
 					if verbose: print 'New:', team, season, teamProb[team], weeksIn, date
@@ -1833,14 +1848,6 @@ class TempMeet:
 		if not type(s)==type(self):  # not called on a season
 			return False
 		return self.name==s.name and self.date==s.date
-
-
-class TeamMeet(Model):
-	team = ForeignKeyField(TeamSeason)
-	meet = ForeignKeyField(Meet)
-
-	class Meta:
-		database = db
 
 
 class Team(Model):
@@ -1965,6 +1972,8 @@ def testTimePre():
 
 
 if __name__ == '__main__':
+
+	Swimstaging.create_table()
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
