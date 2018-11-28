@@ -26,6 +26,7 @@ else:
 	db = PostgresqlDatabase('swimdb', user='hallmank')
 
 def timetohun(timeStr):
+	#00:08:18.41
 	parts = re.split('[:.]', timeStr)
 	if len(parts) != 4:
 		return None
@@ -35,7 +36,6 @@ def timetohun(timeStr):
 		hun += int(parts[1]) * 100 * 60
 		hun += int(parts[0]) * 100 * 60 * 60
 	return hun
-	#00:08:18.41
 
 def rejectOutliers(dataX, dataY=None, l=5, r=6):
 	u = np.mean(dataX)
@@ -170,12 +170,12 @@ class Worldtimedist(Model):
 	class Meta:
 		database = db
 
-def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False):
+def importSwims():
 	# 9/1 starting date
 	root = 'data/world'
 
 	for fileName in os.listdir(root):
-		if not 'xml' in fileName:
+		if not 'xml' in fileName or not 'Nationals' in fileName:
 			continue
 
 		tree = ET.parse(root + '/' + fileName)
@@ -257,6 +257,10 @@ def importSwims(loadSwims=False, loadSwimmers=False, loadTeams=False):
 						reactiontime = None
 
 					print 'SWIM:', distance, stroke, relay, date, round, place, lane, heat, time, points, reactiontime
+					try:
+						int(heat)
+					except ValueError:
+						heat = 0
 					Worldswim.get_or_create(distance=distance, stroke=stroke, relay=relay, date=date, round=round,
 											place=place, lane=lane, heat=heat, time=time, points=points,
 											reactiontime=reactiontime, swimmer=swimmerID, course=course, meet=meetName)
@@ -473,28 +477,7 @@ def eventDifferences():
 
 	print menCount
 
-
-
-
-
-
-
-if __name__== '__main__':
-	'''
-	db.drop_tables([Worldswim])
-	db.drop_tables([Worldswimmer])
-	db.drop_tables([Worldteam])
-	db.create_tables([Worldteam])
-	db.create_tables([Worldswimmer])
-	db.create_tables([Worldswim])
-	'''
-	#importSwims()
-
-	#eventDifferences()
-	saveSkewDist('F', '100 FREE')
-
-	#topstrokes()
-	'''
+def gender_stats():
 	allgenders = []
 	for nation in ['USA','AUS','CHN','GBR','FRA','HUN','SWE','JPN','ITA','RSA','RUS','GER','NED','BRA','DEN','NZL']:
 		team = Worldteam.get(nation=nation)
@@ -509,8 +492,40 @@ if __name__== '__main__':
 			if gender == 'F':
 				gendercounts[idx] += 1
 	percentages = [i/float(len(allgenders)) for i in gendercounts]
-	print percentages
-	'''
+	return percentages
+
+# relative age effect exists?
+def bday_stats():
+	import datetime
+	b_days = []
+	months = {}
+	for i in range(1, 13):
+		months[str(i)] = 0
+	for swimmer in Worldswimmer.select().join(Worldteam).where(Worldteam.nation=='USA', Worldteam.code!='USA'):
+		if int(swimmer.birthdate.year) < 2000: continue
+		#print swimmer.birthdate.year
+		b_days.append((swimmer.birthdate - datetime.date(swimmer.birthdate.year, 1, 1)).days)
+		months[str(swimmer.birthdate.month)] += 1
+
+	import matplotlib.pyplot as plt
+	vals_sort = []
+	keys_sort = []
+	for i in range(1, len(months)+1):
+		vals_sort.append(months[str(i)])
+		keys_sort.append(str(i))
+	plt.bar(range(len(months)), vals_sort, align='center')
+	plt.xticks(range(len(months)), keys_sort)
 
 
+	#plt.hist(b_days, bins=12)
+	plt.show()
+
+if __name__== '__main__':
+	bday_stats()
+	#importSwims()
+
+	#eventDifferences()
+	#saveSkewDist('F', '100 FREE')
+
+	#topstrokes()
 

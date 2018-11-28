@@ -8,7 +8,7 @@ import os, urlparse
 from numpy import percentile, median, mean, std, average
 from peewee import *
 from math import isnan, pow
-from swimdb import Meet, TeamMeet, TeamSeason, Swim, swimTime, db
+from swimdb import TeamSeason, Swim, swimTime, db
 from swimdb import getSkewDist as getSkewDistCollege
 from clubdb import convert, getSkewDist
 from clubdb import db as clubdb
@@ -68,10 +68,12 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 		meets = {}
 	else:
 		meets = []
-	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
-			TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.team==team):
-		newSeason = teamMeet.team.season
-		newMeet = teamMeet.meet.meet
+	#for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
+	#		TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.team==team):
+	for swim in Swim.select(Swim.meet, Swim.season).distinct().where(
+			Swim.division==division, Swim.gender==gender, Swim.team==team):
+		newSeason = swim.season
+		newMeet = swim.meet
 		newMeet.strip()
 
 		if newSeason not in meets and not season:
@@ -418,14 +420,14 @@ class Improvement():
 		else:
 			return render.improvement(conferences=sorted(confList.keys()), table=None)
 
-		if int(form.season) in range(2013, currentSeason):
-			season1 = int(form.season)
-			season2 = int(form.season) - 1
-			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
-			table = googleCandle(teamImp)
-		elif form.season == 'All':
+		if form.season == 'All':
 			season1 = season
 			season2 = season - 3
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+			table = googleCandle(teamImp)
+		elif int(form.season) in range(2013, currentSeason):
+			season1 = int(form.season)
+			season2 = int(form.season) - 1
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 			table = googleCandle(teamImp)
 		else:
@@ -449,13 +451,13 @@ class ImprovementJSON():
 		else:
 			return {}
 
-		if int(form.season) in range(2013, currentSeason):
-			season1 = int(form.season)
-			season2 = int(form.season) - 1
-			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
-		elif form.season == 'All':
+		if form.season == 'All':
 			season1 = season
 			season2 = season - 3
+			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
+		elif int(form.season) in range(2013, currentSeason):
+			season1 = int(form.season)
+			season2 = int(form.season) - 1
 			teamImp = sqlmeets.getImprovement(gender=gender, season1=season1, season2=season2, teams=teams)
 		else:
 			return {}

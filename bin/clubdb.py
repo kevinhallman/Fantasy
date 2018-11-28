@@ -160,6 +160,7 @@ def saveSkewDist(gender, age, event, course='LCM', plot=False, year=None, getsta
 			plt.plot(bins, y)
 			plt.show()
 			return
+
 		newDist = Clubtimedist(gender=gender, age=age, course=course, event=event, a=a, mu=mu, sigma=sigma, year=year)
 		newDist.save()
 		return newDist
@@ -1352,18 +1353,31 @@ def testTimePre(limit=100):
 	print '2flat', np.mean(avgFlatMisses), np.std(avgFlatMisses)
 	print 'combine', np.mean(combinedMisses), np.std(combinedMisses)
 
-if __name__== '__main__':
-	#for age in range(20, 21):
-	#	for year in range(2007, 2015):
-	#		safeImport(age=age, year=year, load_course='SCY')
-	#		safeImport(age=age, year=year, load_course='LCM')
+# at what age do people get fast?
+def top_year_rank(name):
+	age_rank = {}
+	for swimmer in Clubswimmer.select().where(Clubswimmer.name==name, Clubswimmer.age>14).order_by(Clubswimmer.age):
+		age_rank[swimmer.age] = None
+		for swim in Clubswim.select(fn.min(Clubswim.time), Clubswim.event, Clubswim.team).where(
+				Clubswim.swimmer==swimmer, Clubswim.course=='LCM').group_by(Clubswim.event, Clubswim.team):
+			print swimmer.age, swim.team.season
+			print swim.event, swim.min
+			for time in Clubswim.raw("select count(*) from clubswim, clubswimmer, clubteam where event=%s and time<%s "
+							"and clubswim.swimmer_id=clubswimmer.id and clubswim.team_id=clubteam.id "
+							"and course='LCM' and age=%s and clubteam.season=%s",
+									 swim.event, swim.min, swimmer.age, swim.team.season):
+				count = time.count
+				print 'place', count
 
-	#print testTimePre()
-	#mark = Clubswimmer.get(id=4487181)
-	#mark.similarSwimmers(search=2000, limit=10)
+			print count
+			if not age_rank[swimmer.age] or age_rank[swimmer.age] > count:
+				age_rank[swimmer.age] = count
+			print swim.min, swim.event, swimmer.name, count
 
-	#showAttrition()
-	#showAgeCurves(age=16)
+	for age in age_rank:
+		print age, age_rank[age]
+
+def record_prediction():
 	import matplotlib.pyplot as plt
 	gender = 'Women'
 	records = {}
@@ -1396,11 +1410,23 @@ if __name__== '__main__':
 		mu = np.median(times)
 		sigma = np.std(times)
 		n, bins, patches = plt.hist(times, 60, normed=1)
-		#plt.show()
+		plt.show()
 		print event, swimTime(mu), sigma, norm.cdf(record, loc=mu, scale=sigma), top/float(sample), num
-		#'''
 
+if __name__== '__main__':
+	#for age in range(20, 21):
+	#	for year in range(2007, 2015):
+	#		safeImport(age=age, year=year, load_course='SCY')
+	#		safeImport(age=age, year=year, load_course='LCM')
 
+	#print testTimePre()
+	#mark = Clubswimmer.get(id=4487181)
+	#mark.similarSwimmers(search=2000, limit=10)
+
+	#showAttrition()
+	#showAgeCurves(age=16)
+	#top_year_rank('Adrian, Nathan')
+	record_prediction()
 
 
 
