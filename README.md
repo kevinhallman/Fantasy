@@ -1,35 +1,10 @@
-# python-getting-started
+# swimulator application
 
-A barebones Python app, which can easily be deployed to Heroku.
+A web.py application to display swimming analysis and simulations.
 
-This application support the [Getting Started with Python on Heroku](https://devcenter.heroku.com/articles/getting-started-with-python) article - check it out.
+swiddb is the associated postgres database
+bin/appsql.py is the web application. Run via python bin/appsql.py
+bin/clubdb.py, swimdb.py, and sqlmeets.py contain the data models and analysis
+bin/loadtimes.py loads new times into the database
 
-## Running Locally
-
-Make sure you have Python [installed properly](http://install.python-guide.org).  Also, install the [Heroku Toolbelt](https://toolbelt.heroku.com/).
-
-```sh
-$ git clone git@github.com:heroku/python-getting-started.git
-$ cd python-getting-started
-$ pip install -r requirements.txt
-$ python manage.py syncdb
-$ foreman start web
-```
-
-Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-## Deploying to Heroku
-
-```sh
-$ heroku create
-$ git push heroku master
-$ heroku run python manage.py syncdb
-$ heroku open
-```
-
-## Documentation
-
-For more information about using Python on Heroku, see these Dev Center articles:
-
-- [Python on Heroku](https://devcenter.heroku.com/categories/python)
-
+data folder contains swimming data to be loaded in bia loadtimes.py, worlddb.py, and clubbd.py corresponding to college meets, international meets, and USA club meets respectively
