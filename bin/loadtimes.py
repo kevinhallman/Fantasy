@@ -44,8 +44,7 @@ def getNewConfs():
 load in new swim times
 can load in to all SQL tables if params are true
 '''
-def load(loadTeams=False, loadSwimmers=False, loadSwims=False, loadyear=2019,
-		 type='new'):
+def load(loadTeams=False, loadSwimmers=False, loadSwims=False, loadyear=2019, type='new'):
 	swims = []
 	swimmers = []
 	swimmerKeys = set()
@@ -243,7 +242,7 @@ def new_load(year=2019):
 		'INNER JOIN teamseason ts ON ss.team=ts.team and ss.division=ts.division and ss.gender=ts.gender and '
 				   'ss.season=ts.season '
 		'INNER JOIN swimmer sr ON ss.name=sr.name and ts.id=sr.team_id '
-		'LEFT OUTER JOIN swim sw on sw.name=ss.name and sw.event=ss.event and sw.time=ss.time and ss.date=ss.date where sw.id IS NULL')
+		'LEFT OUTER JOIN swim sw on sw.name=ss.name and sw.event=ss.event and sw.time=ss.time and sw.date=ss.date where sw.id IS NULL')
 
 	#Swim.raw('UPDATE swimstaging SET new=False WHERE new=True').execute()
 
