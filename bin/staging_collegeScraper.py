@@ -364,7 +364,7 @@ def clean_data(data):
 # pull team/conference info from file
 def getConfs():
 	confTeams = {}
-	with open('data/conferences.txt', 'r') as file:
+	with open('bin/conferences.txt', 'r') as file:
 		for line in file:
 			parts = re.split('\t', line.strip())
 			division = parts[0]
@@ -449,7 +449,7 @@ def scrapeConferenceData(yearNum=19):
 								print conference
 								print getTopTimes(file=meetFile, date=year+' '+division, distance=distance,
 											stroke=stroke, gender=gender, conference=conference, bestAll='best',
-												  number=7000, oldTimes=set(), season=year)
+												  number=7000, season=year)
 
 
 # parse data stored from getConferenceData and store conference mapping to a file
@@ -497,7 +497,7 @@ def storeConfs():
 							#print div, gender, year, conf, team.strip()
 
 
-def updateConfs(year=18):
+def updateConfs(year=19):
 	scrapeConferenceData(yearNum=year)
 	storeConfs()
 
