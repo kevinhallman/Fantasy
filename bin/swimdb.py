@@ -140,24 +140,20 @@ def date2week(d):
 		season = d.year + 1
 	else:
 		season = d.year
-	startDate = date(season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
+	startDate = date(season - 1, 10, 14)  # use Oct 15 as the start date, prolly good for 2019
 	weeksIn = int((d - startDate).days / 7)
 	return weeksIn
 
 
 '''converts week to a date'''
 def week2date(week, season=None):
+	if not week:
+		return date.today()
 	if not season:
 		season = thisSeason()
 
-	startDate = date(season - 1, 10, 16)  # use Oct 15 as the start date, prolly good for 2017
-
-	if week == None:
-		return date.today()
-
+	startDate = date(season - 1, 10, 14)  # use Oct 15 as the start date, prolly good for 2017
 	simDate = startDate + timedelta(weeks=week)
-	if simDate > date.today():  # can't simulate with future data
-		simDate = date.today()
 
 	return simDate
 
@@ -301,15 +297,7 @@ class TeamSeason(Model):
 
 	'''top expected score for the whole team'''
 	def topTeamScore(self, dual=True, weeksIn=None):
-		#print weeksIn
-		# convert the week to a date
-		startDate = date(self.season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
-		if not weeksIn:
-			simDate = None
-		else:
-			simDate = startDate + timedelta(weeks=weeksIn)
-		if simDate > date.today():  # can't simulate with future data
-			simDate = None
+		simDate = week2date(weeksIn)
 
 		if dual:
 			events = eventsDualS
@@ -486,18 +474,23 @@ class TeamSeason(Model):
 		if not weeksIn:
 			weeksIn = 25
 		simDate = week2date(weeksIn, self.season)
+		if simDate > date.today():
+			print 'future date'
+			return
 
 		scoreDual, scoreInv = None, None
 		# check to see if it already exists in db then update
 		try:
 			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
-			if invite and (stats.strengthinvite is None or update):
+			if invite and (not stats.strengthinvite or update):
 				scoreInv = self.topTeamScore(dual=False, weeksIn=weeksIn)
 				stats.strengthinvite = scoreInv
+				stats.date = simDate
 				if verbose: print self.team, scoreInv
-			if dual and (stats.strengthdual is None or update):
+			if dual and (not stats.strengthdual or update):
 				scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
 				stats.strengthdual = scoreDual
+				stats.date = simDate
 				if verbose: print self.team, scoreDual
 			stats.save()
 		except TeamStats.DoesNotExist:
@@ -520,7 +513,6 @@ class TeamSeason(Model):
 				.where(TeamStats.strengthinvite.is_null(False), TeamStats.teamseasonid==self.id) \
 				.order_by(TeamStats.week.desc()).limit(1):
 				if stats.week < weeksIn or (update and stats.week == weeksIn):
-
 					self.strengthinvite = scoreInv
 					self.save()
 		if scoreDual:
@@ -1173,9 +1165,6 @@ class Meet:
 	def addSwim(self, swim):
 		if not swim.getScoreTeam() in self.teams:
 			self.teams.append(swim.getScoreTeam())
-		if self.name and not self.date or not self.season:  # without a name, its a dummy meet
-			self.date = swim.date
-			self.season= swim.season
 
 		if not swim.event in self.eventSwims:
 			self.eventSwims[swim.event] = []
@@ -1711,15 +1700,22 @@ class Meet:
 		return self.scores[0][0]
 
 	# update stored win probabilities
-	def update(self, weeksIn, division, gender, season, nextYear=False, nats=False, taper=True, verbose=True):
+	def update(self, division, gender, season, nextYear=False, nats=False, taper=True, verbose=True):
+		if self.date:
+			date = self.date
+		else:
+			date = date.today()
+		weeksIn = date2week(date)
 		weeksOut = 16 - weeksIn
-		date = week2date(weeksIn, season)
 		if nextYear:
 			weeksOut = '-1'
 			weeksIn = '-1'
-		self.scoreMonteCarlo(weeksOut=weeksOut, taper=taper)
+
+		self.scoreMonteCarlo(weeksOut=weeksOut, taper=taper, runs=100)
 		teamProb = self.getWinProb()
 		print teamProb
+
+		print weeksIn, date
 		for team in teamProb:
 			try:
 				teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
@@ -1843,11 +1839,6 @@ class Meet:
 					print swim.printScore().lstrip()
 
 		return ''
-
-	def __eq__(self, s):
-		if not type(s)==type(self):  # not called on a season
-			return False
-		return self.name==s.name and self.date==s.date
 
 
 class Team(Model):
@@ -1973,7 +1964,8 @@ def testTimePre():
 
 if __name__ == '__main__':
 
-	Swimstaging.create_table()
+	carleton = TeamSeason.get(id=10511)
+	carleton.getWeekStrength(weeksIn=4, update=True, verbose=True)
 	migrator = PostgresqlMigrator(db)
 	with db.transaction():
 		migrate(
@@ -1982,3 +1974,4 @@ if __name__ == '__main__':
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
+	

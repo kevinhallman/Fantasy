@@ -22,7 +22,7 @@ else:
 
 def getNewConfs():
 	confTeams = {}
-	with open('data/newconferences.txt', 'r') as file:
+	with open('bin/newconferences.txt', 'r') as file:
 		for line in file:
 			parts = re.split('\t', line.strip())
 			division = parts[0]
@@ -321,11 +321,6 @@ def mergeTeams(sourceTeamId, targetTeamId):
 			else:
 				swim.save()
 
-	# now switch the meet linking table
-	for teammeet in TeamMeet.select().where(TeamMeet.team==sourceTeam.id):
-		teammeet.team = targetTeam.id
-		teammeet.save()
-
 	TeamSeason.delete().where(TeamSeason.id==sourceTeamId).execute()
 
 
@@ -358,7 +353,7 @@ def fixRelays():
 	count = 0
 	for swim in Swim.select(Swim.name, Swim.id, Swim.relay, Swimmer.name, Swimmer.team, TeamSeason.team,
 							TeamSeason.season, TeamSeason.team, TeamSeason.gender).join(
-			Swimmer).join(TeamSeason).where(~Swimmer.name.endswith('Relay'), Swim.relay==True):
+			Swimmer).join(TeamSeason).where(Swimmer.name.endswith('Relay'), Swim.relay==True):
 		print swim.id, swim.swimmer.name, swim.name, swim.swimmer.team.team, swim.swimmer.team.id
 		try:
 			relay = Swimmer.get(Swimmer.team==swim.swimmer.team.id, Swimmer.name.endswith('Relay'))
@@ -507,24 +502,6 @@ def delete_nulls():
 	(SELECT r.id FROM teamseason r
 	LEFT OUTER JOIN swimmer m ON m.team_id=r.id WHERE m.id IS NULL);
 	'''
-
-def fixMeetNames():
-	for char in ['+', '@', '&']:
-		searchStr = '%' + char + '%'
-		for meet in Meet.select().where(Meet.meet % searchStr):
-			print meet.meet
-			if char == '+':
-				newName = meet.meet.replace('+', ' ')
-			elif char == '@':
-				newName = meet.meet.replace('@', 'at')
-			else:
-				newName = meet.meet.replace('&', 'and')
-
-			print newName
-			Swim.update(meet=newName).where(Swim.meet==meet.meet).execute()
-
-			meet.meet = newName
-			meet.save()
 
 def badTimes():
 	for event in eventConvert:
