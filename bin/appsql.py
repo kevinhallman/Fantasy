@@ -684,14 +684,21 @@ class ProgramsJSON():
 
 		return json.dumps(teamRankLabel)
 
+topTeamCache = {'D1': {'Men': None, 'Women': None}, 'D2': {'Men': None, 'Women': None}, 'D3': {'Men': None, 'Women': None}}
+
 class SeasonRankings():
 	def GET(self):
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		oldTopTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+		# check cache first
+		if topTeamCache[form.division][form.gender]:
+			topTeams = topTeamCache[form.division][form.gender]
+		else:
+			topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+			topTeamCache[form.division][form.gender] = topTeams
 
-		rank = showRank(oldTopTeams)
+		rank = showRank(topTeams)
 		return render.preseason(rank)
 
 class SeasonRankingsJSON():
@@ -699,7 +706,12 @@ class SeasonRankingsJSON():
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+		# check cache first
+		if topTeamCache[form.division][form.gender]:
+			topTeams = topTeamCache[form.division][form.gender]
+		else:
+			topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
+			topTeamCache[form.division][form.gender] = topTeams
 
 		response = {}
 		for idx, team in enumerate(topTeams):
