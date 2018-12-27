@@ -10,6 +10,7 @@ import re
 import os
 from swimdb import Swimstaging
 from loadtimes import getNewConfs
+import time as Time
 
 # converts to a time in seconds
 def toTime(time):
@@ -25,7 +26,7 @@ conferenceMap = {59:'Allegheny Mountain',81:'American Southwest',346:'Appalachia
 
 def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stroke='1', gender='rbGenderMale',
 				bestAll='radBestTimeOnly', number=100, startDate='', endDate='', season=None):
-
+	print 'start'
 	if 'DIII' in date:
 		URL = 'https://legacy.usaswimming.org/DesktopDefault.aspx?TabId=3055'
 		cut = '9'
@@ -103,7 +104,7 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 	revd = dict([reversed(i) for i in dateDict.items()])
 	# make sure we can translate back as well
 	dateDict.update(revd)
-
+	print 'events'
 	# translate strokes
 	if stroke=='FR':
 		strokeOut = 'Freestyle'
@@ -217,23 +218,29 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 		'X-MicrosoftAjax': 'Delta=true',
 		'X-Requested-With': 'XMLHttpRequest'
 	}
-
+	start = Time.time()
+	print 'pre post', start
 	html = requests.post(URL, data=payload, headers=headers).text
-
+	post_time = Time.time() - start
+	print 'post post', Time.time()
+	print post_time
 	# find a good place to start parsing
 	place = html.find('Meet Results</td>') + 20
 	end = html.find('</table>', place + 1000)
 	count = 0
 	event = str(distance) + ' ' + strokeOut
 	num = 0
-	num_new = 0
 	times_dict = []
 	keys = set()
 
+	p_time, q_time, c_time = 0, 0, 0 
+
 	# parse the individual times looping through the html
 	# there is so much extra junk in the html this is faster than fully parsing
+	print 'looping'
 	if relInd=='rbIndividual':
 		while place > 0:
+			start = Time.time()
 			place = html.find('</td>', place+1, end)
 			count = (count + 1) % 12
 			if count == 1:
@@ -259,13 +266,16 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 					conf_name = conferenceMap[conference]
 				else:
 					conf_name = None
-
+				p_time += Time.time() - start
+				start = Time.time()
 				# insert into staging table if key doesn't exist
 				key = hash(swimmer + event + time + date)
 				if key not in keys:
 					keys.add(key)
 					query = Swimstaging.select().where(Swimstaging.ukey==key)  # floats in SQL and python different
 					if not query.exists():
+						q_time += Time.time() - start
+						start = Time.time()
 						num += 1
 						new_swim = {'meet': meet, 'date': date, 'season': season, 'name': swimmer,
 								'team': team, 'gender': genderOut, 'event': event, 'time': time, 'division': division,
@@ -273,6 +283,9 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 						clean = clean_data(new_swim)
 						if clean:
 							times_dict.append(clean)
+							c_time += Time.time - start()
+					else:
+						q_time += Time.time() - start
 
 	# parse relays
 	elif relInd=='rbRelay':
@@ -321,6 +334,10 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 		print 'Swims: ', len(times_dict)
 		Swimstaging.insert_many(times_dict).execute()
 
+	print 'parse',p_time
+	print 'clean', c_time
+	print 'query', q_time
+	print 'post', post_time
 	return num
 
 confTeams = getNewConfs()
