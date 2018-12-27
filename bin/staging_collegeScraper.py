@@ -219,10 +219,10 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 		'X-Requested-With': 'XMLHttpRequest'
 	}
 	start = Time.time()
-	print 'pre post', start
+	print 'pre post'
 	html = requests.post(URL, data=payload, headers=headers).text
 	post_time = Time.time() - start
-	print 'post post', Time.time()
+	print 'post post'
 	print post_time
 	# find a good place to start parsing
 	place = html.find('Meet Results</td>') + 20
@@ -283,7 +283,7 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 						clean = clean_data(new_swim)
 						if clean:
 							times_dict.append(clean)
-							c_time += Time.time - start()
+							c_time += Time.time() - start()
 					else:
 						q_time += Time.time() - start
 
