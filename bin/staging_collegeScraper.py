@@ -283,7 +283,7 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 						clean = clean_data(new_swim)
 						if clean:
 							times_dict.append(clean)
-							c_time += Time.time() - start()
+							c_time += Time.time() - start
 					else:
 						q_time += Time.time() - start
 
