@@ -1,4 +1,5 @@
 import time as Time
+from datetime import date as Date
 from swimdb import Swim, TeamSeason, Swimmer, toTime, Meet, seasonString, TeamStats
 from sqlmeets import update_weekly_stats, date2week
 import re
@@ -549,14 +550,15 @@ if __name__ == '__main__':
 
 	if args['stats']:
 		if int(args['stats']) == 0:
-			week = date2week()
+			week = date2week(Date.today())
 		else:
 			week = int(args['stats'])
 		int(args['stats'])
 		for division in ['D1', 'D2', 'D3']:
 			for gender in ['Men' , 'Women']:
 				print division, gender
-				update_weekly_stats(week=week, season=2019, division=division, gender=gender)
+				for week in [-1, 5, 10, 15, 20, 25]:
+					update_weekly_stats(week=week, season=2016, division=division, gender=gender)
 
 
 	# fixConfs()

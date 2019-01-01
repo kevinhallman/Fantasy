@@ -26,7 +26,6 @@ conferenceMap = {59:'Allegheny Mountain',81:'American Southwest',346:'Appalachia
 
 def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stroke='1', gender='rbGenderMale',
 				bestAll='radBestTimeOnly', number=100, startDate='', endDate='', season=None):
-	print 'start'
 	if 'DIII' in date:
 		URL = 'https://legacy.usaswimming.org/DesktopDefault.aspx?TabId=3055'
 		cut = '9'
@@ -104,7 +103,6 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 	revd = dict([reversed(i) for i in dateDict.items()])
 	# make sure we can translate back as well
 	dateDict.update(revd)
-	print 'events'
 	# translate strokes
 	if stroke=='FR':
 		strokeOut = 'Freestyle'
@@ -130,8 +128,8 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 		stroke = '1'
 		rStroke = '7'
 
-	# translate best or all times
-	if 'all' in bestAll:
+	# translate best or all times, D1 men relays broken for now
+	if 'all' in bestAll and not (rStroke in ['6','7'] and division==1 and gender=='m'):
 		bestAll = 'radAllTimesForSwimmer'
 	else:
 		bestAll = 'radBestTimeOnly'
@@ -218,12 +216,9 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 		'X-MicrosoftAjax': 'Delta=true',
 		'X-Requested-With': 'XMLHttpRequest'
 	}
-	start = Time.time()
-	print 'pre post'
+
 	html = requests.post(URL, data=payload, headers=headers).text
-	post_time = Time.time() - start
-	print 'post post'
-	print post_time
+
 	# find a good place to start parsing
 	place = html.find('Meet Results</td>') + 20
 	end = html.find('</table>', place + 1000)
@@ -233,11 +228,8 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 	times_dict = []
 	keys = set()
 
-	p_time, q_time, c_time = 0, 0, 0 
-
 	# parse the individual times looping through the html
 	# there is so much extra junk in the html this is faster than fully parsing
-	print 'looping'
 	if relInd=='rbIndividual':
 		while place > 0:
 			start = Time.time()
@@ -266,26 +258,19 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 					conf_name = conferenceMap[conference]
 				else:
 					conf_name = None
-				p_time += Time.time() - start
 				start = Time.time()
 				# insert into staging table if key doesn't exist
 				key = hash(swimmer + event + time + date)
 				if key not in keys:
 					keys.add(key)
-					query = Swimstaging.select().where(Swimstaging.ukey==key)  # floats in SQL and python different
-					if not query.exists():
-						q_time += Time.time() - start
-						start = Time.time()
-						num += 1
-						new_swim = {'meet': meet, 'date': date, 'season': season, 'name': swimmer,
-								'team': team, 'gender': genderOut, 'event': event, 'time': time, 'division': division,
-								'relay': False, 'ukey': key, 'year': year, 'conference':conf_name}
-						clean = clean_data(new_swim)
-						if clean:
-							times_dict.append(clean)
-							c_time += Time.time() - start
-					else:
-						q_time += Time.time() - start
+					start = Time.time()
+					num += 1
+					new_swim = {'meet': meet, 'date': date, 'season': season, 'name': swimmer,
+							'team': team, 'gender': genderOut, 'event': event, 'time': time, 'division': division,
+							'relay': False, 'year': year, 'conference':conf_name}
+					clean = clean_data(new_swim)
+					if clean:
+						times_dict.append(clean)
 
 	# parse relays
 	elif relInd=='rbRelay':
@@ -319,25 +304,19 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 				key = hash(swimmer + event + time + date)
 				if key not in keys:
 					keys.add(key)
-					query = Swimstaging.select().where(Swimstaging.ukey==key)
-					if not query.exists():
-						num += 1
-						new_swim = {'meet': meet, 'date': date, 'season': season, 'name': swimmer,
-								'team': team, 'gender': genderOut, 'event': event, 'time': time, 'division': division,
-								'relay': True, 'ukey': key, 'year': None, 'conference': conf_name}
-						clean = clean_data(new_swim)
-						if clean:
-							times_dict.append(clean)
+					num += 1
+					new_swim = {'meet': meet, 'date': date, 'season': season, 'name': swimmer,
+							'team': team, 'gender': genderOut, 'event': event, 'time': time, 'division': division,
+							'relay': True, 'year': None, 'conference': conf_name}
+					clean = clean_data(new_swim)
+					if clean:
+						times_dict.append(clean)
 
 	# load all times into staging table
 	if len(times_dict) > 0:
 		print 'Swims: ', len(times_dict)
 		Swimstaging.insert_many(times_dict).execute()
 
-	print 'parse',p_time
-	print 'clean', c_time
-	print 'query', q_time
-	print 'post', post_time
 	return num
 
 confTeams = getNewConfs()
@@ -401,18 +380,18 @@ def getConfs():
 
 
 def topTimesLoop():
-	best_all = 'all'  #'best'
+	best_all = 'all'  #'all'
 	confDiv = getConfs()
-	genders = ['f', 'm']
+	genders = ['m', 'f']
 	divisions = ['DI', 'DII', 'DIII']
 	distances = dict()
+	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	distances['FL'] = [100, 200]
 	distances['BK'] = [100, 200]
 	distances['BR'] = [100, 200]
 	distances['IM'] = [200, 400]
 	distances['MED-R'] = [200, 400]
 	distances['FR-R'] = [200, 400, 800]
-	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	conferences = ['']
 	years = ['19'] #c,'17','16','15','14','13','12','11','10']
 
@@ -440,6 +419,18 @@ def topTimesLoop():
 							print getTopTimes(date=year+' '+division, distance=distance,
 									stroke=stroke, gender=gender, conference=conference, bestAll=best_all,
 											  number=7000, season=year)
+	#purposefuly load duplicates then delete
+	print 'deleting dups'
+	Swimstaging.raw('DELETE '
+		'FROM swimstaging '
+		'USING ( '
+		'SELECT count(s1.id), s1.id AS swim1, s2.id AS swim2 '
+		'FROM swimstaging s1, swimstaging s2 '
+		'WHERE s1.name=s2.name and s1.event=s2.event and s1.time=s2.time and s1.date=s2.date and s1.id!=s2.id '
+		'GROUP BY s1.id, s2.id '
+		') AS s '
+		'WHERE swimstaging.id = s.swim1').execute()
+
 
 # get 100 free results for every conference to figure out which teams are in a conference and division
 def scrapeConferenceData(yearNum=19):
@@ -464,7 +455,7 @@ def scrapeConferenceData(yearNum=19):
 
 								# now find the times and load them into the new file if they aren't in the old
 								print conference
-								print getTopTimes(file=meetFile, date=year+' '+division, distance=distance,
+								print getTopTimes(date=year+' '+division, distance=distance,
 											stroke=stroke, gender=gender, conference=conference, bestAll='best',
 												  number=7000, season=year)
 

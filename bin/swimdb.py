@@ -1,8 +1,7 @@
-from peewee import *
-import os, heapq, urlparse, numpy as np
-from datetime import date, timedelta
-import time as Time
-from playhouse.migrate import *
+from peewee import PostgresqlDatabase, ForeignKeyField, CharField, IntegerField, IntegrityError, FloatField, fn, Model, DateField, BooleanField
+import os, heapq, urlparse, re, numpy as np, time as Time
+from datetime import date as Date, timedelta
+from playhouse.migrate import PostgresqlMigrator, migrate
 from math import log
 from scipy.stats import norm, truncnorm, skewnorm, linregress
 from sympy import binomial
@@ -134,25 +133,22 @@ def toTime(time):
 
 '''converts a date to the numbered weeks'''
 def date2week(d):
-	if d > date.today():
-		d = date.today()
 	if d.month > 6:
 		season = d.year + 1
 	else:
 		season = d.year
-	startDate = date(season - 1, 10, 14)  # use Oct 15 as the start date, prolly good for 2019
+	startDate = Date(season - 1, 10, 14)  # use Oct 14 as the start date, prolly good for 2019
 	weeksIn = int((d - startDate).days / 7)
 	return weeksIn
-
 
 '''converts week to a date'''
 def week2date(week, season=None):
 	if not week:
-		return date.today()
+		return Date.today()
 	if not season:
 		season = thisSeason()
 
-	startDate = date(season - 1, 10, 14)  # use Oct 15 as the start date, prolly good for 2017
+	startDate = Date(season - 1, 10, 14)  # use Oct 14 as the start date, prolly good for 2017
 	simDate = startDate + timedelta(weeks=week)
 
 	return simDate
@@ -160,7 +156,7 @@ def week2date(week, season=None):
 
 '''returns current season'''
 def thisSeason():
-	today = date.today()
+	today = Date.today()
 	if today.month > 6:
 		return today.year + 1
 	return today.year
@@ -173,9 +169,9 @@ def seasonString(dateString):
 	year = int(dateParts[2])
 	month = int(dateParts[0])
 	day = int(dateParts[1])
-	d = date(year, month, day)
+	d = Date(year, month, day)
 
-	if d > date(d.year, 6, 1):
+	if d > Date(d.year, 6, 1):
 		year = d.year + 1
 	else:
 		year = d.year
@@ -213,13 +209,17 @@ class TeamSeason(Model):
 			except TeamSeason.DoesNotExist:
 				return
 
-	def getTaperStats(self, weeks=12, yearsback=1, toptime=True):
+	def getTaperStats(self, weeks=12, yearsback=1, toptime=True, pre_season=True):
+		if pre_season:
+			stats = TeamStats.get(team=self, week=weeks)
+			return stats.pretaper
+
 		lastSeason = self.getPrevious(yearsBack=yearsback)
 
 		if not lastSeason:
 			return None, None
 		# underestimate taper by using later weeks
-		for stats in TeamStats.select().where(TeamStats.teamseasonid==lastSeason.id, TeamStats.week >= weeks)\
+		for stats in TeamStats.select().where(TeamStats.team==lastSeason.id, TeamStats.week >= weeks)\
 				.limit(1).order_by(TeamStats.week):
 			if toptime:
 				return stats.toptaper, stats.toptaperstd
@@ -227,9 +227,83 @@ class TeamSeason(Model):
 				return stats.mediantaper, stats.mediantaperstd
 		return None, None
 
+	def findTaperStats(self, weeks=10, topTime=True, averageTime=True, pre_season=False, this_season=True):
+		newDate = week2date(week=weeks, season=self.season)
+		taperSwims = self.getTaperSwims()
+		dropsTop, dropsAvg, drops_previous = [], [], []
+
+		if this_season:
+			for taperSwim in taperSwims:
+				# now find the top untapered swims before that date
+				if topTime:
+					for earlySwim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
+						Swim.event==taperSwim.event, Swim.date < newDate):
+						if earlySwim.min:
+							dropPer = 100 * (earlySwim.min - taperSwim.time) / taperSwim.time
+							dropsTop.append(dropPer)
+				# use average time
+				if averageTime:
+					for earlySwim in Swim.select(fn.avg(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
+						Swim.event==taperSwim.event, Swim.date < newDate):
+						if earlySwim.avg:
+							dropPer = 100 * (earlySwim.avg - taperSwim.time) / taperSwim.time
+							dropsAvg.append(dropPer)
+
+		# look for difference in last season's taper with this season
+		if pre_season:
+			preTeam = self.getPrevious()
+			if not preTeam:
+				return
+			top_times = preTeam.getTaperSwims(structured=True)
+
+			# find mid-season taper adjustments by find dif in last taper times
+			for swimmer in top_times:
+				for event in top_times[swimmer]:
+					date = week2date(10, self.season)
+					old_swim = top_times[swimmer][event]
+					new_swimmer = old_swim.swimmer.nextSeason()
+					if not new_swimmer: continue
+					for swim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==new_swimmer, Swim.event==event, Swim.date < date):
+						pass
+					if swim.min:
+						drops_previous.append((swim.min - old_swim.time) / ((old_swim.time + swim.min) / 2.0))
+						#print old_swim.event, old_swim.name, old_swim.time, swim.min, (swim.min - old_swim.time) / ((old_swim.time + swim.min) / 2.0)
+		if len(drops_previous) > 1: 
+			mean_drops_pre = np.mean(drops_previous)
+		else:
+			mean_drops_pre = None
+		if len(dropsTop) > 1: 
+			stdDropTop = np.std(dropsTop)
+			meanDropTop = np.mean(dropsTop)
+		else:
+			stdDropTop, meanDropTop = None, None
+		if len(dropsAvg) > 1: 
+			stdDropAvg = np.std(dropsAvg)
+			meanDropAvg = np.mean(dropsAvg)
+		else:
+			stdDropAvg, meanDropAvg = None, None
+
+		newStats = {'week': weeks, 'date': newDate, 'team': self.id,
+						'toptaper': meanDropTop, 'toptaperstd': stdDropTop, 'mediantaper': meanDropAvg,
+					'mediantaperstd': stdDropAvg, 'pretaper': mean_drops_pre}
+
+		print newStats
+		try:
+			stats = TeamStats.get(TeamStats.team==self.id, TeamStats.week==weeks)
+			# it exists so update it
+			if meanDropTop: stats.toptaper = meanDropTop
+			if stdDropTop: stats.toptaperstd = stdDropTop
+			if meanDropAvg: stats.mediantaper = meanDropAvg
+			if stdDropAvg: stats.mediantaperstd = stdDropAvg
+			if mean_drops_pre: stats.pretaper = mean_drops_pre
+			stats.date = newDate
+			stats.save()
+		except TeamStats.DoesNotExist:
+			TeamStats.insert_many([newStats]).execute()
+
 	def getWinnats(self, previous=0):
 		for stats in TeamStats.select(TeamStats.winnats, TeamStats.week).where(TeamStats.winnats.is_null(False),
-				TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
+				TeamStats.team==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
 			if stats.winnats:
 				return stats.winnats
 		if self.winnats:
@@ -240,7 +314,7 @@ class TeamSeason(Model):
 		if not self.conference:
 			return 0
 		for stats in TeamStats.select(TeamStats.winconf, TeamStats.week)\
-				.where(TeamStats.winconf.is_null(False), TeamStats.teamseasonid==self.id, TeamStats.week > 0)\
+				.where(TeamStats.winconf.is_null(False), TeamStats.team==self.id, TeamStats.week > 0)\
 				.order_by(TeamStats.week.desc()).limit(1).offset(previous):
 			if stats.winconf:
 				return stats.winconf
@@ -252,7 +326,7 @@ class TeamSeason(Model):
 	def getStrength(self, previous=0, invite=True, update=False):
 		if invite:
 			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week).where(TeamStats.strengthinvite.is_null(False),
-					TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
+					TeamStats.team==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
 				if stats.strengthinvite:
 					if update:
 						self.strengthinvite = stats.strengthinvite
@@ -260,7 +334,7 @@ class TeamSeason(Model):
 					return stats.strengthinvite
 		else:
 			for stats in TeamStats.select(TeamStats.strengthdual, TeamStats.week).where(TeamStats.strengthdual.is_null(
-					False), TeamStats.teamseasonid==self.id).limit(1).order_by(TeamStats.week.desc()).offset(previous):
+					False), TeamStats.team==self.id).limit(1).order_by(TeamStats.week.desc()).offset(previous):
 				if stats.strengthdual:
 					if update:
 						self.strengthdual = stats.strengthdual
@@ -271,17 +345,17 @@ class TeamSeason(Model):
 		if self.season != thisSeason():
 			weeksIn = 25
 		else:
-			weeksIn = date2week(date.today())
-		simDate = week2date(weeksIn)
+			weeksIn = date2week(Date.today())
+		simDate = week2date(weeksIn, self.season)
 		scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
 		scoreInvite = self.topTeamScore(dual=False, weeksIn=weeksIn)
 		try:
-			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
+			stats = TeamStats.get(team=self.id, week=weeksIn)
 			stats.strengthdual = scoreDual
 			stats.strengthinvite = scoreInvite
 			stats.save()
 		except TeamStats.DoesNotExist:
-			TeamStats.create(teamseasonid=self.id, week=weeksIn, strengthinvite=scoreInvite, strengthdual=scoreDual,
+			TeamStats.create(team=self.id, week=weeksIn, strengthinvite=scoreInvite, strengthdual=scoreDual,
 								 date=simDate)
 
 		if invite:
@@ -297,7 +371,7 @@ class TeamSeason(Model):
 
 	'''top expected score for the whole team'''
 	def topTeamScore(self, dual=True, weeksIn=None):
-		simDate = week2date(weeksIn)
+		simDate = week2date(weeksIn, self.season)
 
 		if dual:
 			events = eventsDualS
@@ -368,50 +442,6 @@ class TeamSeason(Model):
 		else:
 			return teamSwims
 
-	def findTaperStats(self, weeks=10, topTime=True, averageTime=True):
-		newDate = week2date(week=weeks, season=self.season)
-		taperSwims = self.getTaperSwims()
-		dropsTop = []
-		dropsAvg = []
-
-		for taperSwim in taperSwims:
-			# now find the top untapered swims before that date
-			if topTime:
-				for earlySwim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
-					Swim.event==taperSwim.event, Swim.date < newDate):
-					if earlySwim.min:
-						dropPer = 100 * (earlySwim.min - taperSwim.time) / taperSwim.time
-						dropsTop.append(dropPer)
-			# use average time
-			if averageTime:
-				for earlySwim in Swim.select(fn.avg(Swim.time)).where(Swim.swimmer==taperSwim.swimmer,
-					Swim.event==taperSwim.event, Swim.date < newDate):
-					if earlySwim.avg:
-						dropPer = 100 * (earlySwim.avg - taperSwim.time) / taperSwim.time
-						dropsAvg.append(dropPer)
-
-		stdDropTop = np.std(dropsTop)
-		meanDropTop = np.mean(dropsTop)
-		stdDropAvg = np.std(dropsAvg)
-		meanDropAvg = np.mean(dropsAvg)
-
-		newStats = {'week': weeks, 'date': newDate, 'teamseasonid': self.id,
-						'toptaper': meanDropTop, 'toptaperstd': stdDropTop, 'mediantaper': meanDropAvg,
-					'mediantaperstd': stdDropAvg}
-
-		print newStats
-		try:
-			stats = TeamStats.get(TeamStats.teamseasonid==self.id, TeamStats.week==weeks)
-			# it exists so update it
-			stats.toptaper = meanDropTop
-			stats.toptaperstd = stdDropTop
-			stats.mediantaper = meanDropAvg
-			stats.mediantaperstd = stdDropAvg
-			stats.date = newDate
-			stats.save()
-		except TeamStats.DoesNotExist:
-			TeamStats.insert_many([newStats]).execute()
-
 	def getAttrition(self, update=False, verbose=False):
 		# get previous year's team, drop if null
 		preTeam = self.getPrevious(1)
@@ -474,14 +504,14 @@ class TeamSeason(Model):
 		if not weeksIn:
 			weeksIn = 25
 		simDate = week2date(weeksIn, self.season)
-		if simDate > date.today():
+		if simDate > Date.today():
 			print 'future date'
 			return
 
 		scoreDual, scoreInv = None, None
 		# check to see if it already exists in db then update
 		try:
-			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
+			stats = TeamStats.get(team=self.id, week=weeksIn)
 			if invite and (not stats.strengthinvite or update):
 				scoreInv = self.topTeamScore(dual=False, weeksIn=weeksIn)
 				stats.strengthinvite = scoreInv
@@ -502,7 +532,7 @@ class TeamSeason(Model):
 				scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
 			else:
 				scoreDual = None
-			stats = TeamStats.create(teamseasonid=self.id, week=weeksIn, strengthinvite=scoreInv,
+			stats = TeamStats.create(team=self.id, week=weeksIn, strengthinvite=scoreInv,
 								 strengthdual=scoreDual, date=simDate)
 			stats.save()
 			if verbose: print self.team, scoreDual, scoreInv, stats.id
@@ -510,14 +540,14 @@ class TeamSeason(Model):
 		# update team total if this is the latest week
 		if scoreInv:
 			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week) \
-				.where(TeamStats.strengthinvite.is_null(False), TeamStats.teamseasonid==self.id) \
+				.where(TeamStats.strengthinvite.is_null(False), TeamStats.team==self.id) \
 				.order_by(TeamStats.week.desc()).limit(1):
 				if stats.week < weeksIn or (update and stats.week == weeksIn):
 					self.strengthinvite = scoreInv
 					self.save()
 		if scoreDual:
 			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week) \
-				.where(TeamStats.strengthdual.is_null(False), TeamStats.teamseasonid==self.id) \
+				.where(TeamStats.strengthdual.is_null(False), TeamStats.team==self.id) \
 				.order_by(TeamStats.week.desc()).limit(1):
 				if stats.week < weeksIn or (update and stats.week == weeksIn):
 					self.strengthdual = scoreDual
@@ -620,17 +650,20 @@ class TeamSeason(Model):
 
 		print difs
 		print np.mean(difs), np.std(difs)
-
+				
 	class Meta:
 		database = db
 
 
 class TeamStats(Model):
-	teamseasonid = ForeignKeyField(TeamSeason)
+	team = ForeignKeyField(TeamSeason)
 	winnats = FloatField(null=True)
+	natsscore = IntegerField(null=True)
 	winconf = FloatField(null=True)
+	confscore = IntegerField(null=True)
 	date = DateField()  # will be the date the stats were current as of
 	week = IntegerField(null=True)
+	pretaper = FloatField(null=True)
 	toptaper = FloatField(null=True)
 	toptaperstd = FloatField(null=True)
 	mediantaper = FloatField(null=True)
@@ -842,8 +875,8 @@ class Swimmer(Model):
 
 	def nextSeason(self, years=1):
 		try:
-			return Swimmer.get(Swimmer.team==self.team, Swimmer.gender==self.gender,
-						   Swimmer.name==self.name, Swimmer.season==self.season + years)
+			return Swimmer.get(Swimmer.team==self.team.nextSeason(), Swimmer.gender==self.gender,
+						   Swimmer.name==self.name)
 		except Swimmer.DoesNotExist:
 			return
 
@@ -947,6 +980,11 @@ class Swim(Model):
 
 		return totalScore / len(percents)
 
+	def getTeam(self):
+		if self.swimmer:
+			return self.swimmer.team
+		return TeamSeason.get(team=self.team, season=self.season, gender=self.gender)
+
 	def getScoreTeam(self):
 		if self.scoreTeam:
 			return self.scoreTeam
@@ -994,11 +1032,14 @@ class Swim(Model):
 		return name+br+self.getScoreTeam()+genderStr+br+event+br+time+br+meet
 
 	def taper(self, weeks, noise=0):
-		taper, taperStd = self.swimmer.team.getTaperStats(weeks=weeks)
+		#taper, taperStd = self.swimmer.team.getTaperStats(weeks=weeks)
+		team = self.getTeam()
+		taper = team.getTaperStats(weeks=weeks)
 		if not taper:
-			taper = .03
-		self.taperTime = self.time - self.time * taper / 100.0 + self.time * noise
-		self.scoreTime = self.time - self.time * taper / 100.0 + self.time * noise
+			taper = .015
+		#print taper, team
+		self.taperTime = self.time - self.time * taper + self.time * noise
+		self.scoreTime = self.time - self.time * taper + self.time * noise
 
 	def improve(self, database):
 		if self.division:
@@ -1050,7 +1091,6 @@ class Swim(Model):
 
 
 class Swimstaging(Model):
-	ukey = CharField(primary_key=True)
 	meet = CharField()
 	date = DateField()
 	season = IntegerField()
@@ -1067,7 +1107,6 @@ class Swimstaging(Model):
 
 	class Meta:
 		database = db
-		# unique indexe = ('name', 'event', 'time', 'date')
 
 
 class Improvement(Model):
@@ -1183,11 +1222,14 @@ class Meet:
 				if swim.name==name:
 					self.eventSwims[event].remove(swim)
 
-	def nextYear(self):
+	def remove_class(self, year='Senior'):
 		for event in self.eventSwims:
-			if 'Relay' in event:
-				continue
-			self.eventSwims[event] = [x for x in self.eventSwims[event] if x.year != 'Senior']
+			self.eventSwims[event] = [swim for swim in self.eventSwims[event] if swim.year != year or 'Relay' in event]
+	
+	def get_class(self, year='Freshman'):
+		for event in self.eventSwims:
+			self.eventSwims[event] = [swim for swim in self.eventSwims[event] if swim.year == year]
+		return self.eventSwims
 
 	def getEvents(self, events=''):
 		myEvents = set(self.eventSwims.keys())
@@ -1438,10 +1480,11 @@ class Meet:
 				relay.changeSwimmer(swim1, swim2)
 				return
 
-	def taper(self, weeks=12):
+	def taper(self, weeks=10):
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
 				swim.taper(weeks=weeks)
+		return self
 
 	'''
 	gives the expected score of the top team limup as compared to the whole division
@@ -1598,8 +1641,7 @@ class Meet:
 					swim.score = 0
 
 		teamScoresDist = []
-		for iternation in range(runs):  # run runs # of times
-
+		for _ in range(runs):  # run runs # of times
 			teamTapers = {}  # team noise
 			for team in self.teams:
 				teamTapers[team] = np.random.normal(0, teamSigma)
@@ -1700,40 +1742,55 @@ class Meet:
 		return self.scores[0][0]
 
 	# update stored win probabilities
-	def update(self, division, gender, season, nextYear=False, nats=False, taper=True, verbose=True):
-		if self.date:
-			date = self.date
+	def update(self, division, gender, season, nats=False, taper=True, verbose=True, week=None):
+		if week:
+			weeksIn = week
+			date = week2date(weeksIn, season)
 		else:
-			date = date.today()
-		weeksIn = date2week(date)
+			if self.date:
+				date = self.date
+			else:
+				date = Date.today()
+			weeksIn = date2week(date)
 		weeksOut = 16 - weeksIn
-		if nextYear:
-			weeksOut = '-1'
-			weeksIn = '-1'
 
+		# score monte carlo to find win probs then reset to real scores
+		self.score()
+		scores = {}
+		for piece in self.teamScores():
+			team, score = piece[0], piece[1]
+			scores[team] = score
 		self.scoreMonteCarlo(weeksOut=weeksOut, taper=taper, runs=100)
 		teamProb = self.getWinProb()
-		print teamProb
 
-		print weeksIn, date
+		if verbose:
+			print teamProb
+			print weeksIn, date
+
 		for team in teamProb:
 			try:
 				teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
 				try:
-					stats = TeamStats.get(teamseasonid=teamSeason.id, week=weeksIn)
+					stats = TeamStats.get(team=teamSeason.id, week=weeksIn)
+					score = scores[team]
 					if nats:
 						stats.winnats = teamProb[team]
+						stats.natsscore = score
+						stats.date = date
 					else:
 						stats.winconf = teamProb[team]
+						stats.confscore = score
+						stats.date = date
 					if verbose: print 'Existing:', team, season, stats.winconf, stats.winnats, weeksIn, date, \
-						teamSeason.id, stats.id
+						teamSeason.id, stats.id, stats.confscore, stats.natsscore
 					stats.save()
 				except TeamStats.DoesNotExist:
-					if verbose: print 'New:', team, season, teamProb[team], weeksIn, date
+					score = self.getTeamScore(team)
+					if verbose: print 'New:', team, season, teamProb[team], weeksIn, date, score, nats
 					if nats:
-						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winnats=teamProb[team], date=date)
+						TeamStats.create(team=teamSeason.id, week=weeksIn, winnats=teamProb[team], natsscore=score, date=date)
 					else:
-						TeamStats.create(teamseasonid=teamSeason.id, week=weeksIn, winconf=teamProb[team], date=date)
+						TeamStats.create(team=teamSeason.id, week=weeksIn, winconf=teamProb[team], confscore=score, date=date)
 			except TeamSeason.DoesNotExist:
 				if verbose: print 'wrong', team, division, gender, season
 
@@ -1956,7 +2013,7 @@ def testTimePre():
 
 	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
 		try:
-			TeamStats.get(teamseasonid=team.id, week=18)
+			TeamStats.get(team=team.id, week=18)
 		except TeamStats.DoesNotExist:
 			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
 				team.findTaperStats(weeks=week)
@@ -1964,14 +2021,17 @@ def testTimePre():
 
 if __name__ == '__main__':
 
-	carleton = TeamSeason.get(id=10511)
-	carleton.getWeekStrength(weeksIn=4, update=True, verbose=True)
+	#carleton = TeamSeason.get(id=10511)
+	#carleton.getWeekStrength(weeksIn=4, update=True, verbose=True)
 	migrator = PostgresqlMigrator(db)
+	db.drop_table(Swimstaging)
+	db.create_table(Swimstaging)
 	with db.transaction():
 		migrate(
-			#migrator.add_column('swim', 'event_norm', Swim.event_norm),
-			#migrator.add_column('teamseason', 'improvement', TeamSeason.improvement)
+			#migrator.add_column('teamstats', 'pretaper', TeamStats.pretaper),
+			#migrator.add_column('teamstats', 'confscore', TeamStats.confscore),
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
-	
+	#for team in TeamSeason.select().where(TeamSeason.season==2017):
+	#	team.findTaperStats(pre_season=True, this_season=False)

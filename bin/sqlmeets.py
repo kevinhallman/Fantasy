@@ -1,11 +1,11 @@
 import numpy as np
 from datetime import date as Date, timedelta
-from peewee import *
+import peewee
 import os, urlparse, time
 #from scipy.stats import norm, linregress
 #simport matplotlib.pyplot as plt
 
-from swimdb import Improvement, TeamSeason, Swimmer, Swim, Meet
+from swimdb import Improvement, TeamSeason, Swimmer, Swim, Meet, week2date, date2week, thisSeason, rejectOutliers
 from events import eventOrderInd, eventsChamp3, eventsChamp, eventsDualS, requiredEvents, allEvents, eventOrder
 
 pointsChampionship = [20, 17, 16, 15, 14, 13, 12, 11, 9, 7, 6, 5, 4, 3, 2, 1]
@@ -13,27 +13,8 @@ pointsDualI = [9, 4, 3, 2, 1]
 pointsDualR = [11, 4, 2]
 
 # setup database connection
-db_proxy = Proxy()
-db = Proxy()
-
-def thisSeason():
-	today = Date.today()
-	if today.month > 6:
-		return today.year + 1
-	return today.year
-
-def rejectOutliers(dataX, dataY=None, l=5, r=6):
-	u = np.mean(dataX)
-	s = np.std(dataX)
-
-	if dataY:
-		data = zip(dataX, dataY)
-		newList = [i for i in data if (u - l*s < i[0] < u + r*s)]
-		newX, newY = zip(*newList)
-		return list(newX), list(newY)
-	else:
-		newList = [i for i in dataX if (u - l*s < i < u + r*s)]
-	return newList
+db_proxy = peewee.Proxy()
+db = peewee.Proxy()
 
 def ECDF(data):
 	def cdf(num):
@@ -76,8 +57,8 @@ def grad(f, x, y, h=0.0025):
 	dy = (f(x, y) - f(x, y+h))/h
 	return dx, dy
 
-def gradientDescent(f, x0, y0, step=.001):
-	for i in range(10):
+def gradientDescent(f, x0, y0, steps=10, step=.001):
+	for _ in range(steps):
 		dx, dy = grad(f, x0, y0)
 		length = ((dx**2 + dy**2) ** .5)
 		print 'delta:', dx, dy
@@ -94,39 +75,6 @@ def frange(x, y, jump):
 	while x < y:
 		yield x
 		x += jump
-
-def date2week(d=None):
-	if not d:
-		d = Date.today()
-	if d > Date.today():
-		d = Date.today()
-	if d.month > 6:
-		season = d.year + 1
-	else:
-		season = d.year
-	startDate = Date(season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
-	weeksIn = int((d - startDate).days / 7)
-
-	last_week = 25
-	if weeksIn > last_week:
-		return last_week
-
-	return weeksIn
-
-def week2date(week, season=None):
-	if not season:
-		season = thisSeason()
-
-	startDate = Date(season - 1, 10, 16)  # use Oct 15 as the start date, prolly good for 2017
-
-	if week == None:
-		return Date.today()
-
-	simDate = startDate + timedelta(weeks=week)
-	if simDate > Date.today():  # can't simulate with future data
-		simDate = Date.today()
-
-	return simDate
 
 '''
 full database methods
@@ -277,7 +225,7 @@ def averageTimes(conf, season=None, gender='Men', division=None, date=None):
 		date = Date.today()
 
 	topMeet = Meet()
-	topMeet.date = dateStr
+	topMeet.date = date
 	if conf=='Nationals':
 		select = Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason)\
 			.where(TeamSeason.gender==gender, TeamSeason.division==division, TeamSeason.season==season, Swim.date < date)
@@ -285,7 +233,7 @@ def averageTimes(conf, season=None, gender='Men', division=None, date=None):
 		select = Swim.select(Swim, Swimmer, TeamSeason).join(Swimmer).join(TeamSeason)\
 			.where(TeamSeason.gender==gender, TeamSeason.conference==conf, TeamSeason.season==season, Swim.date < date)
 
-	query = select.select(Swim.name, Swim.event, fn.Avg(Swim.time), Swim.team, Swimmer.year).group_by(Swim.name,
+	query = select.select(Swim.name, Swim.event, peewee.fn.Avg(Swim.time), Swim.team, Swimmer.year).group_by(Swim.name,
 			Swim.event, Swim.team, Swimmer.year)
 
 	for swim in query:
@@ -351,34 +299,75 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 	return newMeet
 
 # simulates conference or national meet, must be real conference
-def sim_conference(season, gender, conf, division=None, dateStr=None, top=True, update=False, taper=False,
-			   nextYear=False, teamMax=17):
-	if not season:
-		season = thisSeason()  # use current season
-	start = time.time()
+def sim_conference(season, gender, conf, division, dateStr=None, top=True, update=False, taper=False, teamMax=17, verbose=False):
+	if not season: # use current season
+		season = thisSeason()
+
+	if verbose: print 'conf sim', season, dateStr
 	if top:
 		conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr)
 	else:  # use avg times
 		conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
 	
-	if nextYear:  # estimate next year's results
-		conf_meet.nextYear()
-		season += 1  # update the correct season
-	print 'time top times:', time.time() - start
+	#print conf_meet
 	conf_meet.events = eventsChamp3
 	conf_meet.topEvents(teamMax=teamMax)
-	print 'time top events:', time.time() - start
 	conf_meet.score()
+	#print conf_meet.teamScores()
 
 	if taper:
 		conf_meet.taper()
+
+	conf_meet.events = eventsChamp3
+	conf_meet.topEvents(teamMax=teamMax)
+	conf_meet.score()
+	#print conf_meet.teamScores()
+	
+	if verbose:
+		print conf_meet
+		print conf_meet.teamScores()
+
 	if update:
-		weeksIn = date2week(dateStr)
 		if conf == 'Nationals':
 			nats = True
 		else:
 			nats = False
 		print conf, nats
+		# update the season after you take times from
+		conf_meet.update(division=division, gender=gender, season=season, nats=nats, taper=taper)
+
+	return conf_meet
+
+# simulates conference using last year's times except the freshmen, pull those times from this year and taper
+def future_conference(season, gender, conf, division, week=None, update=False, teamMax=17, verbose=False):
+	if not season: # use current season
+		season = thisSeason()
+
+	# pull top times from last season, then remove seniors
+	if verbose: print 'conf sim', season, conf, gender, division
+	conf_meet = topTimes(conf=conf, season=season - 1, gender=gender, division=division)
+	conf_meet.remove_class('Senior')
+
+	# pull freshman times from date this season if week given
+	if week:
+		frosh_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=frosh_date)
+		conf_meet.get_class('Freshman')
+		
+	conf_meet.events = eventsChamp3
+	conf_meet.topEvents(teamMax=teamMax)
+	conf_meet.score()
+	
+	if verbose:
+		print conf_meet
+		print conf_meet.teamScores()
+
+	if update:
+		if conf == 'Nationals':
+			nats = True
+		else:
+			nats = False
+		print conf, nats
+		# update the season after you take times from
 		conf_meet.update(division=division, gender=gender, season=season, nats=nats)
 
 	return conf_meet
@@ -428,14 +417,14 @@ def swimmerRank(division='D3', gender='Men', season=2019, num=25, conference=Non
 
 
 def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
-	print season
 	if not week:
-		week = date2week()
-	simDate = week2date(week)
-	print simDate
+		week = date2week(Date.today())
+	simDate = week2date(week, season=season)
+
+	print 'season', season, 'week', week, 'date', simDate
 	if simDate > Date.today():
 		print 'Error, future date'
-		return  # would be a future week
+		return
 
 	# national meets probabilities
 	sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate)
@@ -449,9 +438,9 @@ def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
 		sim_conference(conf=conference, gender=gender, season=season, division=division, update=True, dateStr=simDate)
 
 	# update team strengths
-	for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender,
-			TeamSeason.season==season):
-		team.getWeekStrength(update=True, weeksIn=week, verbose=True)
+	#for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender,
+	#		TeamSeason.season==season):
+	#	team.getWeekStrength(update=True, weeksIn=week, verbose=True)
 
 '''
 returns which meets were likely tapers
@@ -508,7 +497,6 @@ calculates and stores improvement data for a season
 def storeImprovement(season=2018):
 	swims = []
 	for team in TeamSeason.select().where(TeamSeason.season==season):
-		#if not team.team=='Valparaiso': continue
 		preTeam = team.getPrevious()
 		if not preTeam:
 			continue
@@ -563,15 +551,105 @@ def update_season_stats(season=2018, recalc=True):
 		print team.team
 		team.updateSeasonStats()
 
+
+def time_drops_data(season, team, gender='Men', division='D1', verbose=False):
+	import pandas as pd
+	swims = []
+	team_adjustments,team_adjustments2 = {}, {}
+	for team in TeamSeason.select().where(TeamSeason.gender==gender, TeamSeason.division==division, 
+					TeamSeason.season == season):
+		preTeam = team.getPrevious()
+		if not preTeam:
+			continue
+		if verbose: print team.team, preTeam.team
+
+		top1 = team.getTaperSwims(structured=True)
+		top2 = preTeam.getTaperSwims(structured=True)
+		if verbose: print top1, top2
+
+		for swimmer in top1:
+			if not swimmer in top2:
+				continue
+			for event in top1[swimmer]:
+				if not event in top2[swimmer]:
+					continue
+				swim1 = top1[swimmer][event]
+				swim2 = top2[swimmer][event]
+				time1 = swim1.time
+				time2 = swim2.time
+				drop = (time2-time1) / ((time1+time2) / 2) * 100
+				if verbose: print swimmer, event, time1, time2
+				if abs(drop) > 10:  # toss outliers
+					continue
+
+				for week in [10, 20]:
+					date = week2date(week, season)
+					if verbose: print swim1.swimmer.id, event, date
+					for swim in Swim.select(peewee.fn.min(Swim.time)).where(Swim.swimmer==swim1.swimmer, Swim.event==event, Swim.date<date):
+						if week == 10:
+							week10s2 = swim.min
+						elif week == 20:
+							week20s2 = swim.min
+				for week in [10, 20]:
+					date = week2date(week, season -1)
+					for swim in Swim.select(peewee.fn.min(Swim.time)).where(Swim.swimmer==swim2.swimmer, Swim.event==event, Swim.date<date):
+						if week == 10:
+							week10s1 = swim.min
+						elif week == 20:
+							week20s1 = swim.min
+				totime = None
+				for swim in Swim.select(peewee.fn.min(Swim.time)).where(Swim.swimmer==swim1.swimmer, Swim.event==event, Swim.date>date):
+					totime = swim.min
+
+				newSwim = {'name': swim1.name,
+						   'team': team.team, 'gender': team.gender, 'event': event,
+						   'improvement': drop,  # positive=faster
+						   'fromtime': swim2.time, 'totime': totime,
+						   'fromseason': preTeam.season,
+						   'toseason': team.season,
+						   'conference': team.conference, 'division': team.division,
+						   'week10s1': week10s1,
+						   'week20s1': week20s1,
+						   'week10s2': week10s2,
+						   'week20s2': week20s2}
+				swims.append(newSwim)
+
+	data = pd.DataFrame({'old_adj': team_adjustments.values(), 'new_adj': team_adjustments2.values()})
+	from statsmodels.formula.api import ols
+	model = ols('old_adj ~ new_adj', data=data).fit()
+	print model.summary()
+	
+	return team_adjustments, team_adjustments2
+	data = pd.DataFrame(swims)
+
+	data.to_csv("stats/men_taper_stats.csv")
+
 if __name__ == "__main__":
 	# database setup
 	urlparse.uses_netloc.append("postgres")
 	if "DATABASE_URL" in os.environ:  # production
 		url = urlparse.urlparse(os.environ["DATABASE_URL"])
-		db = PostgresqlDatabase(database=url.path[1:],
+		db = peewee.PostgresqlDatabase(database=url.path[1:],
 								user=url.username,
 								password=url.password,
 								host=url.hostname,
 								port=url.port)
 	else:
-		db = PostgresqlDatabase('swimdb', user='hallmank')
+		db = peewee.PostgresqlDatabase('swimdb', user='hallmank')
+
+	
+	
+	gender='Men'
+	division = 'D1'
+	for gender in ['Men', 'Women']:
+		for season in [2016]:
+			for division in ['D1', 'D2', 'D3']:
+				simDate = week2date(week=10, season=season)
+				sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+				
+				simDate = week2date(week=11, season=season)
+				sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=False)
+	
+	#season = 2017
+	#simDate = week2date(week=10, season=season)
+	#sim_conference(conf='Nationals', gender='Women', division='D1', season=season, dateStr=simDate, verbose=True)
