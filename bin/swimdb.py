@@ -209,10 +209,10 @@ class TeamSeason(Model):
 			except TeamSeason.DoesNotExist:
 				return
 
-	def getTaperStats(self, weeks=12, yearsback=1, toptime=True, pre_season=True):
+	def getTaperStats(self, weeks=12, yearsback=1, toptime=True, pre_season=False):
 		if pre_season:
 			stats = TeamStats.get(team=self, week=weeks)
-			return stats.pretaper
+			return stats.pretaper, None
 
 		lastSeason = self.getPrevious(yearsBack=yearsback)
 
@@ -2030,8 +2030,8 @@ if __name__ == '__main__':
 	#carleton = TeamSeason.get(id=10511)
 	#carleton.getWeekStrength(weeksIn=4, update=True, verbose=True)
 	migrator = PostgresqlMigrator(db)
-	db.drop_table(Swimstaging)
-	db.create_table(Swimstaging)
+	#db.drop_table(Swimstaging)
+	#db.create_table(Swimstaging)
 	with db.transaction():
 		migrate(
 			migrator.add_column('teamstats', 'pretaper', TeamStats.pretaper),
