@@ -980,6 +980,12 @@ class Swim(Model):
 
 		return totalScore / len(percents)
 
+	def getSwimmer(self):
+		if self.swimmer: 
+			return self.swimmer
+		team = TeamSeason.get(team=self.team, season=self.season, gender=self.gender)
+		return Swimmer.get(name=self.name, team=team)
+	
 	def getTeam(self):
 		if self.swimmer:
 			return self.swimmer.team
@@ -2028,8 +2034,9 @@ if __name__ == '__main__':
 	db.create_table(Swimstaging)
 	with db.transaction():
 		migrate(
-			#migrator.add_column('teamstats', 'pretaper', TeamStats.pretaper),
-			#migrator.add_column('teamstats', 'confscore', TeamStats.confscore),
+			migrator.add_column('teamstats', 'pretaper', TeamStats.pretaper),
+			migrator.add_column('teamstats', 'confscore', TeamStats.confscore),
+			migrator.add_column('teamstats', 'natsscore', TeamStats.natsscore)
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)

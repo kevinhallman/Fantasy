@@ -232,10 +232,22 @@ def new_load(year=2019):
 			 'ss.season=ts.season '
 		'LEFT OUTER JOIN swimmer sw on sw.name=ss.name and sw.team_id=team_id where sw.id IS NULL')
 
-	print 'inserting swims'
+	
 	db.execute_sql('CREATE TEMP TABLE stage_swim AS '
 		'SELECT * FROM swimstaging WHERE season=2019 and new=True')
 
+	print 'wipe powerpoints'
+	db.execute_sql('UPDATE swimmer SET ppts=null '
+		'FROM '
+		'(SELECT sr.id FROM stage_swim ss '
+		'INNER JOIN teamseason ts ON ss.team=ts.team and ss.division=ts.division and ss.gender=ts.gender and '
+		'ss.season=ts.season '
+		'INNER JOIN swimmer sr ON ss.name=sr.name and ts.id=sr.team_id '
+		'LEFT OUTER JOIN swim sw on sw.name=ss.name and sw.event=ss.event and sw.time=ss.time and sw.date=ss.date where sw.id IS NULL '
+		') AS s '
+		'WHERE s.id=swimmer.id ')
+
+	print 'inserting swims'
 	db.execute_sql('INSERT INTO swim (name, event, date, time, season, team, meet, gender, division, relay, '
 				   'swimmer_id) '
 		'SELECT ss.name, ss.event, ss.date, ss.time, ss.season, ss.team, ss.meet, ss.gender, ss.division, ss.relay, '
@@ -244,8 +256,6 @@ def new_load(year=2019):
 				   'ss.season=ts.season '
 		'INNER JOIN swimmer sr ON ss.name=sr.name and ts.id=sr.team_id '
 		'LEFT OUTER JOIN swim sw on sw.name=ss.name and sw.event=ss.event and sw.time=ss.time and sw.date=ss.date where sw.id IS NULL')
-
-	#Swim.raw('UPDATE swimstaging SET new=False WHERE new=True').execute()
 
 	print 'fixing duplicates'
 	fixDupSwimmers(year)
