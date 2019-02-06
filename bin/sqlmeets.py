@@ -1,7 +1,8 @@
 import numpy as np
 from datetime import date as Date, timedelta
+import datetime
 import peewee
-import os, urlparse, time
+import os, urlparse, time, json
 #from scipy.stats import norm, linregress
 #simport matplotlib.pyplot as plt
 
@@ -303,20 +304,26 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 	if not season: # use current season
 		season = thisSeason()
 
-	if verbose: print 'conf sim', season, dateStr
-	if top:
-		conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr)
-	else:  # use avg times
-		conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
-	
-	#print conf_meet
-	conf_meet.events = eventsChamp3
-	conf_meet.topEvents(teamMax=teamMax)
-	conf_meet.score()
-	#print conf_meet.teamScores()
-
+	# estimated taper meet
 	if taper:
-		conf_meet.taper()
+		if not dateStr:
+			dateStr = Date.today()
+		if type(dateStr) == str:
+			dateStr = datetime.datetime.strptime(dateStr, '%Y-%m-%d').date()
+		
+		week = date2week(dateStr)
+
+		if week > 1:
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=40)
+			conf_meet.taper(week=week, division=division)
+		else:
+			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=40)
+			conf_meet.remove_class('Senior')
+	else:
+		if top:
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=40)
+		else:  # use avg times
+			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
 
 	conf_meet.events = eventsChamp3
 	conf_meet.topEvents(teamMax=teamMax)
@@ -324,6 +331,7 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 	#print conf_meet.teamScores()
 	
 	if verbose:
+		print 'conf sim', conf, season, dateStr
 		print conf_meet
 		print conf_meet.teamScores()
 
@@ -332,43 +340,8 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 			nats = True
 		else:
 			nats = False
-		print conf, nats
 		# update the season after you take times from
-		conf_meet.update(division=division, gender=gender, season=season, nats=nats, taper=taper)
-
-	return conf_meet
-
-# simulates conference using last year's times except the freshmen, pull those times from this year and taper
-def future_conference(season, gender, conf, division, week=None, update=False, teamMax=17, verbose=False):
-	if not season: # use current season
-		season = thisSeason()
-
-	# pull top times from last season, then remove seniors
-	if verbose: print 'conf sim', season, conf, gender, division
-	conf_meet = topTimes(conf=conf, season=season - 1, gender=gender, division=division)
-	conf_meet.remove_class('Senior')
-
-	# pull freshman times from date this season if week given
-	if week:
-		frosh_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=frosh_date)
-		conf_meet.get_class('Freshman')
-		
-	conf_meet.events = eventsChamp3
-	conf_meet.topEvents(teamMax=teamMax)
-	conf_meet.score()
-	
-	if verbose:
-		print conf_meet
-		print conf_meet.teamScores()
-
-	if update:
-		if conf == 'Nationals':
-			nats = True
-		else:
-			nats = False
-		print conf, nats
-		# update the season after you take times from
-		conf_meet.update(division=division, gender=gender, season=season, nats=nats)
+		conf_meet.update(division=division, gender=gender, season=season, nats=nats, taper=taper, week=week)
 
 	return conf_meet
 
@@ -427,7 +400,7 @@ def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
 		return
 
 	# national meets probabilities
-	sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate)
+	sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
 
 	# conf meet odds
 	conferences, _ = getConfs()
@@ -435,12 +408,11 @@ def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
 	for conference in conferences[division][gender]:
 		if conference == '':
 			continue
-		sim_conference(conf=conference, gender=gender, season=season, division=division, update=True, dateStr=simDate)
+		sim_conference(conf=conference, gender=gender, season=season, division=division, update=True, dateStr=simDate, taper=True)
 
 	# update team strengths
-	#for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender,
-	#		TeamSeason.season==season):
-	#	team.getWeekStrength(update=True, weeksIn=week, verbose=True)
+	for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.season==season):
+		team.getWeekStrength(update=True, weeksIn=week, verbose=True)
 
 '''
 returns which meets were likely tapers
@@ -624,6 +596,108 @@ def time_drops_data(season, team, gender='Men', division='D1', verbose=False):
 
 	data.to_csv("stats/men_taper_stats.csv")
 
+
+def nats_time_drops(gender='Men', division='D1', outfile='stats/nats_taper_stats', verbose=False):
+	import pandas as pd
+	swims = []
+	for season in range(2010, 2019):
+		date = week2date(week=25, season=season)
+		print date, season, gender, division, len(swims)
+		conf = sim_conference(season, gender=gender, conf='Nationals', division=division, dateStr=date)
+		conf.score()
+		#team_adjustments, team_adjustments2 = {}, {}
+		for event in conf.eventSwims:
+			for swim in conf.eventSwims[event]:
+				# just using scoring swims
+				if swim.score < 1: continue
+				
+				swimmer = swim.getSwimmer()
+				if verbose: print swimmer.name, swimmer.name, event
+				
+				times = {}
+				for seasons_back in range(4):
+					temp_swimmer = swimmer.nextSeason(-seasons_back)
+					#print temp_swimmer.name, temp_swimmer.year
+					if not temp_swimmer: 
+						times[seasons_back] = [None] * 25
+						continue
+					times[seasons_back] = []
+					for week in range(1, 26):
+						date = week2date(week=week, season=(season - seasons_back))
+						#print date, week, season - seasons_back
+						times[seasons_back].append(temp_swimmer.topTime(event=swim.event, date=date))
+
+				newSwim = {'name': swimmer.name,
+							'team': swimmer.team.team, 
+							'gender': gender, 
+							'event': event,
+							'season': season,
+							'place': swim.place,
+							}
+				for season_num in times:
+					for num, time in enumerate(times[season_num]):
+						newSwim['season' + str(season_num) + 'week' + str(num)] = time
+				#print newSwim
+				swims.append(newSwim)
+
+	data = pd.DataFrame(swims)
+	data.to_csv('{0}_{1}_{2}.csv'.format(outfile, division, gender))
+
+
+def save_nats_drop_stats(file_name='model_params.json'):
+	import pandas as pd
+	from statsmodels.formula.api import ols
+	
+	data_d1_men = pd.read_csv('nats_taper_stats_D1_men.csv')
+	data_d1_women = pd.read_csv('nats_taper_stats_D1_women.csv')
+	data_d2_men = pd.read_csv('nats_taper_stats_D2_men.csv')
+	data_d2_women = pd.read_csv('nats_taper_stats_D2_women.csv')
+	data_d3_men = pd.read_csv('nats_taper_stats_D3_men.csv')
+	data_d3_women = pd.read_csv('nats_taper_stats_D3_women.csv')
+	
+	fits = {}
+	for gender in ['Women', 'Men']:
+		fits[gender] = {}
+		for division in ['D1', 'D2', 'D3']:
+			
+			if gender == 'Men':
+				if division == 'D1':
+					data = data_d1_men
+				if division == 'D2':
+					data = data_d2_men
+				if division == 'D3':
+					data = data_d3_men
+			if gender == 'Women':
+				if division == 'D1':
+					data = data_d1_women
+				if division == 'D2':
+					data = data_d2_women
+				if division == 'D3':
+					data = data_d3_women
+					
+			fits[gender][division] = {}
+			for week in range(25):
+				fits[gender][division][week] = {}
+				
+				fits[gender][division][week]['one_season'] = {}
+				fit_str = 'season0week24 ~ season0week{0} - 1'.format(week)
+				model = ols(fit_str, data=data).fit()
+				fits[gender][division][week]['one_season'] = model.params[0]
+				
+				fits[gender][division][week]['two_season'] = {}
+				fit_str = 'season0week24 ~ season0week{0} + season1week24 - 1'.format(week)
+				model = ols(fit_str, data=data).fit()
+				fits[gender][division][week]['two_season'] = [model.params[0], model.params[1]]
+				
+				fits[gender][division][week]['three_season'] = {}
+				fit_str = 'season0week24 ~ season0week{0} + season1week24 + season2week24 - 1'.format(week)
+				model = ols(fit_str, data=data).fit()
+				fits[gender][division][week]['three_season'] = [model.params[0], model.params[1], model.params[2]]
+				
+	print 'season0weekx', 'season1week24', 'season2week24'
+	with open(file_name, 'w') as f:
+		f.write(json.dumps(fits))
+
 if __name__ == "__main__":
 	# database setup
 	urlparse.uses_netloc.append("postgres")
@@ -637,19 +711,16 @@ if __name__ == "__main__":
 	else:
 		db = peewee.PostgresqlDatabase('swimdb', user='hallmank')
 
-	
-	
-	gender='Men'
+	#nats_time_drops(gender='Men', division='D3')
+	update_weekly_stats(division='D1', gender='Men')
+
+	'''
 	division = 'D1'
-	for gender in ['Men', 'Women']:
-		for season in [2016]:
-			for division in ['D1', 'D2', 'D3']:
-				simDate = week2date(week=10, season=season)
-				sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
-				
-				simDate = week2date(week=11, season=season)
-				sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=False)
+	for gender in ['Men']:
+		for season in [2018]:
+			for division in ['D1']:
+				for week in range(25):
+					simDate = week2date(week=week, season=season)
+					conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+	'''
 	
-	#season = 2017
-	#simDate = week2date(week=10, season=season)
-	#sim_conference(conf='Nationals', gender='Women', division='D1', season=season, dateStr=simDate, verbose=True)

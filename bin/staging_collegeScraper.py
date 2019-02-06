@@ -421,6 +421,7 @@ def topTimesLoop():
 											  number=7000, season=year)
 	#purposefuly load duplicates then delete
 	print 'deleting dups'
+	
 	Swimstaging.raw('DELETE '
 		'FROM swimstaging '
 		'USING ( '

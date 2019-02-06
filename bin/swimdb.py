@@ -1,5 +1,5 @@
 from peewee import PostgresqlDatabase, ForeignKeyField, CharField, IntegerField, IntegrityError, FloatField, fn, Model, DateField, BooleanField
-import os, heapq, urlparse, re, numpy as np, time as Time
+import os, heapq, urlparse, re, json, numpy as np, time as Time
 from datetime import date as Date, timedelta
 from playhouse.migrate import PostgresqlMigrator, migrate
 from math import log
@@ -100,7 +100,7 @@ def getSkewDist(gender, division, event):
 
 '''make time look nice'''
 def swimTime(time):
-	parts = re.split("\.", str(time))
+	parts = re.split(r"\.", str(time))
 	if not len(parts)==2:
 		return time
 	(seconds, point) = parts[0], parts[1]
@@ -663,13 +663,10 @@ class TeamStats(Model):
 	confscore = IntegerField(null=True)
 	date = DateField()  # will be the date the stats were current as of
 	week = IntegerField(null=True)
-	pretaper = FloatField(null=True)
 	toptaper = FloatField(null=True)
-	toptaperstd = FloatField(null=True)
-	mediantaper = FloatField(null=True)
-	mediantaperstd = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
+	taper = BooleanField(default=False)
 	class Meta:
 		database = db
 
@@ -687,87 +684,46 @@ class Swimmer(Model):
 	class Meta:
 		database = db
 
-	def similarSwimmers(self, num=3):
-		swims1 = self.eventPPts()
-		print swims1
+	def predictTime(self, week, event, elite=True, division='D1', params=None, verbose=False):
+		if params:
+			params = params[self.gender][division]#self.team.division]
 
+		#find previous season's best
+		pre_swimmer = self.nextSeason(-1)
+		pre_time, time = None, None
+		#start= Time.time()
+		if pre_swimmer:
+			for swim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==pre_swimmer, Swim.event==event):
+				pre_time = swim.min
+		
+		#find this season's best
+		date = week2date(week=week, season=self.season)
+		for swim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==self, Swim.event==event, Swim.date<date):
+			time = swim.min
+		#print Time.time() - start
+		if verbose:
+			print self.name, event
+			print 'previous time', pre_time
+			print 'mid top time', time
 
-		totalDeltas = {}
-		# same season
-		for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
-				Swimmer.year==self.year, TeamSeason.division==self.team.division).order_by(fn.Random()).limit(10000):
-			if s2.id==self.id:  # don't use own times
-				continue
-			swims2 = s2.eventPPts()
+		# one time doesn't exist
+		if not pre_time:
+			if not time: 
+				return
+			return time * params[str(week-1)]['one_season']['0']
 
-			totalDeltas[s2] = 0
-			for event in allEvents:
-				if event in swims1 and event in swims2:
-					totalDeltas[s2] += (swims1[event] - swims2[event]) ** 2
-				elif event in swims1:
-					totalDeltas[s2] += swims1[event] ** 2
-				elif event in swims2:
-					totalDeltas[s2] += swims2[event] ** 2
+		# no current time or no current taper times (<week 7)
+		if not time or week<7:
+			return pre_time * params['last_season']['0']
+		return time * params[str(week-1)]['two_season']['0'] + pre_time * params[str(week-1)]['two_season']['1']
 
-		# previous season
-		previous = self.nextSeason(-1)
-		if previous:
-			swims1 = previous.eventPPts()
-			for s2 in Swimmer.select(Swimmer, TeamSeason).join(TeamSeason).where(Swimmer.gender==self.gender,
-					Swimmer.year=='Freshman', TeamSeason.division==self.team.division).order_by(fn.Random()).limit(10000):
-				if s2.id==self.id:  # don't use own times
-					continue
-				swims2 = s2.eventPPts()
-				next2 = s2.nextSeason()
-				if not next2 in totalDeltas:  # previous year doesn't match
-					continue
-				for event in allEvents:
-					if event in swims1 and event in swims2:
-						totalDeltas[next2] += (swims1[event] - swims2[event]) ** 2
-					elif event in swims1:
-						totalDeltas[next2] += swims1[event] ** 2
-					elif event in swims2:
-						totalDeltas[next2] += swims2[event] ** 2
-
-		totalSwimmers = 0
-		totalEvents = 0
-		events = {}
-		for swimmer, value in sorted(totalDeltas.iteritems(), key=lambda (k, v): (v, k)):
-			totalSwimmers += 1
-			if totalSwimmers > num:
-				break
-			futureSwimmer = swimmer.nextSeason()
-			if futureSwimmer:
-				tapers = futureSwimmer.getTaperSwims()
-				for event in tapers:
-					if not event in events:
-						events[event] = []
-					events[event].append(tapers[event].time)
-					totalEvents += 1
-
-		# now average out the times for the most similar swimmers
-		predictedTapers = {}
-		for event in events:
-			time = np.mean(events[event])
-			ppt = round(Swim(event=event, division=self.team.division, gender=self.gender, time=time).getPPTs())
-			std = np.std(events[event])
-			percent = float(len(events[event]))/ float(totalEvents)
-			predictedTapers[event] = {'time':time, 'std': std, 'ppts': ppt, 'percent': percent}
-			print event, time, std, ppt, percent
-
-
-		print 'swimmer1'
-		tapers = s1.getTaperSwims()
-		for event in tapers:
-			print event, tapers[event].time
-		print 'next season'
-		futureSelf = s1.nextSeason()
-		if futureSelf:
-			futureTapers = futureSelf.getTaperSwims()
-			for event in futureTapers:
-				print event, futureTapers[event].time, futureTapers[event].getPPTs()
-
-		return tapers, futureTapers, predictedTapers
+	def topTime(self, event, date=None):
+		if not date:
+			for swim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==self, Swim.event==event):
+				return swim.min
+		for swim in Swim.select(fn.min(Swim.time)).where(Swim.swimmer==self, Swim.event==event, Swim.date<date):
+			return swim.min
+		return None
 
 	def stats(self, distNum=20, topNum=3):  # used to find if two swimmers are similar
 		topSwims = self.topSwims(distNum)
@@ -875,7 +831,7 @@ class Swimmer(Model):
 
 	def nextSeason(self, years=1):
 		try:
-			return Swimmer.get(Swimmer.team==self.team.nextSeason(), Swimmer.gender==self.gender,
+			return Swimmer.get(Swimmer.team==self.team.nextSeason(years=years), Swimmer.gender==self.gender,
 						   Swimmer.name==self.name)
 		except Swimmer.DoesNotExist:
 			return
@@ -1037,39 +993,12 @@ class Swim(Model):
 
 		return name+br+self.getScoreTeam()+genderStr+br+event+br+time+br+meet
 
-	def taper(self, weeks, noise=0):
-		#taper, taperStd = self.swimmer.team.getTaperStats(weeks=weeks)
-		team = self.getTeam()
-		taper = team.getTaperStats(weeks=weeks)
-		if not taper:
-			taper = .015
-		#print taper, team
-		self.taperTime = self.time - self.time * taper + self.time * noise
-		self.scoreTime = self.time - self.time * taper + self.time * noise
-
-	def improve(self, database):
-		if self.division:
-			division=self.division
-		else:
-			division='D3'
-
-		if '1000' in self.event or 'Relay' in self.event:
-			self.scoreTime = self.time
-			return self
-		try:
-			f = database.getExtrapEvent(gender=self.gender, division=division, year=self.year, event=self.event)
-			newTime = self.time + f(self.time)
-			# cap improvement, regression for really slow and fast times at 2%
-			if newTime > 1.02 * self.time:
-				self.scoreTime = self.time * 1.02
-			elif newTime < .98 * self.time:
-				self.scoreTime = .98 * self.time
-			else:
-				self.scoreTime = newTime
-		except:
-			self.scoreTime = self.time
-
-		return self
+	def taper(self, week, params=None, division=division):
+		time = self.getSwimmer().predictTime(week=week, event=self.event, params=params, division=division)
+		self.taperTime = self.scoreTime = time
+		self.meet = None
+		self.date = None
+		return time
 
 	def getTaperTime(self):
 		if self.taperTime:
@@ -1234,8 +1163,10 @@ class Meet:
 	
 	def get_class(self, year='Freshman'):
 		for event in self.eventSwims:
-			self.eventSwims[event] = [swim for swim in self.eventSwims[event] if swim.year == year]
-		return self.eventSwims
+			for swim in self.eventSwims[event]:
+				if swim.year==year:
+					yield swim
+			#self.eventSwims[event] = [swim for swim in self.eventSwims[event] if swim.year == year]
 
 	def getEvents(self, events=''):
 		myEvents = set(self.eventSwims.keys())
@@ -1486,10 +1417,16 @@ class Meet:
 				relay.changeSwimmer(swim1, swim2)
 				return
 
-	def taper(self, weeks=10):
+	def taper(self, week=10, division='D1'):
+		with open('bin/model_params.json') as f:
+			taper_params = json.load(f)
+		
 		for event in self.eventSwims:
+			#start = Time.time()
+			#print event, len(self.eventSwims[event])
 			for swim in self.eventSwims[event]:
-				swim.taper(weeks=weeks)
+				swim.taper(week=week, params=taper_params, division=division)
+			#print Time.time() - start
 		return self
 
 	'''
@@ -1612,39 +1549,15 @@ class Meet:
 						teamSwims[team] += 1
 					preSwim = swim
 
-	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500, teamSigma=.02,
-						weeksOut=None, taper=False):
-		# need to include taper by teams
-		if taper:
-			weeksIn = 16 - weeksOut
-			self.taper(weeksIn)
-		# default the sigma if we just know the date
-		if weeksOut == -1:
-			sigma = 0.045
-			teamSigma = .02
-		elif weeksOut <= 4:
-			teamSigma = .01
-			sigma = 0.025
-		elif weeksOut <= 8:
-			teamSigma = .015
-			sigma = 0.035
-		elif weeksOut <= 12:
-			teamSigma = 0.015
-			sigma = 0.0425
-		elif weeksOut <= 16:
-			teamSigma = 0.025
-			sigma = 0.045
-		elif weeksOut > 16:
-			teamSigma = .0325
-			sigma = 0.0375
-
+	def scoreMonteCarlo(self, dual=None, events='', heatSize=8, heats=2, sigma=.02, runs=500):
 		events = self.getEvents(events)
-		# print teamSigma, sigma, weeksOut
 
 		for event in self.eventSwims:  # assign scores to the swims
 			if not event in events and self.eventSwims[event]:  # set score of those not being swum to zero
 				for swim in self.eventSwims[event]:
 					swim.score = 0
+		
+		sigmai = teamSigma = sigma * .71 # sqrt(2)/2
 
 		teamScoresDist = []
 		for _ in range(runs):  # run runs # of times
@@ -1652,9 +1565,10 @@ class Meet:
 			for team in self.teams:
 				teamTapers[team] = np.random.normal(0, teamSigma)
 			for event in self.eventSwims:  # individual swim noise
+				if event not in events: continue
 				for swim in self.eventSwims[event]:
 					if swim.time:
-						noise = np.random.normal(0, sigma) * swim.getTaperTime()
+						noise = np.random.normal(0, sigmai) * swim.getTaperTime()
 						teamNoise = teamTapers[swim.team] * swim.getTaperTime()
 						swim.scoreTime = swim.getTaperTime() + noise + teamNoise
 
@@ -1663,8 +1577,8 @@ class Meet:
 
 			# now score
 			self.assignPoints(dual=dual, heats=heats, heatSize=heatSize, events=events)
-
 			teamScoresDist.append(self.teamScores(events))
+
 		self.reset(times=True)  # reset the times to normal
 
 		places = {}  # stores the number of times each team was 1st, 2nd, ect.
@@ -1748,7 +1662,7 @@ class Meet:
 		return self.scores[0][0]
 
 	# update stored win probabilities
-	def update(self, division, gender, season, nats=False, taper=True, verbose=True, week=None):
+	def update(self, division, gender, season, nats=False, taper=False, verbose=False, week=None):
 		if week:
 			weeksIn = week
 			date = week2date(weeksIn, season)
@@ -1758,7 +1672,6 @@ class Meet:
 			else:
 				date = Date.today()
 			weeksIn = date2week(date)
-		weeksOut = 16 - weeksIn
 
 		# score monte carlo to find win probs then reset to real scores
 		self.score()
@@ -1766,18 +1679,23 @@ class Meet:
 		for piece in self.teamScores():
 			team, score = piece[0], piece[1]
 			scores[team] = score
-		self.scoreMonteCarlo(weeksOut=weeksOut, taper=taper, runs=100)
+
+		with open('bin/model_params.json') as f:
+			taper_params = json.load(f)
+		sigma = taper_params[gender][division]['last_season']['error']
+		print 'sigma', sigma
+		self.scoreMonteCarlo(runs=500, sigma=sigma)
 		teamProb = self.getWinProb()
 
-		if verbose:
-			print teamProb
-			print weeksIn, date
+		#if verbose:
+		print teamProb
+		print weeksIn, date
 
 		for team in teamProb:
 			try:
 				teamSeason = TeamSeason.get(team=team, division=division, gender=gender, season=season)
 				try:
-					stats = TeamStats.get(team=teamSeason.id, week=weeksIn)
+					stats = TeamStats.get(team=teamSeason.id, week=weeksIn, taper=taper)
 					score = scores[team]
 					if nats:
 						stats.winnats = teamProb[team]
@@ -1788,15 +1706,15 @@ class Meet:
 						stats.confscore = score
 						stats.date = date
 					if verbose: print 'Existing:', team, season, stats.winconf, stats.winnats, weeksIn, date, \
-						teamSeason.id, stats.id, stats.confscore, stats.natsscore
+						teamSeason.id, stats.id, stats.confscore, stats.natsscore, taper
 					stats.save()
 				except TeamStats.DoesNotExist:
 					score = self.getTeamScore(team)
 					if verbose: print 'New:', team, season, teamProb[team], weeksIn, date, score, nats
 					if nats:
-						TeamStats.create(team=teamSeason.id, week=weeksIn, winnats=teamProb[team], natsscore=score, date=date)
+						TeamStats.create(team=teamSeason.id, week=weeksIn, winnats=teamProb[team], natsscore=score, date=date, taper=taper)
 					else:
-						TeamStats.create(team=teamSeason.id, week=weeksIn, winconf=teamProb[team], confscore=score, date=date)
+						TeamStats.create(team=teamSeason.id, week=weeksIn, winconf=teamProb[team], confscore=score, date=date, taper=taper)
 			except TeamSeason.DoesNotExist:
 				if verbose: print 'wrong', team, division, gender, season
 
@@ -1896,6 +1814,7 @@ class Meet:
 			print "-------------------------------------------------------------------------------------"
 			print "Event: " + event
 			for swim in self.eventSwims[event]:
+				if swim.place > 20: continue
 				if swim.score:
 					print swim.printScore().lstrip()+"\t"+str(swim.score)
 				else:
@@ -2002,43 +1921,26 @@ class Timedist(Model):
 		database = db
 
 
-def testTimePre():
-	misses = []
-	flatMisses = []
-	for s1 in Swimmer.select().where(Swimmer.gender=='Men', Swimmer.year=='Sophomore').order_by(fn.Random()).limit(200):
-		if not s1.nextSeason():
-			continue
-		times, futureTimes, predictedTimes = s1.similarSwimmers()
-		for event in futureTimes:
-			if event in predictedTimes:
-				misses.append(abs(futureTimes[event].time - predictedTimes[event]['time']) / futureTimes[event].time)
-			if event in times:
-				flatMisses.append(abs(times[event].time*.99 - futureTimes[event].time) / futureTimes[event].time)
-	print 'knn', np.mean(misses), np.std(misses)
-	print 'flat', np.mean(flatMisses), np.std(flatMisses)
-
-	for team in TeamSeason.select().where(TeamSeason.season << [2016, 2015]):
-		try:
-			TeamStats.get(team=team.id, week=18)
-		except TeamStats.DoesNotExist:
-			for week in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
-				team.findTaperStats(weeks=week)
-
-
 if __name__ == '__main__':
-
-	#carleton = TeamSeason.get(id=10511)
-	#carleton.getWeekStrength(weeksIn=4, update=True, verbose=True)
 	migrator = PostgresqlMigrator(db)
 	#db.drop_table(Swimstaging)
 	#db.create_table(Swimstaging)
 	with db.transaction():
 		migrate(
-			migrator.add_column('teamstats', 'pretaper', TeamStats.pretaper),
-			migrator.add_column('teamstats', 'confscore', TeamStats.confscore),
-			migrator.add_column('teamstats', 'natsscore', TeamStats.natsscore)
+			migrator.drop_column('teamstats', 'taper'),
+			migrator.add_column('teamstats', 'taper', TeamStats.taper),
+			migrator.drop_column('teamstats', 'pretaper'),
+			migrator.drop_column('teamstats', 'toptaperstd'),
+			migrator.drop_column('teamstats', 'mediantaper'),
+			migrator.drop_column('teamstats', 'toptaperstd'),
+			#migrator.add_column('teamstats', 'natsscore', TeamStats.natsscore)
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)
 		)
-	#for team in TeamSeason.select().where(TeamSeason.season==2017):
-	#	team.findTaperStats(pre_season=True, this_season=False)
+	
+
+	#texas = TeamSeason.get(team='Texas', season=2018, gender='Men')
+	#for swim in texas.getTaperSwims():
+	#	print swim.event, swim.name, 'week 10'
+	#	print swim.swimmer.predictTime(week=10, event=swim.event, elite=True)
+	#	print 'real', swim.swimmer.topTime(event=swim.event)

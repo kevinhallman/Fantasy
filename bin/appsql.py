@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
-import web
+import web, re, json, os, urlparse
 import sqlmeets
-import re
-import json
-import os, urlparse
+
 from numpy import percentile, median, mean, std, average
-from peewee import *
 from math import isnan, pow
 from swimdb import TeamSeason, Swim, swimTime, db
 from swimdb import getSkewDist as getSkewDistCollege
@@ -303,8 +300,12 @@ class Conf():
 			swimdate = None
 
 		if form.conference:
+			taper = False
 			if form.taper == 'Top Time':
 				topTimes = True
+			elif form.taper == 'Taper':
+				topTimes = True
+				taper = True
 			else:
 				topTimes = False
 
@@ -315,8 +316,7 @@ class Conf():
 			else:
 				size = 17
 			if form.conference == 'Nationals':
-				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate,
-											   top=topTimes, teamMax=size)
+				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate, top=topTimes, teamMax=size, taper=taper)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -325,8 +325,7 @@ class Conf():
 				scores = confMeet.scoreString(25)
 				teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 			else:
-				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate,
-											   top=topTimes, teamMax=size)
+				confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate, top=topTimes, teamMax=size, taper=taper)
 				if form.heats and form.heats=='24':
 					confMeet.setHeats(heats=3)
 				else:
@@ -1194,7 +1193,7 @@ class getConfs():
 		try:
 			return json.dumps(conferences[form.division][form.gender].keys())
 		except:
-			return json.dumps()
+			return {}
 
 class getTeams():
 	def GET(self):
@@ -1203,7 +1202,7 @@ class getTeams():
 		try:
 			return json.dumps(allTeams[form.gender][form.division])
 		except:
-			return json.dumps()
+			return {}
 
 # HTML generators
 
