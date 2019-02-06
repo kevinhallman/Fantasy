@@ -1927,7 +1927,7 @@ if __name__ == '__main__':
 	#db.create_table(Swimstaging)
 	with db.transaction():
 		migrate(
-			migrator.drop_column('teamstats', 'taper'),
+			#migrator.drop_column('teamstats', 'taper'),
 			migrator.add_column('teamstats', 'taper', TeamStats.taper),
 			migrator.drop_column('teamstats', 'pretaper'),
 			migrator.drop_column('teamstats', 'toptaperstd'),
