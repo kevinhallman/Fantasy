@@ -273,7 +273,7 @@ class Conf():
 						 gender=None, heats=None, size=None)
 		setGenDiv(form.gender, form.division)
 
-		start = Time.time()
+		#start = Time.time()
 		division = session.division
 		gender = session.gender
 		confDict = conferences[division][gender]
@@ -338,7 +338,7 @@ class Conf():
 		else:
 			scores = None
 			teamScores = None
-			winProb = None  # used for monte carlo simulations
+			# winProb = None  # used for monte carlo simulations
 		if teamScores:
 			table = googleTable(teamScores, scores['scores'])
 		else:
@@ -369,23 +369,26 @@ class ConfJSON():
 		else:
 			swimdate = None
 
-		if form.taper.title() == 'Top Time':
+		taper = False
+		if form.taper == 'Top Time':
 			topTimes = True
+		elif form.taper == 'Taper':
+			topTimes = True
+			taper = True
 		else:
 			topTimes = False
 		if form.conference.title() == 'Nationals':
-			confMeet = sqlmeets.sim_conference(season, gender, form.conference.title(), division, swimdate,
-											   top=topTimes)
+			confMeet = sqlmeets.sim_conference(season, gender, form.conference.title(), division, swimdate, top=topTimes, taper=taper)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
 				confMeet.setHeats(heats=2)
-				confMeet.score()
+			confMeet.score()
 			scores = confMeet.scoreString(25)
 			teamScores = confMeet.scoreReport(repressSwim=True, repressTeam=True)
 		else:
 			#print season, gender, form.conference.title(), division, swimdate, topTimes
-			confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate, top=topTimes)
+			confMeet = sqlmeets.sim_conference(season, gender, form.conference, division, swimdate, top=topTimes, taper=taper)
 			if form.heats and form.heats=='24':
 				confMeet.setHeats(heats=3)
 			else:
@@ -683,19 +686,12 @@ class ProgramsJSON():
 
 		return json.dumps(teamRankLabel)
 
-topTeamCache = {'D1': {'Men': None, 'Women': None}, 'D2': {'Men': None, 'Women': None}, 'D3': {'Men': None, 'Women': None}}
-
 class SeasonRankings():
 	def GET(self):
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
 
-		# check cache first
-		if topTeamCache[form.division][form.gender]:
-			topTeams = topTeamCache[form.division][form.gender]
-		else:
-			topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
-			topTeamCache[form.division][form.gender] = topTeams
+		topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		rank = showRank(topTeams)
 		return render.preseason(rank)
@@ -704,13 +700,7 @@ class SeasonRankingsJSON():
 	def GET(self):
 		form = web.input(gender=None, division=None)
 		setGenDiv(form.gender, form.division)
-
-		# check cache first
-		if topTeamCache[form.division][form.gender]:
-			topTeams = topTeamCache[form.division][form.gender]
-		else:
-			topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
-			topTeamCache[form.division][form.gender] = topTeams
+		topTeams = sqlmeets.teamRank(gender=session.gender, division=session.division, season=currentSeason)
 
 		response = {}
 		for idx, team in enumerate(topTeams):

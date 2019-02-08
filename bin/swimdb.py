@@ -355,8 +355,7 @@ class TeamSeason(Model):
 			stats.strengthinvite = scoreInvite
 			stats.save()
 		except TeamStats.DoesNotExist:
-			TeamStats.create(team=self.id, week=weeksIn, strengthinvite=scoreInvite, strengthdual=scoreDual,
-								 date=simDate)
+			TeamStats.create(team=self.id, week=weeksIn, strengthinvite=scoreInvite, strengthdual=scoreDual, date=simDate, taper=False)
 
 		if invite:
 			if update:
@@ -1417,17 +1416,85 @@ class Meet:
 				relay.changeSwimmer(swim1, swim2)
 				return
 
-	def taper(self, week=10, division='D1'):
+	def taper(self, week=10, division='D1', gender='Women', verbose=False):
 		with open('bin/model_params.json') as f:
 			taper_params = json.load(f)
+			params = taper_params[gender][division]
 		
+		# insert all the swimmers and events we will need to taper
+		db.execute_sql('CREATE TEMP TABLE swimmer_event(id INT, event VARCHAR)')
+		query_string = ''
+		query_string += 'INSERT INTO swimmer_event VALUES '
 		for event in self.eventSwims:
-			#start = Time.time()
-			#print event, len(self.eventSwims[event])
 			for swim in self.eventSwims[event]:
-				swim.taper(week=week, params=taper_params, division=division)
-			#print Time.time() - start
-		return self
+				query_string += "({0}, '{1}'),".format(swim.swimmer.id, event)
+		# chop trailing comma
+		query_string = query_string[:-1]
+		db.execute_sql(query_string)
+		
+		# find top times from this season
+		date = week2date(week, 2019)
+		times = {}
+		for swim in Swim.raw('SELECT ranked_swims.id, ranked_swims.event, ranked_swims.time FROM ( '
+			'SELECT swim.time, swimmer_event.*, rank() OVER ( '
+				'PARTITION BY swimmer_event.id, swim.event '
+				'ORDER BY swim.time '
+			') '
+			'FROM swimmer_event '
+			'INNER JOIN swim ON swim.swimmer_id=swimmer_event.id and swim.event=swimmer_event.event '
+			'WHERE swim.date < %s'
+			') ranked_swims WHERE rank=1', date):
+			if swim.id not in times:
+				times[swim.id] = {}
+			times[swim.id][swim.event] = {'current': swim.time}
+		
+		# get top times from last season
+		for swim in Swim.raw('SELECT ranked_swims.id, ranked_swims.event, ranked_swims.time, ranked_swims.date FROM ( '
+			'SELECT swim.time, swim.date, swimmer_event.*, rank() OVER ( '
+				'PARTITION BY swimmer_event.id, swim.event '
+				'ORDER BY swim.time '
+			') '
+			'FROM swimmer_event '
+			'INNER JOIN swimmer s ON s.id=swimmer_event.id '
+			'INNER JOIN teamseason ts ON s.team_id=ts.id '
+			'INNER JOIN teamseason ts2 ON ts.team=ts2.team and ts.season-1=ts2.season '
+			'INNER JOIN swimmer s2 ON s.name=s2.name and s2.team_id=ts2.id '
+			'INNER JOIN swim ON swim.swimmer_id=s2.id and swim.event=swimmer_event.event '
+			') ranked_swims WHERE rank=1'):
+			times[swim.id][swim.event]['pre_time'] = swim.time
+
+		# now taper based off of parameters
+		for event in self.eventSwims:
+			for swim in self.eventSwims[event]:
+				swim.meet = None
+				swim.date = None
+				try:
+					pre_time = times[swim.swimmer.id][swim.event]['pre_time']
+				except:
+					pre_time = None
+				try:
+					time = times[swim.swimmer.id][swim.event]['current']
+				except:
+					time = None
+				if verbose:
+					print self.name, event
+					print 'previous time', pre_time
+					print 'mid top time', time
+
+				# one time doesn't exist
+				if not pre_time:
+					if not time: 
+						taper_time = None
+					else:
+						taper_time = time * params[str(week-1)]['one_season']['0']
+				else:
+					# no current time or no current taper times (<week 7)
+					if not time or week<7:
+						taper_time = pre_time * params['last_season']['0']
+					else:
+						taper_time = time * params[str(week-1)]['two_season']['0'] + pre_time * params[str(week-1)]['two_season']['1']
+				
+				swim.taperTime = swim.scoreTime = taper_time
 
 	'''
 	gives the expected score of the top team limup as compared to the whole division
@@ -1928,11 +1995,11 @@ if __name__ == '__main__':
 	with db.transaction():
 		migrate(
 			#migrator.drop_column('teamstats', 'taper'),
-			migrator.add_column('teamstats', 'taper', TeamStats.taper),
-			migrator.drop_column('teamstats', 'pretaper'),
-			migrator.drop_column('teamstats', 'toptaperstd'),
-			migrator.drop_column('teamstats', 'mediantaper'),
-			migrator.drop_column('teamstats', 'toptaperstd'),
+			#migrator.add_column('teamstats', 'taper', TeamStats.taper),
+			#migrator.drop_column('teamstats', 'pretaper'),
+			#migrator.drop_column('teamstats', 'toptaperstd'),
+			#migrator.drop_column('teamstats', 'mediantaper'),
+			#migrator.drop_column('teamstats', 'toptaperstd'),
 			#migrator.add_column('teamstats', 'natsscore', TeamStats.natsscore)
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
 			#migrator.add_column('swim', 'powerpoints', Swim.powerpoints)

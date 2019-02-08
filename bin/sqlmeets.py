@@ -315,7 +315,7 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 
 		if week > 1:
 			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=40)
-			conf_meet.taper(week=week, division=division)
+			conf_meet.taper(week=week, division=division, gender=gender)
 		else:
 			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=40)
 			conf_meet.remove_class('Senior')
@@ -346,18 +346,21 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 	return conf_meet
 
 '''
-returns top 25 teams and caches ranking data
+returns top 25 teams by est invite strength. Don't worry about taper since strength isn't tapered
 '''
 def teamRank(division='D3', gender='Men', season=2016, num=25):
-	teamScores = {}
-	for team in TeamSeason.select().where(TeamSeason.gender==gender, TeamSeason.division==division,
-							TeamSeason.season==season):
-		teamScores[team.team] = team
-	teams = sorted(teamScores.values(), key=lambda t: t.getStrength(), reverse=True)[:num]
-
-	return teams
-
-
+	teams = []
+	for team in TeamSeason.raw('SELECT rank_filter.* FROM ( '
+		'SELECT teamseason.*, teamstats.strengthinvite as strength, rank() OVER ( '
+			'PARTITION BY teamseason.id '
+			'ORDER BY teamstats.week DESC '
+		') '
+		'FROM teamseason '
+		'INNER JOIN teamstats ON teamseason.id=teamstats.team_id '
+		'WHERE gender=%s and division=%s and season=%s and teamstats.strengthinvite IS NOT NULL '
+		') rank_filter WHERE rank=1 ORDER BY strength DESC LIMIT %s', gender, division, season, num):
+		teams.append(team)
+	return teams1
 '''
 Returns top swimmers in a conference by top 3 event ppts
 '''
@@ -712,7 +715,7 @@ if __name__ == "__main__":
 		db = peewee.PostgresqlDatabase('swimdb', user='hallmank')
 
 	#nats_time_drops(gender='Men', division='D3')
-	update_weekly_stats(division='D1', gender='Men')
+	#update_weekly_stats(division='D1', gender='Men')
 
 	'''
 	division = 'D1'
@@ -723,4 +726,4 @@ if __name__ == "__main__":
 					simDate = week2date(week=week, season=season)
 					conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
 	'''
-	
+	conf = sim_conference(conf='Nationals', gender='Women', division='D1', season=2019, update=False, taper=True)
