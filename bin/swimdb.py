@@ -222,9 +222,9 @@ class TeamSeason(Model):
 		for stats in TeamStats.select().where(TeamStats.team==lastSeason.id, TeamStats.week >= weeks)\
 				.limit(1).order_by(TeamStats.week):
 			if toptime:
-				return stats.toptaper, stats.toptaperstd
+				return stats.toptaper, 0 #stats.toptaperstd
 			else:
-				return stats.mediantaper, stats.mediantaperstd
+				return stats.mediantaper, 0 #stats.mediantaperstd
 		return None, None
 
 	def findTaperStats(self, weeks=10, topTime=True, averageTime=True, pre_season=False, this_season=True):

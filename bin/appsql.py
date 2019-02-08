@@ -3,6 +3,7 @@
 import web, re, json, os, urlparse
 import sqlmeets
 
+from peewee import fn
 from numpy import percentile, median, mean, std, average
 from math import isnan, pow
 from swimdb import TeamSeason, Swim, swimTime, db

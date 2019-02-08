@@ -360,7 +360,7 @@ def teamRank(division='D3', gender='Men', season=2016, num=25):
 		'WHERE gender=%s and division=%s and season=%s and teamstats.strengthinvite IS NOT NULL '
 		') rank_filter WHERE rank=1 ORDER BY strength DESC LIMIT %s', gender, division, season, num):
 		teams.append(team)
-	return teams1
+	return teams
 '''
 Returns top swimmers in a conference by top 3 event ppts
 '''
