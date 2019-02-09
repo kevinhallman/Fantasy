@@ -1417,12 +1417,15 @@ class Meet:
 				return
 
 	def taper(self, week=10, division='D1', gender='Women', verbose=False):
+		start = Time.time()
+		print 'taper performance'
 		with open('bin/model_params.json') as f:
 			taper_params = json.load(f)
 			params = taper_params[gender][division]
-		
+
 		# insert all the swimmers and events we will need to taper
 		db.execute_sql('CREATE TEMP TABLE swimmer_event(id INT, event VARCHAR)')
+		print Time.time() - start
 		query_string = ''
 		query_string += 'INSERT INTO swimmer_event VALUES '
 		for event in self.eventSwims:
@@ -1430,7 +1433,9 @@ class Meet:
 				query_string += "({0}, '{1}'),".format(swim.swimmer.id, event)
 		# chop trailing comma
 		query_string = query_string[:-1]
+		print Time.time() - start
 		db.execute_sql(query_string)
+		print Time.time() - start
 		
 		# find top times from this season
 		date = week2date(week, 2019)
@@ -1447,6 +1452,7 @@ class Meet:
 			if swim.id not in times:
 				times[swim.id] = {}
 			times[swim.id][swim.event] = {'current': swim.time}
+		print Time.time() - start
 		
 		# get top times from last season
 		for swim in Swim.raw('SELECT ranked_swims.id, ranked_swims.event, ranked_swims.time, ranked_swims.date FROM ( '
@@ -1462,6 +1468,7 @@ class Meet:
 			'INNER JOIN swim ON swim.swimmer_id=s2.id and swim.event=swimmer_event.event '
 			') ranked_swims WHERE rank=1'):
 			times[swim.id][swim.event]['pre_time'] = swim.time
+		print Time.time() - start
 
 		# now taper based off of parameters
 		for event in self.eventSwims:
@@ -1495,6 +1502,7 @@ class Meet:
 						taper_time = time * params[str(week-1)]['two_season']['0'] + pre_time * params[str(week-1)]['two_season']['1']
 				
 				swim.taperTime = swim.scoreTime = taper_time
+		print Time.time() - start
 
 	'''
 	gives the expected score of the top team limup as compared to the whole division
