@@ -304,7 +304,7 @@ class Conf():
 			taper = False
 			if form.taper == 'Top Time':
 				topTimes = True
-			elif form.taper == 'Taper':
+			elif form.taper == 'Estimated Taper':
 				topTimes = True
 				taper = True
 			else:
@@ -373,7 +373,7 @@ class ConfJSON():
 		taper = False
 		if form.taper == 'Top Time':
 			topTimes = True
-		elif form.taper == 'Taper':
+		elif form.taper == 'Estimated Taper':
 			topTimes = True
 			taper = True
 		else:
