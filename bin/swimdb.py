@@ -1478,11 +1478,11 @@ class Meet:
 				swim.meet = None
 				swim.date = None
 				try:
-					pre_time = times[swim.swimmer.id][swim.event]['pre_time']
+					pre_time = times[swim._data['swimmer']][swim.event]['pre_time']
 				except:
 					pre_time = None
 				try:
-					time = times[swim.swimmer.id][swim.event]['current']
+					time = times[swim._data['swimmer']][swim.event]['current']
 				except:
 					time = None
 				if verbose:
