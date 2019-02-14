@@ -727,4 +727,4 @@ if __name__ == "__main__":
 					conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
 	'''
 	conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
-	print conf
+	#print conf
