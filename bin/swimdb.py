@@ -1545,7 +1545,7 @@ class Meet:
 				preTime = None
 				for idx, swim in enumerate(self.eventSwims[event]):
 					# assign same place for ties
-					if swim.time != preTime:
+					if swim.getScoreTime() != preTime:
 						swim.place = idx + 1
 					else:
 						swim.place = idx
@@ -1889,7 +1889,7 @@ class Meet:
 			print "-------------------------------------------------------------------------------------"
 			print "Event: " + event
 			for swim in self.eventSwims[event]:
-				if swim.place > 20: continue
+				if swim.place > 30: continue
 				if swim.score:
 					print swim.printScore().lstrip()+"\t"+str(swim.score)
 				else:

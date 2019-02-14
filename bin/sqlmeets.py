@@ -287,7 +287,7 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 				"WHERE ts.season=%s and ts.gender=%s and ts.division=%s and swim.date<%s and ts.conference=%s"
 			") AS a "
 			"WHERE a.rank=1", season, gender, division, dateStr, conf)
-
+	
 	for swim in query:
 		swim.gender = gender
 		swim.division = division
@@ -312,23 +312,23 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 			dateStr = datetime.datetime.strptime(dateStr, '%Y-%m-%d').date()
 		
 		week = date2week(dateStr)
+		if verbose: print week
 
 		if week > 1:
-			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=40)
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=100)
 			conf_meet.taper(week=week, division=division, gender=gender)
 		else:
-			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=40)
+			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=100)
 			conf_meet.remove_class('Senior')
 	else:
 		if top:
-			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=40)
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=100)
 		else:  # use avg times
 			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
 
 	conf_meet.events = eventsChamp3
 	conf_meet.topEvents(teamMax=teamMax)
 	conf_meet.score()
-	#print conf_meet.teamScores()
 	
 	if verbose:
 		print 'conf sim', conf, season, dateStr
@@ -726,4 +726,5 @@ if __name__ == "__main__":
 					simDate = week2date(week=week, season=season)
 					conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
 	'''
-	conf = sim_conference(conf='Nationals', gender='Women', division='D1', season=2019, update=False, taper=True)
+	conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
+	print conf
