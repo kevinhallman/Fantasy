@@ -1430,7 +1430,9 @@ class Meet:
 		query_string += 'INSERT INTO swimmer_event VALUES '
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
-				query_string += "({0}, '{1}'),".format(swim.swimmer.id, event)
+				#print swim.__dict__
+				#print 0/0
+				query_string += "({0}, '{1}'),".format(swim._data['swimmer'], event)
 		# chop trailing comma
 		query_string = query_string[:-1]
 		print Time.time() - start
