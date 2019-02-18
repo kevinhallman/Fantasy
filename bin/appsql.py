@@ -351,6 +351,7 @@ class Conf():
 class ConfJSON():
 	def GET(self):
 		form = web.input(conference=None, taper=None, date=None, season=2016, division=None, gender=None, heats=None)
+		print form.date, form.conference
 		web.header("Content-Type", "application/json")
 		division = form.division
 		gender = form.gender
@@ -957,7 +958,7 @@ class Taper():
 		if form.toptime == 'Top Time':
 			toptime = True
 		else:
-			toptime = False  # use average times
+			toptime = True  # use average times
 
 		if form.season in {'2016', '2015'}:
 			seasons = {int(form.season)}
@@ -995,7 +996,7 @@ class TaperJSON():
 		if form.toptime == 'Top Time':
 			toptime = True
 		else:
-			toptime = False  # use average times
+			toptime = True  # use average times
 
 		if form.season in {'2016', '2015'}:
 			seasons = {int(form.season)}
@@ -1211,7 +1212,8 @@ def showMeet(scores):
 			for part in swim:
 				if 'Yard' in part:  # skip events
 					continue
-				html += '<td>' + str(part) + '</td>'
+				part_str = re.sub(r'[^\x00-\x7F]+',' ', str(part)) # remove non-ascii
+				html += '<td>' + part_str + '</td>'
 			html += '</tr>'
 	html += '</table></br>'
 	return html
