@@ -1212,10 +1212,10 @@ def showMeet(scores):
 			for part in swim:
 				if 'Yard' in part:  # skip events
 					continue
-				if type(part) == str:
-					part_str = part
-				else:
+				if type(part) == int:
 					part_str = str(part)
+				else:
+					part_str = part
 				html += '<td>' + part_str + '</td>'
 			html += '</tr>'
 	html += '</table></br>'
