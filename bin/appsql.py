@@ -1212,7 +1212,10 @@ def showMeet(scores):
 			for part in swim:
 				if 'Yard' in part:  # skip events
 					continue
-				part_str = re.sub(r'[^\x00-\x7F]+',' ', str(part)) # remove non-ascii
+				if type(part) == str:
+					part_str = part
+				else:
+					part_str = str(part)
 				html += '<td>' + part_str + '</td>'
 			html += '</tr>'
 	html += '</table></br>'
