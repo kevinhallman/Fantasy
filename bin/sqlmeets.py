@@ -301,6 +301,7 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 
 # simulates conference or national meet, must be real conference
 def sim_conference(season, gender, conf, division, dateStr=None, top=True, update=False, taper=False, teamMax=17, verbose=False):
+	swimmer_limit = 100
 	if not season: # use current season
 		season = thisSeason()
 
@@ -315,14 +316,14 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 		if verbose: print week
 
 		if week > 1:
-			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=100)
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=swimmer_limit)
 			conf_meet.taper(week=week, division=division, gender=gender)
 		else:
-			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=100)
+			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=swimmer_limit)
 			conf_meet.remove_class('Senior')
 	else:
 		if top:
-			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=100)
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=swimmer_limit)
 		else:  # use avg times
 			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
 
@@ -600,19 +601,20 @@ def time_drops_data(season, team, gender='Men', division='D1', verbose=False):
 	data.to_csv("stats/men_taper_stats.csv")
 
 
-def nats_time_drops(gender='Men', division='D1', outfile='stats/nats_taper_stats', verbose=False):
+def nats_time_drops(gender='Men', division='D3', outfile='stats/all_taper_stats', verbose=False):
 	import pandas as pd
 	swims = []
-	for season in range(2010, 2019):
+	for season in range(2012, 2019):
 		date = week2date(week=25, season=season)
 		print date, season, gender, division, len(swims)
 		conf = sim_conference(season, gender=gender, conf='Nationals', division=division, dateStr=date)
 		conf.score()
 		#team_adjustments, team_adjustments2 = {}, {}
 		for event in conf.eventSwims:
+			print event
 			for swim in conf.eventSwims[event]:
 				# just using scoring swims
-				if swim.score < 1: continue
+				#if swim.score < 1: continue
 				
 				swimmer = swim.getSwimmer()
 				if verbose: print swimmer.name, swimmer.name, event
@@ -636,13 +638,14 @@ def nats_time_drops(gender='Men', division='D1', outfile='stats/nats_taper_stats
 							'event': event,
 							'season': season,
 							'place': swim.place,
+							#'team_drop': swimmer.team.getTaperStats()[0]
 							}
 				for season_num in times:
 					for num, time in enumerate(times[season_num]):
 						newSwim['season' + str(season_num) + 'week' + str(num)] = time
 				#print newSwim
 				swims.append(newSwim)
-
+		print len(swims)
 	data = pd.DataFrame(swims)
 	data.to_csv('{0}_{1}_{2}.csv'.format(outfile, division, gender))
 
@@ -701,6 +704,11 @@ def save_nats_drop_stats(file_name='model_params.json'):
 	with open(file_name, 'w') as f:
 		f.write(json.dumps(fits))
 
+def save_taper_stats(division, gender, season):
+	for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.season==season):
+		for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
+			team.findTaperStats(topTime=True, averageTime=True, weeks=week)
+
 if __name__ == "__main__":
 	# database setup
 	urlparse.uses_netloc.append("postgres")
@@ -717,14 +725,14 @@ if __name__ == "__main__":
 	#nats_time_drops(gender='Men', division='D3')
 	#update_weekly_stats(division='D1', gender='Men')
 
-	'''
-	division = 'D1'
-	for gender in ['Men']:
-		for season in [2018]:
-			for division in ['D1']:
-				for week in range(25):
-					simDate = week2date(week=week, season=season)
-					conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
-	'''
-	conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
+	for gender in ['Men', 'Women']:
+		for season in [2018, 2017]:
+			for division in ['D1', 'D2', 'D3']:
+				save_taper_stats(gender=gender, division=division, season=season)
+				#for week in range(25):
+				#simDate = week2date(week=week, season=season)
+				#conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+				
+	#conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
 	#print conf
+	

@@ -771,10 +771,9 @@ class TeamStats():
 		swimTable = showTopSwimmers(topSwimmers)
 
 		if teamseason.getTaperStats(weeks=8):
-			(medtaper, stdtaper) = teamseason.getTaperStats(weeks=8)
+			medtaper = teamseason.getTaperStats(weeks=8)
 		else:
-			(medtaper, stdtaper) = 0, 0
-		print medtaper, stdtaper
+			medtaper = 0
 
 		conf = teamseason.conference
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
@@ -818,13 +817,12 @@ class TeamStatsJSON():
 		swimTable = showTopSwimmers(topSwimmers)
 
 		if teamseason.getTaperStats(weeks=8):
-			(medtaper, stdtaper) = teamseason.getTaperStats(weeks=8)
+			medtaper = teamseason.getTaperStats(weeks=8)
 		else:
-			(medtaper, stdtaper) = 0, 0
-		print medtaper, stdtaper
+			medtaper, stdtaper) = 0
 
 		conf = teamseason.conference
-		stats[team] = {'winnats': winNats, 'winconf': winConf, 'medtaper': medtaper, 'stdtaper': stdtaper,
+		stats[team] = {'winnats': winNats, 'winconf': winConf, 'medtaper': medtaper, 'stdtaper': 1,
 					   'strength': inviteStr, 'attrition': attrition, 'improvement': imp, 'topswimmers': topSwimmers}
 		return render.teamstats(team, inviteStr, attrition, imp, winConf, winNats, swimTable, conf, medtaper)
 
@@ -955,18 +953,18 @@ class Taper():
 		gender = session.gender
 		confList = conferences[division][gender]
 
+		if not form.conference or not (form.conference in confList):
+			return render.taper(conferences=sorted(confList.keys()), table=None)
+
 		if form.toptime == 'Top Time':
 			toptime = True
 		else:
-			toptime = True  # use average times
+			toptime = False  # use average times
 
-		if form.season in {'2016', '2015'}:
+		if int(form.season) in range(2015, 2019):
 			seasons = {int(form.season)}
 		else:
-			seasons = {2016}
-
-		if not form.conference or not (form.conference in confList):
-			return render.taper(conferences=sorted(confList.keys()), table=None)
+			seasons = {2018}	
 
 		tapers = {}
 		teams = confList[form.conference]
@@ -976,7 +974,8 @@ class Taper():
 				try:
 					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
 					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
-						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
+						taper = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
+						#print taper
 						if taper < 0 or taper > 100 or isnan(taper):
 							taper = ''
 						tapers[team][week] = taper
@@ -996,12 +995,12 @@ class TaperJSON():
 		if form.toptime == 'Top Time':
 			toptime = True
 		else:
-			toptime = True  # use average times
+			toptime = False  # use average times
 
-		if form.season in {'2016', '2015'}:
+		if int(form.season) in range(2015, 2019):
 			seasons = {int(form.season)}
 		else:
-			seasons = {2016}
+			seasons = {2018}
 
 		if not form.conference or not (form.conference in confList):
 			return render.taper(conferences=sorted(confList.keys()), table=None)
@@ -1013,8 +1012,7 @@ class TaperJSON():
 				try:
 					teamseason = TeamSeason.get(team=team, gender=gender, season=season, division=division)
 					for week in {4, 6, 8, 10, 12, 14, 16, 18, 20}:
-						taper, taperstd = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
-						#print team, week, taper
+						taper = teamseason.getTaperStats(weeks=week, yearsback=0, toptime=toptime)
 						if taper < 0 or taper > 100 or isnan(taper):
 							taper = ''
 						if not team in tapers:

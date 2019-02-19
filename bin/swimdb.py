@@ -212,20 +212,19 @@ class TeamSeason(Model):
 	def getTaperStats(self, weeks=12, yearsback=1, toptime=True, pre_season=False):
 		if pre_season:
 			stats = TeamStats.get(team=self, week=weeks)
-			return stats.pretaper, None
+			return stats.pretaper
 
 		lastSeason = self.getPrevious(yearsBack=yearsback)
-
 		if not lastSeason:
-			return None, None
+			return None
+			
 		# underestimate taper by using later weeks
-		for stats in TeamStats.select().where(TeamStats.team==lastSeason.id, TeamStats.week >= weeks)\
-				.limit(1).order_by(TeamStats.week):
+		for stats in TeamStats.select().where(TeamStats.team==lastSeason.id, TeamStats.week >= weeks).limit(1).order_by(TeamStats.week):
 			if toptime:
-				return stats.toptaper, 0 #stats.toptaperstd
+				return stats.toptaper
 			else:
-				return stats.mediantaper, 0 #stats.mediantaperstd
-		return None, None
+				return stats.mediantaper
+		return None
 
 	def findTaperStats(self, weeks=10, topTime=True, averageTime=True, pre_season=False, this_season=True):
 		newDate = week2date(week=weeks, season=self.season)
@@ -283,19 +282,17 @@ class TeamSeason(Model):
 		else:
 			stdDropAvg, meanDropAvg = None, None
 
-		newStats = {'week': weeks, 'date': newDate, 'team': self.id,
-						'toptaper': meanDropTop, 'toptaperstd': stdDropTop, 'mediantaper': meanDropAvg,
-					'mediantaperstd': stdDropAvg, 'pretaper': mean_drops_pre}
+		newStats = {'week': weeks, 'date': newDate, 'team': self.id, 'toptaper': meanDropTop, 'mediantaper': meanDropAvg}
 
 		print newStats
 		try:
 			stats = TeamStats.get(TeamStats.team==self.id, TeamStats.week==weeks)
 			# it exists so update it
 			if meanDropTop: stats.toptaper = meanDropTop
-			if stdDropTop: stats.toptaperstd = stdDropTop
+			#if stdDropTop: stats.toptaperstd = stdDropTop
 			if meanDropAvg: stats.mediantaper = meanDropAvg
-			if stdDropAvg: stats.mediantaperstd = stdDropAvg
-			if mean_drops_pre: stats.pretaper = mean_drops_pre
+			#if stdDropAvg: stats.mediantaperstd = stdDropAvg
+			#if mean_drops_pre: stats.pretaper = mean_drops_pre
 			stats.date = newDate
 			stats.save()
 		except TeamStats.DoesNotExist:
@@ -663,6 +660,7 @@ class TeamStats(Model):
 	date = DateField()  # will be the date the stats were current as of
 	week = IntegerField(null=True)
 	toptaper = FloatField(null=True)
+	mediantaper = FloatField(null=True)
 	strengthdual = FloatField(null=True)
 	strengthinvite = FloatField(null=True)
 	taper = BooleanField(default=False)
@@ -1181,7 +1179,7 @@ class Meet:
 	decides top events for each swimmer
 	top swimmers are decided by highest scoring event right now
 	'''
-	def topEvents(self, teamMax=17, indMax=3, adjEvents=False, debug=False):
+	def topEvents(self, teamMax=17, indMax=3, adjEvents=False, debug=False, limit=100):
 		self.place()
 		conference = Meet()
 		indSwims = {}
@@ -1207,8 +1205,8 @@ class Meet:
 		# pare down
 		self.place()
 		for event in self.eventSwims:
-			if len(self.eventSwims[event]) > 100:
-				self.eventSwims[event] = self.eventSwims[event][:99]  # start with top 100 times
+			if len(self.eventSwims[event]) > limit:
+				self.eventSwims[event] = self.eventSwims[event][:limit-1]  # start with top 100 times
 
 		# now make sure that each person swims their top events
 		preEvent = None
@@ -2008,7 +2006,7 @@ if __name__ == '__main__':
 			#migrator.add_column('teamstats', 'taper', TeamStats.taper),
 			#migrator.drop_column('teamstats', 'pretaper'),
 			#migrator.drop_column('teamstats', 'toptaperstd'),
-			#migrator.drop_column('teamstats', 'mediantaper'),
+			migrator.add_column('teamstats', 'mediantaper', TeamStats.mediantaper),
 			#migrator.drop_column('teamstats', 'toptaperstd'),
 			#migrator.add_column('teamstats', 'natsscore', TeamStats.natsscore)
 			#migrator.add_column('swimmer', 'team_id', Swimmer.team)
