@@ -819,7 +819,7 @@ class TeamStatsJSON():
 		if teamseason.getTaperStats(weeks=8):
 			medtaper = teamseason.getTaperStats(weeks=8)
 		else:
-			medtaper, stdtaper) = 0
+			medtaper = 0
 
 		conf = teamseason.conference
 		stats[team] = {'winnats': winNats, 'winconf': winConf, 'medtaper': medtaper, 'stdtaper': 1,
