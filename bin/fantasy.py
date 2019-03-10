@@ -1,6 +1,6 @@
 import peewee as pw
 from playhouse.migrate import PostgresqlMigrator, migrate
-from swimdb import Swimmer, TempMeet, Swim,TeamSeason
+from swimdb import Swimmer, Meet, Swim, TeamSeason, TeamStats
 from datetime import date, timedelta
 from events import eventsDualS, eventsChamp
 import heapq
@@ -163,69 +163,14 @@ class FantasyTeam(pw.Model):
 			except:
 				return 'error'
 
-	# pulls top team strength for that year
-	def getStrength(self, previous=0, invite=True, update=False):
-		if invite:
-			for stats in TeamStats.select(TeamStats.strengthinvite, TeamStats.week).where(TeamStats.strengthinvite.is_null(False),
-					TeamStats.teamseasonid==self.id).order_by(TeamStats.week.desc()).limit(1).offset(previous):
-				if stats.strengthinvite:
-					if update:
-						self.strengthinvite = stats.strengthinvite
-						self.save()
-					return stats.strengthinvite
-		else:
-			for stats in TeamStats.select(TeamStats.strengthdual, TeamStats.week).where(TeamStats.strengthdual.is_null(
-					False), TeamStats.teamseasonid==self.id).limit(1).order_by(TeamStats.week.desc()).offset(previous):
-				if stats.strengthdual:
-					if update:
-						self.strengthdual = stats.strengthdual
-						self.save()
-					return stats.strengthdual
-
-		# no stats yet, so save them off
-		if self.season != thisSeason():
-			weeksIn = 20
-		else:
-			weeksIn = date2week(date.today())
-		simDate = week2date(weeksIn)
-		scoreDual = self.topTeamScore(dual=True, weeksIn=weeksIn)
-		scoreInvite = self.topTeamScore(dual=False, weeksIn=weeksIn)
-		try:
-			stats = TeamStats.get(teamseasonid=self.id, week=weeksIn)
-			stats.strengthdual = scoreDual
-			stats.strengthinvite = scoreInvite
-			stats.save()
-		except TeamStats.DoesNotExist:
-			TeamStats.create(teamseasonid=self.id, week=weeksIn, strengthinvite=scoreInvite, strengthdual=scoreDual,
-								 date=simDate)
-
-		if invite:
-			if update:
-				self.strengthinvite = scoreInvite
-				self.save()
-			return scoreInvite
-		else:
-			if update:
-				self.strengthdual = scoreDual
-				self.save()
-			return scoreDual
-
 	'''top expected score for the whole team'''
-	def topTeamScore(self, dual=True, weeksIn=None):
-		# convert the week to a date
-		startDate = date(self.season - 1, 10, 15)  # use Oct 15 as the start date, prolly good for 2017
-		if weeksIn == None:  # can't simulate with future data
-			simDate = date.today()
-		else:
-			simDate = startDate + timedelta(weeks=weeksIn)
-		if simDate > date.today():  # can't simulate with future data
-			simDate = date.today()
+	def topTeamScore(self, dual=True, month=None):
 
 		if dual:
 			events = eventsDualS
 		else:
 			events = eventsChamp
-		topMeet = self.topTimes(events=events, dateStr=simDate)
+		topMeet = self.topTimes(events=events, month=month)
 
 		topMeet.topEvents(teamMax=17, indMax=3)
 		if dual:
@@ -256,7 +201,7 @@ class FantasyTeam(pw.Model):
 			endDate = str(self.conference.season) + '-4-1'
 			startDate = str(self.conference.season - 1) + '-10-1'
 
-		newMeet = TempMeet()
+		newMeet = Meet()
 		if verbose: print startDate, endDate
 		for fanswimmer in self.swimmers():
 			swimmer = fanswimmer.swimmer
@@ -278,13 +223,6 @@ class FantasyTeam(pw.Model):
 
 		return newMeet
 
-	def addUpRelay(self, event):
-		if event not in {'400 Yard Medley Relay', '400 Yard Freestyle Relay', '800 Yard Freestyle Relay'}:
-			return
-
-		if event=='400 Yard Freestyle Relay':
-			pass
-
 	# dual another team and optionally save the stored result
 	def dual(self, team2=None, month=0, lineup1=None, lineup2=None, verbose=False, save=True):
 		# check to see if the score exists, if not create it
@@ -301,8 +239,8 @@ class FantasyTeam(pw.Model):
 		if not team2:
 			team2 = score.team_two
 
-		meet = TempMeet()
-		bench = TempMeet()
+		meet = Meet()
+		bench = Meet()
 		if lineup1:  # get swims from lineup
 			meet.addSwims(lineup1.getSwims(), newTeamName=self.name)
 		else:  # if the meet exists use those

@@ -305,6 +305,9 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 	if not season: # use current season
 		season = thisSeason()
 
+	week = date2week(dateStr)
+	
+	print week, simDate, gender, conf, division, taper
 	# estimated taper meet
 	if taper:
 		if not dateStr:
@@ -312,13 +315,12 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 		if type(dateStr) == str:
 			dateStr = datetime.datetime.strptime(dateStr, '%Y-%m-%d').date()
 		
-		week = date2week(dateStr)
 		if verbose: print week
 
 		if week > 1:
 			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, limit=swimmer_limit)
 			conf_meet.taper(week=week, division=division, gender=gender)
-		else:
+		else:  # taper week of 0 means we pull from last season and graduate seniors
 			conf_meet = topTimes(conf=conf, season=season-1, gender=gender, division=division, limit=swimmer_limit)
 			conf_meet.remove_class('Senior')
 	else:
@@ -638,7 +640,7 @@ def nats_time_drops(gender='Men', division='D3', outfile='stats/all_taper_stats'
 							'event': event,
 							'season': season,
 							'place': swim.place,
-							#'team_drop': swimmer.team.getTaperStats()[0]
+							#'team_drop': swimmer.team.getTaperStats()
 							}
 				for season_num in times:
 					for num, time in enumerate(times[season_num]):
@@ -722,16 +724,19 @@ if __name__ == "__main__":
 	else:
 		db = peewee.PostgresqlDatabase('swimdb', user='hallmank')
 
-	#nats_time_drops(gender='Men', division='D3')
-	#update_weekly_stats(division='D1', gender='Men')
+	#simDate= week2date(11, 2016)
+	#print simDate
+	#conf = sim_conference(conf='Nationals', gender='Men', division='D1', season=2016, update=True, dateStr=simDate, taper=True)
 
 	for gender in ['Men', 'Women']:
-		for season in [2018, 2017]:
-			for division in ['D1', 'D2', 'D3']:
-				save_taper_stats(gender=gender, division=division, season=season)
-				#for week in range(25):
-				#simDate = week2date(week=week, season=season)
-				#conf = sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+		for season in [2015, 2016, 2017, 2018]:
+			for division in ['D1']:
+				#save_taper_stats(gender=gender, division=division, season=season)
+				for week in range(26):
+					#pass
+					simDate = week2date(week=week, season=season)
+					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=False)
 				
 	#conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
 	#print conf

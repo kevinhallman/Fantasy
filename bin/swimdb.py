@@ -143,7 +143,7 @@ def date2week(d):
 
 '''converts week to a date'''
 def week2date(week, season=None):
-	if not week:
+	if week==None:
 		return Date.today()
 	if not season:
 		season = thisSeason()
@@ -1416,26 +1416,26 @@ class Meet:
 
 	def taper(self, week=10, division='D1', gender='Women', verbose=False):
 		start = Time.time()
-		print 'taper performance'
+		if self.isEmpty(): return
+
+		if verbose: print 'taper performance'
 		with open('bin/model_params.json') as f:
 			taper_params = json.load(f)
 			params = taper_params[gender][division]
 
 		# insert all the swimmers and events we will need to taper
 		db.execute_sql('CREATE TEMP TABLE swimmer_event(id INT, event VARCHAR)')
-		print Time.time() - start
+		if verbose: print Time.time() - start
 		query_string = ''
 		query_string += 'INSERT INTO swimmer_event VALUES '
 		for event in self.eventSwims:
 			for swim in self.eventSwims[event]:
-				#print swim.__dict__
-				#print 0/0
 				query_string += "({0}, '{1}'),".format(swim._data['swimmer'], event)
 		# chop trailing comma
 		query_string = query_string[:-1]
-		print Time.time() - start
+		if verbose: print Time.time() - start
 		db.execute_sql(query_string)
-		print Time.time() - start
+		if verbose: print Time.time() - start
 		
 		# find top times from this season
 		date = week2date(week, 2019)
@@ -1452,7 +1452,7 @@ class Meet:
 			if swim.id not in times:
 				times[swim.id] = {}
 			times[swim.id][swim.event] = {'current': swim.time}
-		print 'this season', Time.time() - start
+		if verbose: print 'this season', Time.time() - start
 		
 		# get top times from last season
 		for swim in Swim.raw('SELECT ranked_swims.id, ranked_swims.event, ranked_swims.time, ranked_swims.date FROM ( '
@@ -1468,7 +1468,9 @@ class Meet:
 			'INNER JOIN swim ON swim.swimmer_id=s2.id and swim.event=swimmer_event.event '
 			') ranked_swims WHERE rank=1'):
 			times[swim.id][swim.event]['pre_time'] = swim.time
-		print 'last season', Time.time() - start
+		
+		db.execute_sql('DROP TABLE swimmer_event')
+		if verbose: print 'last season', Time.time() - start
 
 		# now taper based off of parameters
 		for event in self.eventSwims:
@@ -1502,7 +1504,7 @@ class Meet:
 						taper_time = time * params[str(week-1)]['two_season']['0'] + pre_time * params[str(week-1)]['two_season']['1']
 				
 				swim.taperTime = swim.scoreTime = taper_time
-		print 'tapers', Time.time() - start
+		if verbose: print 'tapers', Time.time() - start
 
 	'''
 	gives the expected score of the top team limup as compared to the whole division
@@ -1738,7 +1740,7 @@ class Meet:
 
 	# update stored win probabilities
 	def update(self, division, gender, season, nats=False, taper=False, verbose=False, week=None):
-		if week:
+		if week!= None:
 			weeksIn = week
 			date = week2date(weeksIn, season)
 		else:
@@ -1747,7 +1749,6 @@ class Meet:
 			else:
 				date = Date.today()
 			weeksIn = date2week(date)
-
 		# score monte carlo to find win probs then reset to real scores
 		self.score()
 		scores = {}
@@ -1758,13 +1759,15 @@ class Meet:
 		with open('bin/model_params.json') as f:
 			taper_params = json.load(f)
 		sigma = taper_params[gender][division]['last_season']['error']
-		print 'sigma', sigma
 		self.scoreMonteCarlo(runs=500, sigma=sigma)
 		teamProb = self.getWinProb()
 
-		#if verbose:
-		print teamProb
-		print weeksIn, date
+		if verbose:
+			print 'sigma', sigma
+			print 'week', weeksIn, date
+			print division, gender, season
+			print teamProb
+			print scores
 
 		for team in teamProb:
 			try:

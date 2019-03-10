@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import web
 import sqlmeets
 import re
@@ -7,11 +6,11 @@ import time
 import json
 import os, urlparse
 import hashlib
-from peewee import *
+#from peewee import *
 
 from operator import itemgetter
 from fantasy import FantasyOwner, FantasyTeam, FantasyConference, FantasyScore, FantasyTeamSwimmer
-from swimdb import TeamSeason, TeamMeet, Meet, db, swimTime, Swimmer, Swim, swimTime
+from swimdb import TeamSeason, Meet, Meet, db, swimTime, Swimmer, Swim, swimTime
 from events import eventOrder, eventConvert
 from appsql import showMeet, showScores, showTeamScores
 
@@ -67,10 +66,11 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 		meets = {}
 	else:
 		meets = []
-	for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
-			TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.team==team):
-		newSeason = teamMeet.team.season
-		newMeet = teamMeet.meet.meet
+
+	for swim in Swim.select(Swim.meet, Swim.season).distinct().where(
+			Swim.division==division, Swim.gender==gender, Swim.team==team):
+		newSeason = swim.season
+		newMeet = swim.meet
 		newMeet.strip()
 
 		if newSeason not in meets and not season:
@@ -90,10 +90,7 @@ wsgiapp = app.wsgifunc()
 session = web.session.Session(app, web.session.DiskStore('sessionsFantasy'),
 							  initializer={'login': 0, 'teamid': None, 'userid': None})
 render = web.template.render('templates/fantasy/', base="index", globals={'context': session})
-
 app.add_processor(connection_processor)
-
-database = sqlmeets.SwimDatabase(database=db)
 #(conferences, allTeams) = getConfs()
 
 currentSeason = 2018
@@ -190,7 +187,7 @@ class Joinleague():
 
 		form = web.input()
 		league = FantasyConference.get()
-		return render.league([(league.name, league.id)])
+		return render.joinleague([(league.name, league.id)])
 
 	def POST(self):
 		form = web.input(leagueid=None, division=None, conference=None, gender=None, teamname=None, join=None)
@@ -202,10 +199,10 @@ class Joinleague():
 			try:
 				myTeam = FantasyTeam(conference=myConf, owner=user, name=form.teamname)
 				myTeam.save()
-				session.teaid = myTeam.id
+				session.teamid = myTeam.id
 				return render.lineup()
 			except:
-				return render.league()
+				return render.joinleague()
 
 		# TODO still need to handle creating a new conference
 
@@ -229,7 +226,7 @@ class Matchup():
 		else:
 			bench_html = ''
 
-			scores = newMeet.scoreString(showNum=showNum)
+			scores = meet.scoreString(showNum=25)
 
 		return render.matchup(months, meet_html, bench_html, team_scores_html, score_breakdown)
 

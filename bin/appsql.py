@@ -66,8 +66,7 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 		meets = {}
 	else:
 		meets = []
-	#for teamMeet in TeamMeet.select(Meet, TeamMeet, TeamSeason).join(Meet).switch(TeamMeet).join(TeamSeason).where(
-	#		TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.team==team):
+
 	for swim in Swim.select(Swim.meet, Swim.season).distinct().where(
 			Swim.division==division, Swim.gender==gender, Swim.team==team):
 		newSeason = swim.season
