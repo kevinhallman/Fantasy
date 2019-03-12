@@ -202,7 +202,7 @@ def topTeamScore(teamName, dual=True, season=thisSeason(), gender='Men', divisio
 	else:
 		events = eventsChamp
 	team = TeamSeason.get(season=season, team=teamName, gender=gender, division=division)  # need division
-	topMeet = team.topTimes(events=events, dateStr=simDate)
+	topMeet = team.topTimes(events=events, date=simDate)
 
 	topMeet.topEvents(teamMax=17, indMax=3)
 	if dual:
@@ -250,10 +250,10 @@ def averageTimes(conf, season=None, gender='Men', division=None, date=None):
 '''
 returns meet of top times, start with top 75 in each event
 '''
-def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
+def topTimes(season, gender, conf, division=None, date=None, limit=75):
 	newMeet = Meet()
-	newMeet.date = dateStr
-	if not dateStr:
+	newMeet.date = date
+	if not date:
 		if conf == 'Nationals':
 			query = Swim.raw("SELECT event, time, name, team, date, year, meet, swimmer_id, rank FROM ( "
 					"SELECT event, time, name, team, date, year, meet, swimmer_id, division, season, gender, rank() "
@@ -276,7 +276,7 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 				"INNER JOIN teamseason ts ON sw.team_id=ts.id) "
 				"WHERE ts.season=%s and ts.gender=%s and ts.division=%s and swim.date<%s "
 			") AS a "
-			"WHERE a.rank=1", season, gender, division, dateStr)
+			"WHERE a.rank=1", season, gender, division, date)
 		else:
 			query = Swim.raw("SELECT event, time, rank, name, meet, team, year, swimmer_id, season, gender, division, date FROM "
 			"(SELECT swim.name, time, event, meet, swim.team, sw.year, swimmer_id, ts.season, sw.gender, ts.division, date, rank() "
@@ -286,7 +286,7 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 				"INNER JOIN teamseason ts ON sw.team_id=ts.id) "
 				"WHERE ts.season=%s and ts.gender=%s and ts.division=%s and swim.date<%s and ts.conference=%s"
 			") AS a "
-			"WHERE a.rank=1", season, gender, division, dateStr, conf)
+			"WHERE a.rank=1", season, gender, division, date, conf)
 	
 	for swim in query:
 		swim.gender = gender
@@ -300,21 +300,18 @@ def topTimes(season, gender, conf, division=None, dateStr=None, limit=75):
 	return newMeet
 
 # simulates conference or national meet, must be real conference
-def sim_conference(season, gender, conf, division, dateStr=None, top=True, update=False, taper=False, teamMax=17, verbose=False):
+def sim_conference(season, gender, conf, division, date=None, top=True, update=False, taper=False, teamMax=17, verbose=False):
 	swimmer_limit = 100
 	if not season: # use current season
 		season = thisSeason()
+	if not date:
+		date = Date.today()
 
-	week = date2week(dateStr)
+	week = date2week(date)
 	
-	print week, simDate, gender, conf, division, taper
+	print week, date, gender, conf, division, taper
 	# estimated taper meet
 	if taper:
-		if not dateStr:
-			dateStr = Date.today()
-		if type(dateStr) == str:
-			dateStr = datetime.datetime.strptime(dateStr, '%Y-%m-%d').date()
-		
 		if verbose: print week
 
 		if week > 1:
@@ -325,16 +322,16 @@ def sim_conference(season, gender, conf, division, dateStr=None, top=True, updat
 			conf_meet.remove_class('Senior')
 	else:
 		if top:
-			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, dateStr=dateStr, limit=swimmer_limit)
+			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, date=date, limit=swimmer_limit)
 		else:  # use avg times
-			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=dateStr)
+			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=date)
 
 	conf_meet.events = eventsChamp3
 	conf_meet.topEvents(teamMax=teamMax)
 	conf_meet.score()
 	
 	if verbose:
-		print 'conf sim', conf, season, dateStr
+		print 'conf sim', conf, season, date
 		print conf_meet
 		print conf_meet.teamScores()
 
@@ -406,7 +403,7 @@ def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
 		return
 
 	# national meets probabilities
-	sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
+	sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, date=simDate, taper=True)
 
 	# conf meet odds
 	conferences, _ = getConfs()
@@ -414,7 +411,7 @@ def update_weekly_stats(week=None, division='D3', gender='Women', season=2018):
 	for conference in conferences[division][gender]:
 		if conference == '':
 			continue
-		sim_conference(conf=conference, gender=gender, season=season, division=division, update=True, dateStr=simDate, taper=True)
+		sim_conference(conf=conference, gender=gender, season=season, division=division, update=True, date=simDate, taper=True)
 
 	# update team strengths
 	for team in TeamSeason.select().where(TeamSeason.division==division, TeamSeason.gender==gender, TeamSeason.season==season):
@@ -609,7 +606,7 @@ def nats_time_drops(gender='Men', division='D3', outfile='stats/all_taper_stats'
 	for season in range(2012, 2019):
 		date = week2date(week=25, season=season)
 		print date, season, gender, division, len(swims)
-		conf = sim_conference(season, gender=gender, conf='Nationals', division=division, dateStr=date)
+		conf = sim_conference(season, gender=gender, conf='Nationals', division=division, date=date)
 		conf.score()
 		#team_adjustments, team_adjustments2 = {}, {}
 		for event in conf.eventSwims:
@@ -726,7 +723,7 @@ if __name__ == "__main__":
 
 	#simDate= week2date(11, 2016)
 	#print simDate
-	#conf = sim_conference(conf='Nationals', gender='Men', division='D1', season=2016, update=True, dateStr=simDate, taper=True)
+	#conf = sim_conference(conf='Nationals', gender='Men', division='D1', season=2016, update=True, date=simDate, taper=True)
 
 	for gender in ['Men', 'Women']:
 		for season in [2015, 2016, 2017, 2018]:
@@ -735,8 +732,8 @@ if __name__ == "__main__":
 				for week in range(26):
 					#pass
 					simDate = week2date(week=week, season=season)
-					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=True)
-					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, dateStr=simDate, taper=False)
+					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, date=simDate, taper=True)
+					sim_conference(conf='Nationals', gender=gender, division=division, season=season, update=True, date=simDate, taper=False)
 				
 	#conf = sim_conference(conf='MIAC', gender='Men', division='D3', season=2019, update=False, taper=True, verbose=False)
 	#print conf

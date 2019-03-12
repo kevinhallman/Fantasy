@@ -373,7 +373,7 @@ class TeamSeason(Model):
 			events = eventsDualS
 		else:
 			events = eventsChamp
-		topMeet = self.topTimes(events=events, dateStr=simDate)
+		topMeet = self.topTimes(events=events, date=simDate)
 
 		topMeet.topEvents(teamMax=17, indMax=3)
 		if dual:
@@ -393,8 +393,8 @@ class TeamSeason(Model):
 
 		return heapq.nlargest(num, swimmers)
 
-	def topTimes(self, dateStr=None, events=None):
-		if not dateStr:
+	def topTimes(self, date=None, events=None):
+		if not date:
 			query = Swim.raw("SELECT time, event, gender, name, division, season, year, team, meet, date, team_id "
 						"FROM top_swim WHERE team_id=%s  ", self.id)
 		else:
@@ -406,7 +406,7 @@ class TeamSeason(Model):
 				"INNER JOIN teamseason ts ON sw.team_id=ts.id) "
 				"WHERE ts.id=%s and swim.date<%s "
 			") AS a "
-			"WHERE a.rank=1",self.id, dateStr)
+			"WHERE a.rank=1",self.id, date)
 
 		newMeet = Meet()
 		for swim in query:

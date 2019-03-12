@@ -11,6 +11,7 @@ from swimdb import getSkewDist as getSkewDistCollege
 from clubdb import convert, getSkewDist
 from clubdb import db as clubdb
 from operator import itemgetter
+from datetime import date as Date
 import time as Time
 from events import eventOrder, eventOrderInd, eventConvert
 
@@ -290,10 +291,10 @@ class Conf():
 			try:
 				(month, day) = re.split('/', form.date)
 				if month in ['10', '11', '12']:
-					year = str(season - 1)
+					year = season - 1
 				else:
-					year = str(season)
-				swimdate = year + '-' + month + '-' + day
+					year = season
+				swimdate = Date(year, int(month), int(day))
 			except:  # default
 				swimdate = None
 		else:
@@ -363,10 +364,10 @@ class ConfJSON():
 		if form.date and form.date != 'Whole Season':  # parse the date string
 			(month, day) = re.split('/', form.date)
 			if month in ['10', '11', '12']:
-				year = str(season - 1)
+				year = season - 1
 			else:
-				year = str(season)
-			swimdate = year + '-' + month + '-' + day
+				year = season
+			swimdate = Date(year, int(month), int(day))
 		else:
 			swimdate = None
 
