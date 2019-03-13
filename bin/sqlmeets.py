@@ -312,7 +312,7 @@ def sim_conference(season, gender, conf, division, date=None, top=True, update=F
 		week = date2week(date)
 	
 	print week, date, gender, conf, division, taper
-	
+
 	# estimated taper meet
 	if taper:
 		if verbose: print week
@@ -345,7 +345,7 @@ def sim_conference(season, gender, conf, division, date=None, top=True, update=F
 			nats = False
 		# update the season after you take times from
 		conf_meet.update(division=division, gender=gender, season=season, nats=nats, taper=taper, week=week)
-	print Time.time() - start
+
 	return conf_meet
 
 '''
