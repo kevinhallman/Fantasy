@@ -3,6 +3,7 @@ from datetime import date as Date, timedelta
 import datetime
 import peewee
 import os, urlparse, time, json
+import time as Time
 #from scipy.stats import norm, linregress
 #simport matplotlib.pyplot as plt
 
@@ -288,6 +289,7 @@ def topTimes(season, gender, conf, division=None, date=None, limit=75):
 			") AS a "
 			"WHERE a.rank=1", season, gender, division, date, conf)
 	
+	print query
 	for swim in query:
 		swim.gender = gender
 		swim.division = division
@@ -301,15 +303,16 @@ def topTimes(season, gender, conf, division=None, date=None, limit=75):
 
 # simulates conference or national meet, must be real conference
 def sim_conference(season, gender, conf, division, date=None, top=True, update=False, taper=False, teamMax=17, verbose=False):
-	swimmer_limit = 100
+	swimmer_limit = 50
 	if not season: # use current season
 		season = thisSeason()
 	if not date:
-		date = Date.today()
-
-	week = date2week(date)
+		week = date2week(Date.today())
+	else:
+		week = date2week(date)
 	
 	print week, date, gender, conf, division, taper
+	
 	# estimated taper meet
 	if taper:
 		if verbose: print week
@@ -325,7 +328,7 @@ def sim_conference(season, gender, conf, division, date=None, top=True, update=F
 			conf_meet = topTimes(conf=conf, season=season, gender=gender, division=division, date=date, limit=swimmer_limit)
 		else:  # use avg times
 			conf_meet = averageTimes(conf=conf, season=season, gender=gender, division=division, date=date)
-
+	
 	conf_meet.events = eventsChamp3
 	conf_meet.topEvents(teamMax=teamMax)
 	conf_meet.score()
@@ -342,7 +345,7 @@ def sim_conference(season, gender, conf, division, date=None, top=True, update=F
 			nats = False
 		# update the season after you take times from
 		conf_meet.update(division=division, gender=gender, season=season, nats=nats, taper=taper, week=week)
-
+	print Time.time() - start
 	return conf_meet
 
 '''

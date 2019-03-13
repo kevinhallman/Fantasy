@@ -139,7 +139,11 @@ def date2week(d):
 		season = d.year
 	startDate = Date(season - 1, 10, 14)  # use Oct 14 as the start date, prolly good for 2019
 	weeksIn = int((d - startDate).days / 7)
-	return weeksIn
+	
+	# cap at 25 weeks
+	if weeksIn < 26:
+		return weeksIn
+	return 25
 
 '''converts week to a date'''
 def week2date(week, season=None):
