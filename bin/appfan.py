@@ -82,6 +82,11 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 				meets.append(re.sub('\"', '\\\\\"', newMeet))
 	return meets
 
+def current_teamid():
+	try:
+		return session.teamID
+	except:
+		return None
 
 # set up web configuration
 web.config.debug = False
@@ -122,26 +127,27 @@ class Myteams():
 		if not logged():
 			raise web.seeother('/login')
 
+		# update current team if a new one is chosen
 		form = web.input(teamID=None)
 		if session.teamid != form.teamID:
 			try:
 				session.teamID = FantasyTeam.get(id=form.teamID).id
 			except:
 				pass
-		try:
-			myTeam = FantasyTeam.get(id=form.teamID)
-			teamInfo = (myTeam.name, myTeam.id)
-		except FantasyTeam.DoesNotExist:
-			teamInfo = ('', '')
-
+		if hasattr(session, 'teamID'):
+			print 'current team', session.teamID
 		# return my possible teams
+		teams = []
 		user = FantasyOwner.get(id=session.userid)
-		teams = [teamInfo]
 		for team in FantasyTeam.select().where(FantasyTeam.owner==user):
-			if team.id == teamInfo[1]:
-				continue
 			teams.append((team.name, team.id))
-		return render.myteams(teams)
+		print teams
+		try:
+			teamID = session.teamID
+		except AttributeError:
+			teamID = None
+
+		return render.myteams(teams, teamID)
 
 
 class Roster():
@@ -150,7 +156,7 @@ class Roster():
 			raise web.seeother('/login')
 
 		try:
-			myTeam = FantasyTeam.get(id=session.teamid)
+			myTeam = FantasyTeam.get(id=session.teamID)
 		except:
 			return render.roster('')
 
@@ -196,13 +202,17 @@ class Joinleague():
 		if form.teamname and form.join and form.leagueid:
 			user = FantasyOwner.get(id=session.userid)
 			myConf = FantasyConference.get(id=form.leagueid)
+			print 'joining league', user, myConf, form.teamname
 			try:
 				myTeam = FantasyTeam(conference=myConf, owner=user, name=form.teamname)
 				myTeam.save()
 				session.teamid = myTeam.id
 				return render.lineup()
 			except:
-				return render.joinleague()
+				leagues = []
+				for league in FantasyConference.select():
+					leagues.append(league.name, league.id)
+				return render.joinleague(league)
 
 		# TODO still need to handle creating a new conference
 
@@ -260,25 +270,28 @@ class Login():
 			raise web.seeother('/myteams')
 
 		# try to log the current user in with the info and set session information
-		try:
+		try:  # check username
 			user = FantasyOwner.get(name=name)
 			print name, passwd, user.name, user.password
 		except:
-			print 'bad'
+			print 'user does not exist'
 			session.login = 0
 			return render.login()
 
-		if user.password == passwd:
+		if user.password == passwd: # check password
 			# hashlib.sha1("sAlt101"+passwd).hexdigest() == ident['pass']:
+			# no salt or hash for testing
 			session.login = 1
 			session.userid = user.id
+
+			# default their first fantasy team if they have one
 			try:
 				session.teamid = FantasyTeam.get(owner=user.id).id
 			except FantasyTeam.DoesNotExist:
 				pass
 			raise web.seeother('/myteams')
 		else:
-			print 'bad'
+			print 'bad pwd'
 			session.login = 0
 			return render.login()
 

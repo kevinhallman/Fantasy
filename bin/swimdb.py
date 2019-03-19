@@ -1567,7 +1567,7 @@ class Meet:
 	'''
 	assigns points to the swims
 	'''
-	def assignPoints(self, heats=2, heatSize=8, dual=None, events=allEvents):
+	def assignPoints(self, heats=2, heatSize=8, dual=None, events=allEvents, verbose=False):
 		if dual is None:
 			if len(self.teams)==2:
 				dual=True
@@ -1623,8 +1623,13 @@ class Meet:
 								score = int(score)
 							swim.score = score
 							preSwim.score = score
+							if verbose: print swim
+							if verbose: print 'tie', swim.place, swim.score, preScore, non_scoring_swims
+
 						else:
 							swim.score = points[swim.place - 1 - non_scoring_swims]
+							if verbose: print swim
+							if verbose: print 'tie', swim.place, swim.score, non_scoring_swims
 						if team not in teamSwims:
 							teamSwims[team] = 0
 						teamSwims[team] += 1

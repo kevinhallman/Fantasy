@@ -1,6 +1,12 @@
-$def with (teams)
+$def with (teams, cur_team_id)
 
 <h1>My Teams</h1>
+<form action="/myteams" method="GET">
 $for team, id in teams:
-	<h2>$team</h2>
-	<button></button>
+	$if id == cur_team_id:
+		<input type="radio" name="teamID" value=$id checked>
+	$else:
+		<input type="radio" name="teamID" value=$id>
+	<label>$team</label><br>
+<button type="submit">Submit</button>
+</form>

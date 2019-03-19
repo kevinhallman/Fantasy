@@ -289,7 +289,7 @@ def topTimes(season, gender, conf, division=None, date=None, limit=75):
 			") AS a "
 			"WHERE a.rank=1", season, gender, division, date, conf)
 	
-	print query
+	#print query
 	for swim in query:
 		swim.gender = gender
 		swim.division = division
