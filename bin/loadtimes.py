@@ -66,7 +66,7 @@ def load(year=2019):
 		'SELECT ss.name, 2019, ss.gender, ss.year, ts.id as team_id FROM stage_swimmer ss '
 		'INNER JOIN teamseason ts ON ss.team=ts.team and ss.division=ts.division and ss.gender=ts.gender and '
 			 'ss.season=ts.season '
-		'LEFT OUTER JOIN swimmer sw on sw.name=ss.name and sw.team_id=team_id where sw.id IS NULL')
+		'LEFT OUTER JOIN swimmer sw on sw.name=ss.name and sw.team_id=ts.id where sw.id IS NULL')
 
 	
 	db.execute_sql('CREATE TEMP TABLE stage_swim AS '

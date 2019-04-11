@@ -253,7 +253,7 @@ def getTopTimes(conference="", team='radAllTeam', date='30', distance='50', stro
 				date = html[html.find('>', place+5)+1:html.find('<', place+9)]
 				if time=='Alt Adj' or not time or time=='':
 					continue
-				# print meet, date, swimmer, year, team, genderOut, event, time, age
+				#print meet, date, swimmer, year, team, genderOut, event, time, age
 				if conference != '':
 					conf_name = conferenceMap[conference]
 				else:
@@ -385,6 +385,7 @@ def topTimesLoop():
 	genders = ['m', 'f']
 	divisions = ['DI', 'DII', 'DIII']
 	distances = dict()
+	#distances['FR'] = [50]
 	distances['FR'] = [50, 100, 200, 500, 1000, 1650]
 	distances['FL'] = [100, 200]
 	distances['BK'] = [100, 200]
@@ -427,7 +428,7 @@ def topTimesLoop():
 		'USING ( '
 		'SELECT count(s1.id), s1.id AS swim1, s2.id AS swim2 '
 		'FROM swimstaging s1, swimstaging s2 '
-		'WHERE s1.name=s2.name and s1.event=s2.event and s1.time=s2.time and s1.date=s2.date and s1.id!=s2.id '
+		'WHERE s1.name=s2.name and s1.event=s2.event and s1.time=s2.time and s1.date=s2.date and s1.id>s2.id '
 		'GROUP BY s1.id, s2.id '
 		') AS s '
 		'WHERE swimstaging.id = s.swim1').execute()
