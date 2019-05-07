@@ -27,6 +27,7 @@ urls = ('/', 'Myteams',
 	'/swimmerstats/(.+)', 'Swimmerstats',
 	'/lineup', 'Lineup',
 	'/matchup', 'Matchup',
+	'/conferences', 'TeamConf'
 
 )
 
@@ -42,23 +43,35 @@ def connection_processor(handler):
 
 # retrieves all conference affiliations
 def getConfs():
-	confs = {'D1': {'Men': {}, 'Women': {}}, 'D2': {'Men': {}, 'Women': {}}, 'D3': {'Men': {}, 'Women': {}}}
-	allTeams = {'Men': {'D1': set(), 'D2': set(), 'D3': set()}, 'Women': {'D1': set(), 'D2': set(), 'D3': set()}}
+	confs = {
+				'D1': {'Men': set(), 'Women': set()}, 
+				'D2': {'Men': set(), 'Women': set()}, 
+				'D3': {'Men': set(), 'Women': set()}
+			}
+	for newTeam in TeamSeason.select(TeamSeason.conference, TeamSeason.division, TeamSeason.gender).where(TeamSeason.season==2019).distinct(TeamSeason.conference):
+		if newTeam.conference and newTeam.conference != '':
+			confs[newTeam.division][newTeam.gender].add(newTeam.conference)
+	return confs
+
+# returns conference affiliations of all teams
+def getTeams():
+	confs = {
+				'D1': {'Men': {'all': []}, 'Women': {'all': []}}, 
+				'D2': {'Men': {'all': []}, 'Women': {'all': []}}, 
+				'D3': {'Men': {'all': []}, 'Women': {'all': []}}
+			}
 	for newTeam in TeamSeason.select(TeamSeason.team, TeamSeason.conference, TeamSeason.division,
 									 TeamSeason.gender).distinct(TeamSeason.team):
 		if newTeam.conference not in confs[newTeam.division][newTeam.gender]:
-			confs[newTeam.division][newTeam.gender][newTeam.conference] = set()
+			confs[newTeam.division][newTeam.gender][newTeam.conference] = []
 
-		confs[newTeam.division][newTeam.gender][newTeam.conference].add(newTeam.team.strip())
-		allTeams[newTeam.gender][newTeam.division].add(newTeam.team.strip())
+		confs[newTeam.division][newTeam.gender][newTeam.conference].append(newTeam.team.strip())
+		confs[newTeam.division][newTeam.gender]['all'].append(newTeam.team.strip())
 
-	for division in ['D1', 'D2', 'D3']:
-		allTeams['Men'][division] = list(allTeams['Men'][division])
-		allTeams['Men'][division].sort()
-		allTeams['Women'][division] = list(allTeams['Women'][division])
-		allTeams['Women'][division].sort()
+	return confs
 
-	return confs, allTeams
+confs = getConfs()
+all_teams = getTeams()
 
 # gets the list of meets swum by a team in a given season
 def getMeetList(gender='Women', division='D1', team=None, season=None):
@@ -84,7 +97,7 @@ def getMeetList(gender='Women', division='D1', team=None, season=None):
 
 def current_teamid():
 	try:
-		return session.teamID
+		return session.teamid
 	except:
 		return None
 
@@ -107,7 +120,7 @@ def logged():
 	else:
 		return False
 
-
+# shares out all the css and js files
 class Static():
 	def GET(self, filename):
 		try:
@@ -120,22 +133,42 @@ class Static():
 		except:
 			return
 
+#service to return conference names or teams in a conference
+class TeamConf():
+	def GET(self):
+		form = web.input(gender='Women', division='D1', conference=None)
+		#print form.gender, form.division, form.conference
+		#print json.dumps(sorted(list(confs[form.division][form.gender])))
+		if not form.conference:
+			try:
+				return json.dumps(sorted(list(confs[form.division][form.gender])))
+			except:
+				return
+		else:
+			try:
+				return all_teams[form.division][form.gender][form.conference]
+			except:
+				return {}
+
 
 # shows current team and allows user to change
 class Myteams():
 	def GET(self):
 		if not logged():
 			raise web.seeother('/login')
+		print 'my teams', session.teamid
 
 		# update current team if a new one is chosen
 		form = web.input(teamID=None)
-		if session.teamid != form.teamID:
+
+		if form.teamID and session.teamid != form.teamID:
 			try:
-				session.teamID = FantasyTeam.get(id=form.teamID).id
+				session.teamid = FantasyTeam.get(id=form.teamID).id
 			except:
 				pass
 		if hasattr(session, 'teamID'):
-			print 'current team', session.teamID
+			print 'current team', session.teamid
+
 		# return my possible teams
 		teams = []
 		user = FantasyOwner.get(id=session.userid)
@@ -143,7 +176,7 @@ class Myteams():
 			teams.append((team.name, team.id))
 		print teams
 		try:
-			teamID = session.teamID
+			teamID = session.teamid
 		except AttributeError:
 			teamID = None
 
@@ -156,7 +189,7 @@ class Roster():
 			raise web.seeother('/login')
 
 		try:
-			myTeam = FantasyTeam.get(id=session.teamID)
+			myTeam = FantasyTeam.get(id=session.teamid)
 		except:
 			return render.roster('')
 
@@ -185,18 +218,32 @@ class Swimmers():
 		# refresh page to show updates, return error?
 		return self.GET()
 
-
+# create new league or join existing league
 class Joinleague():
 	def GET(self):
 		if not logged():
 			raise web.seeother('/login')
 
-		form = web.input()
-		league = FantasyConference.get()
-		return render.joinleague([(league.name, league.id)])
+		leagues = []
+		for conf in FantasyConference.select():
+			leagues.append((conf.name, conf.id))
+		return render.joinleague(leagues)
 
 	def POST(self):
-		form = web.input(leagueid=None, division=None, conference=None, gender=None, teamname=None, join=None)
+		form = web.input(leagueid=None, division=None, conference=None, gender=None, teamname=None, join=None, newleaguename=None)
+
+		# new conference
+		if form.newleaguename:
+			try:
+				newLeague = FantasyConference(name=form.newleaguename, gender=form.gender, division=form.division, conference=form.conference)
+				newLeague.save()
+				newLeague.addSwimmers()
+				print 'new league'
+			except:
+				leagues = []
+				for league in FantasyConference.select():
+					leagues.append(league.name, league.id)
+				return render.joinleague(league)
 
 		# join existing conference
 		if form.teamname and form.join and form.leagueid:
@@ -214,7 +261,6 @@ class Joinleague():
 					leagues.append(league.name, league.id)
 				return render.joinleague(league)
 
-		# TODO still need to handle creating a new conference
 
 class Matchup():
 	def GET(self):
@@ -229,14 +275,14 @@ class Matchup():
 			meet_html = showMeet(meet.scoreString())
 			team_scores_html = showTeamScores(meet.scoreReport())
 			score_breakdown = showScores(meet.scoreString())
+			scores = meet.scoreString(showNum=25)
 		else:
 			meet_html = ''
+
 		if bench:
 			bench_html = showMeet(bench.scoreString(showScores=False))
 		else:
 			bench_html = ''
-
-			scores = meet.scoreString(showNum=25)
 
 		return render.matchup(months, meet_html, bench_html, team_scores_html, score_breakdown)
 
@@ -286,7 +332,9 @@ class Login():
 
 			# default their first fantasy team if they have one
 			try:
+				print user.id
 				session.teamid = FantasyTeam.get(owner=user.id).id
+				print session.teamid
 			except FantasyTeam.DoesNotExist:
 				pass
 			raise web.seeother('/myteams')
@@ -296,6 +344,11 @@ class Login():
 			return render.login()
 
 
+class Standings():
+	def GET(self):
+		return render.standings('work in progress')
+
+# show page for stats for a single swimmer
 class Swimmerstats():
 	def GET(self, swimmerid):
 		swimmer = Swimmer.get(id=swimmerid)
